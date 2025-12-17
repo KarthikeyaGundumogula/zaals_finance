@@ -1,4 +1,4 @@
-# User Stories for Capital Layer Protocol Staking Vault
+# User Stories for Zaals Finance
 
 ## **Actors**
 1. Node Operator - create vaults

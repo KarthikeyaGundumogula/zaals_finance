@@ -57,22 +57,13 @@ pub struct ClosePosition<'info> {
     #[account(
         address = vault.nft_collection @ PositionError::InvalidCollection
     )]
-    pub collection: UncheckedAccount<'info,>,
+    pub collection: UncheckedAccount<'info>,
 
-    /// Locking token mint
     #[account(
         mint::token_program = token_program,
         address = vault.locking_token_mint @ TokenError::InvalidLockingMint
     )]
     pub lock_mint: InterfaceAccount<'info, Mint>,
-
-    /// Reward token mint
-    #[account(
-        mint::token_program = token_program,
-        address = vault.locking_token_mint @ TokenError::InvalidRewardMint
-    )]
-    pub reward_mint: InterfaceAccount<'info, Mint>,
-
     #[account(
         mut,
         associated_token::mint = lock_mint,
@@ -80,15 +71,6 @@ pub struct ClosePosition<'info> {
         associated_token::token_program = token_program
     )]
     pub vault_lock_ata: InterfaceAccount<'info, TokenAccount>,
-
-    #[account(
-        mut,
-        associated_token::mint = lock_mint,
-        associated_token::authority = vault,
-        associated_token::token_program = token_program
-    )]
-    pub vault_reward_ata: InterfaceAccount<'info, TokenAccount>,
-
     #[account(
         mut,
         associated_token::mint = lock_mint,
@@ -96,14 +78,6 @@ pub struct ClosePosition<'info> {
         associated_token::token_program = token_program
     )]
     pub capital_provider_lock_ata: InterfaceAccount<'info, TokenAccount>,
-
-    #[account(
-        mut,
-        associated_token::mint = lock_mint,
-        associated_token::authority = position_holder,
-        associated_token::token_program = token_program
-    )]
-    pub capital_provider_reward_ata: InterfaceAccount<'info, TokenAccount>,
 
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -145,7 +119,24 @@ impl<'info> ClosePosition<'info> {
         Ok(claimable)
     }
 
-    pub fn process_transfers(&self) -> Result<()> {
+    fn transfer_capital(&self, amount: u64) -> Result<()> {
+        let cpi_accounts = TransferChecked {
+            from: self.vault_lock_ata.to_account_info(),
+            to: self.capital_provider_lock_ata.to_account_info(),
+            authority: self.vault.to_account_info(),
+            mint: self.lock_mint.to_account_info(),
+        };
+        let operator = self.vault.node_operator.key();
+        let seeds = &[b"Vault", operator.as_ref(), &[self.vault.bump]];
+        let signer = &[&seeds[..]];
+        let cpi_program = self.token_program.to_account_info();
+        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
+        transfer_checked(cpi_ctx, amount, self.lock_mint.decimals)
+    }
+
+    pub fn validate_closing_process_unlock(&mut self) -> Result<()> {
+        let claimable_rewards = self.calculate_claimable_rewards()?;
+        require_gte!(0, claimable_rewards, PositionError::PositionIsNotEmpty);
         let clock = Clock::get()?;
         let lock_starts_at = self.vault.lock_phase_start_at;
         let lock_ends_at = lock_starts_at + self.vault.lock_phase_duration;
@@ -163,40 +154,7 @@ impl<'info> ClosePosition<'info> {
                 self.position.total_value_locked * capital_after_slashing / total_capital_collected;
         }
         self.transfer_capital(position_capital)?;
-        let claimable_rewards = self.calculate_claimable_rewards()?;
-        if claimable_rewards > 0 {
-            self.transfer_rewards(claimable_rewards)?;
-        }
         Ok(())
-    }
-    fn transfer_capital(&self, amount: u64) -> Result<()> {
-        let cpi_accounts = TransferChecked {
-            from: self.vault_lock_ata.to_account_info(),
-            to: self.capital_provider_lock_ata.to_account_info(),
-            authority: self.vault.to_account_info(),
-            mint: self.lock_mint.to_account_info(),
-        };
-        let operator = self.vault.node_operator.key();
-        let seeds = &[b"Vault", operator.as_ref(), &[self.vault.bump]];
-        let signer = &[&seeds[..]];
-        let cpi_program = self.token_program.to_account_info();
-        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
-        transfer_checked(cpi_ctx, amount, self.lock_mint.decimals)
-    }
-
-    fn transfer_rewards(&self, amount: u64) -> Result<()> {
-        let cpi_accounts = TransferChecked {
-            from: self.vault_reward_ata.to_account_info(),
-            to: self.capital_provider_reward_ata.to_account_info(), // change this NFT holder ATA
-            authority: self.vault.to_account_info(),
-            mint: self.reward_mint.to_account_info(),
-        };
-        let operator = self.vault.node_operator.key();
-        let seeds = &[b"Vault", operator.as_ref(), &[self.vault.bump]];
-        let signer = &[&seeds[..]];
-        let cpi_program = self.token_program.to_account_info();
-        let cpi_ctx = CpiContext::new_with_signer(cpi_program, cpi_accounts, signer);
-        transfer_checked(cpi_ctx, amount, self.reward_mint.decimals)
     }
 
     pub fn burn_nft(&mut self) -> Result<()> {

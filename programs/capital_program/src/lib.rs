@@ -1,3 +1,4 @@
+#![allow(deprecated)]
 use anchor_lang::prelude::*;
 
 declare_id!("DW9BXusirecGep9k5FXFDALYiY1HPtBpVWwPJ36ZD8KZ");
@@ -250,7 +251,7 @@ pub mod capital_program {
     }
 
     pub fn close_position_handler(ctx: Context<ClosePosition>) -> Result<()> {
-        ctx.accounts.process_transfers()?;
+        ctx.accounts.validate_closing_process_unlock()?;
         ctx.accounts.burn_nft()?;
         msg!("Position closed successfully");
         emit!(PositionClosedEvent {

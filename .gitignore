@@ -7,3 +7,7 @@ test-ledger
 .yarn
 provider-wallet.json
 staker-wallet.json
+.prettierignore
+.arch.drawio
+.*
+notes.md

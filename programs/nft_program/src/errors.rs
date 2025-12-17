@@ -3,13 +3,13 @@ use anchor_lang::prelude::*;
 #[error_code]
 pub enum ExteranlProgramError {
     #[msg("mpl_core_program passed in accounts didn't match")]
-    InvalidMPLCoreProgramId
+    InvalidMPLCoreProgramId,
 }
 
 #[error_code]
 pub enum SignerError {
     #[msg("Signer must be the owner or delgator of the asset")]
-    InvalidAssetOwner
+    InvalidAssetOwner,
 }
 
 #[error_code]

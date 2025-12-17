@@ -17,12 +17,12 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-generate-clients = "yarn ts-node ./scripts/generate-clients.ts"
+generate-clients = "bash codama/generate-clients.sh"
 localnet = "solana-test-validator -r --bpf-program CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d core.so"
 open = "npx ts-node ./scripts/open-vault.ts"
 stake = "npx ts-node ./scripts/stake.ts"
 depositRewards = "npx ts-node ./scripts/depositRewards.ts"
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 \"tests/**/*.ts\""
+test = "cargo test"
 
 [test]
 startup_wait = 20000

@@ -1,14 +1,14 @@
-#[allow(deprecated)]
+#![allow(deprecated)]
 use anchor_lang::prelude::*;
 declare_id!("3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh");
 
 pub mod errors;
+pub mod events;
 pub mod instructions;
 pub mod state;
-pub mod events;
 
-use instructions::*;
 use events::*;
+use instructions::*;
 
 #[program]
 pub mod nft_program {
@@ -49,8 +49,13 @@ pub mod nft_program {
         Ok(())
     }
 
-    pub fn list_asset_handler(ctx: Context<ListPosition>,price:u64,paying_token_mint:Pubkey) -> Result<()> {
-        ctx.accounts.create_offer(price, paying_token_mint, ctx.bumps)?;
+    pub fn list_asset_handler(
+        ctx: Context<ListPosition>,
+        price: u64,
+        paying_token_mint: Pubkey,
+    ) -> Result<()> {
+        ctx.accounts
+            .create_offer(price, paying_token_mint, ctx.bumps)?;
         ctx.accounts.lock_asset()?;
         msg!("Asset listed for sale");
         emit!(OfferCreatedEvent {

@@ -62,11 +62,11 @@ pub struct BuyPosition<'info> {
 
 impl<'info> BuyPosition<'info> {
     pub fn transfer_tokens(&mut self) -> Result<()> {
-        let transfer_accounts = TransferChecked{
-            from:self.buyer_ata.to_account_info(),
-            to:self.seller_ata.to_account_info(),
-            mint:self.token_mint.to_account_info(),
-            authority:self.seller.to_account_info()
+        let transfer_accounts = TransferChecked {
+            from: self.buyer_ata.to_account_info(),
+            to: self.seller_ata.to_account_info(),
+            mint: self.token_mint.to_account_info(),
+            authority: self.seller.to_account_info(),
         };
         let cpi_ctx = CpiContext::new(self.token_program.to_account_info(), transfer_accounts);
         transfer_checked(cpi_ctx, self.offer.price, self.token_mint.decimals)?;

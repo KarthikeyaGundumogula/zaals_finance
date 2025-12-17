@@ -28,10 +28,10 @@ pub struct UnlistPosition<'info> {
 
 impl<'info> UnlistPosition<'info> {
     pub fn unlock_asset(&mut self) -> Result<()> {
-       let offer_seed = b"Offer";
-       let asset_key = self.asset.key();
-       let bump_seed = [self.offer.bump];
-       let seeds = &[offer_seed.as_ref(), asset_key.as_ref(), bump_seed.as_ref()];
+        let offer_seed = b"Offer";
+        let asset_key = self.asset.key();
+        let bump_seed = [self.offer.bump];
+        let seeds = &[offer_seed.as_ref(), asset_key.as_ref(), bump_seed.as_ref()];
         let signers = &[&seeds[..]];
         TransferV1CpiBuilder::new(&self.mpl_core_program.to_account_info())
             .asset(&self.asset.to_account_info())

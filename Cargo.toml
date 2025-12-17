@@ -12,3 +12,36 @@ codegen-units = 1
 opt-level = 3
 incremental = false
 codegen-units = 1
+
+[package]
+name = "zaals_finance"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+
+[dependencies]
+anchor-lang = "0.31.1"
+anchor-spl = "0.31.1"
+solana-kite = "0.2.1"
+solana-signer = "3.0.0"
+
+[[test]]
+name = "nft-program"
+path = "tests/nft_program.rs"
+
+[dev-dependencies]
+anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
+litesvm = "0.8.2"
+solana-sdk = "3.0.0"
+solana-pubkey = "4.0.0"
+zaals-finance-client = {path = "codama/clients/rust"}
+
+
+
