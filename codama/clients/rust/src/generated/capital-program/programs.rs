@@ -9,5 +9,5 @@ use solana_pubkey::{pubkey, Pubkey};
 
 
   /// `capital_program` program ID.
-  pub const CAPITAL_PROGRAM_ID: Pubkey = pubkey!("DW9BXusirecGep9k5FXFDALYiY1HPtBpVWwPJ36ZD8KZ");
+  pub const CAPITAL_PROGRAM_ID: Pubkey = pubkey!("8syRdGBunFUWZzkgGigv1KWcTEhxPkc15DMVXEYj9qVn");
 

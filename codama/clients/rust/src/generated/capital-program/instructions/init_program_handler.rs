@@ -128,7 +128,7 @@ impl InitProgramHandlerInstructionArgs {
                 ///   0. `[writable]` config
           ///   1. `[]` nft_config
                       ///   2. `[writable, signer]` admin
-                ///   3. `[optional]` nft_program (default to `3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh`)
+                ///   3. `[optional]` nft_program (default to `AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH`)
                 ///   4. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct InitProgramHandlerBuilder {
@@ -167,7 +167,7 @@ impl InitProgramHandlerBuilder {
                         self.admin = Some(admin);
                     self
     }
-            /// `[optional account, default to '3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh']`
+            /// `[optional account, default to 'AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH']`
 /// NFT marketplace program
 #[inline(always)]
     pub fn nft_program(&mut self, nft_program: solana_pubkey::Pubkey) -> &mut Self {
@@ -223,7 +223,7 @@ impl InitProgramHandlerBuilder {
                               config: self.config.expect("config is not set"),
                                         nft_config: self.nft_config.expect("nft_config is not set"),
                                         admin: self.admin.expect("admin is not set"),
-                                        nft_program: self.nft_program.unwrap_or(solana_pubkey::pubkey!("3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh")),
+                                        nft_program: self.nft_program.unwrap_or(solana_pubkey::pubkey!("AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH")),
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
                       };
           let args = InitProgramHandlerInstructionArgs {

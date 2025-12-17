@@ -6,7 +6,7 @@ pub use generated::capital_program::*;
 
 pub mod nft_program {
     pub use super::generated::nft_program::*;
-  }
+}
 
 pub mod capital_program {
     pub use super::generated::capital_program::*;

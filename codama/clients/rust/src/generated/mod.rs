@@ -5,5 +5,6 @@ pub(crate) mod capital_program;
 pub(crate) mod nft_program;
 
 pub mod types {
-    pub use super::capital_program::types::Beneficiary;
+    pub use super::capital_program::types::*;
+    pub use super::nft_program::types::UpdateAuthority;
 }

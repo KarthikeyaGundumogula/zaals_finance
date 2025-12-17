@@ -56,7 +56,7 @@ export type InitProgramHandlerInstruction<
   TAccountNftConfig extends string | AccountMeta<string> = string,
   TAccountAdmin extends string | AccountMeta<string> = string,
   TAccountNftProgram extends string | AccountMeta<string> =
-    "3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh",
+    "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH",
   TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
@@ -229,7 +229,7 @@ export async function getInitProgramHandlerInstructionAsync<
   }
   if (!accounts.nftProgram.value) {
     accounts.nftProgram.value =
-      "3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh" as Address<"3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh">;
+      "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH" as Address<"AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH">;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
@@ -329,7 +329,7 @@ export function getInitProgramHandlerInstruction<
   // Resolve default values.
   if (!accounts.nftProgram.value) {
     accounts.nftProgram.value =
-      "3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh" as Address<"3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh">;
+      "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH" as Address<"AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH">;
   }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =

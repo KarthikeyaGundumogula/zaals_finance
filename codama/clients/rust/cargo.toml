@@ -5,7 +5,7 @@ edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "zaals_finanace_client"
+name = "zaals_finance_client"
 
 [features]
 default = []

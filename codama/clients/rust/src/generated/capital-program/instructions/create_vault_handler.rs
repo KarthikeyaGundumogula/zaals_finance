@@ -197,7 +197,7 @@ impl CreateVaultHandlerInstructionArgs {
                 ///   7. `[optional]` token_program (default to `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`)
                 ///   8. `[optional]` associated_token_program (default to `ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL`)
                 ///   9. `[optional]` mpl_core_program (default to `CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d`)
-                ///   10. `[optional]` nft_marketplace (default to `3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh`)
+                ///   10. `[optional]` nft_marketplace (default to `AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH`)
                 ///   11. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct CreateVaultHandlerBuilder {
@@ -291,7 +291,7 @@ impl CreateVaultHandlerBuilder {
                         self.mpl_core_program = Some(mpl_core_program);
                     self
     }
-            /// `[optional account, default to '3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh']`
+            /// `[optional account, default to 'AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH']`
 #[inline(always)]
     pub fn nft_marketplace(&mut self, nft_marketplace: solana_pubkey::Pubkey) -> &mut Self {
                         self.nft_marketplace = Some(nft_marketplace);
@@ -383,7 +383,7 @@ impl CreateVaultHandlerBuilder {
                                         token_program: self.token_program.unwrap_or(solana_pubkey::pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")),
                                         associated_token_program: self.associated_token_program.unwrap_or(solana_pubkey::pubkey!("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")),
                                         mpl_core_program: self.mpl_core_program.unwrap_or(solana_pubkey::pubkey!("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")),
-                                        nft_marketplace: self.nft_marketplace.unwrap_or(solana_pubkey::pubkey!("3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh")),
+                                        nft_marketplace: self.nft_marketplace.unwrap_or(solana_pubkey::pubkey!("AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH")),
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
                       };
           let args = CreateVaultHandlerInstructionArgs {

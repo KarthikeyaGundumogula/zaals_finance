@@ -6,8 +6,8 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-nft_program = "3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh"
-capital_program = "DW9BXusirecGep9k5FXFDALYiY1HPtBpVWwPJ36ZD8KZ"
+capital_program = "8syRdGBunFUWZzkgGigv1KWcTEhxPkc15DMVXEYj9qVn"
+nft_program = "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH"
 
 [registry]
 url = "https://api.apr.dev"
@@ -17,11 +17,11 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
+depositRewards = "npx ts-node ./scripts/depositRewards.ts"
 generate-clients = "bash codama/generate-clients.sh"
 localnet = "solana-test-validator -r --bpf-program CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d core.so"
 open = "npx ts-node ./scripts/open-vault.ts"
 stake = "npx ts-node ./scripts/stake.ts"
-depositRewards = "npx ts-node ./scripts/depositRewards.ts"
 test = "cargo test"
 
 [test]

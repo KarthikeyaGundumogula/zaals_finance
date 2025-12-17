@@ -28,7 +28,7 @@ import {
 } from "../instructions";
 
 export const CAPITAL_PROGRAM_PROGRAM_ADDRESS =
-  "DW9BXusirecGep9k5FXFDALYiY1HPtBpVWwPJ36ZD8KZ" as Address<"DW9BXusirecGep9k5FXFDALYiY1HPtBpVWwPJ36ZD8KZ">;
+  "8syRdGBunFUWZzkgGigv1KWcTEhxPkc15DMVXEYj9qVn" as Address<"8syRdGBunFUWZzkgGigv1KWcTEhxPkc15DMVXEYj9qVn">;
 
 export enum CapitalProgramAccount {
   AuthorityConfig,
@@ -245,7 +245,7 @@ export function identifyCapitalProgramInstruction(
 }
 
 export type ParsedCapitalProgramInstruction<
-  TProgram extends string = "DW9BXusirecGep9k5FXFDALYiY1HPtBpVWwPJ36ZD8KZ",
+  TProgram extends string = "8syRdGBunFUWZzkgGigv1KWcTEhxPkc15DMVXEYj9qVn",
 > =
   | ({
       instructionType: CapitalProgramInstruction.ClaimBeneficiaryRewardsHandler;

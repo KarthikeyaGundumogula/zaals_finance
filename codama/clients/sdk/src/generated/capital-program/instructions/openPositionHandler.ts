@@ -68,7 +68,7 @@ export type OpenPositionHandlerInstruction<
   TAccountMplCoreProgram extends string | AccountMeta<string> =
     "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
   TAccountNftProgram extends string | AccountMeta<string> =
-    "3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh",
+    "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH",
   TAccountAssociatedTokenProgram extends string | AccountMeta<string> =
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
   TAccountSystemProgram extends string | AccountMeta<string> =
@@ -369,7 +369,7 @@ export async function getOpenPositionHandlerInstructionAsync<
   }
   if (!accounts.nftProgram.value) {
     accounts.nftProgram.value =
-      "3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh" as Address<"3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh">;
+      "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH" as Address<"AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH">;
   }
   if (!accounts.associatedTokenProgram.value) {
     accounts.associatedTokenProgram.value =
@@ -575,7 +575,7 @@ export function getOpenPositionHandlerInstruction<
   }
   if (!accounts.nftProgram.value) {
     accounts.nftProgram.value =
-      "3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh" as Address<"3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh">;
+      "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH" as Address<"AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH">;
   }
   if (!accounts.associatedTokenProgram.value) {
     accounts.associatedTokenProgram.value =

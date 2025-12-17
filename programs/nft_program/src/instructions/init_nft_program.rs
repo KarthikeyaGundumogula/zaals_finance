@@ -8,7 +8,7 @@ pub struct InitNFTProgram<'info> {
     seeds = [b"nft_config"],
     bump,
     payer = admin,
-    space = NFTConfig::INIT_SPACE
+    space = NFTConfig::INIT_SPACE + 8
   )]
     pub config: Account<'info, NFTConfig>,
     #[account(mut)]

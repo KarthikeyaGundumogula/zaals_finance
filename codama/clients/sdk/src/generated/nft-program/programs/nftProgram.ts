@@ -23,7 +23,7 @@ import {
 } from "../instructions";
 
 export const NFT_PROGRAM_PROGRAM_ADDRESS =
-  "3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh" as Address<"3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh">;
+  "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH" as Address<"AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH">;
 
 export enum NftProgramAccount {
   BaseAssetV1,
@@ -156,7 +156,7 @@ export function identifyNftProgramInstruction(
 }
 
 export type ParsedNftProgramInstruction<
-  TProgram extends string = "3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh",
+  TProgram extends string = "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH",
 > =
   | ({
       instructionType: NftProgramInstruction.BurnAsset;

@@ -186,7 +186,7 @@ impl Default for ClosePositionHandlerInstructionData {
                 ///   9. `[optional]` token_program (default to `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`)
                 ///   10. `[optional]` associated_token_program (default to `ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL`)
                 ///   11. `[optional]` mpl_core_program (default to `CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d`)
-                ///   12. `[optional]` nft_program (default to `3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh`)
+                ///   12. `[optional]` nft_program (default to `AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH`)
                 ///   13. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct ClosePositionHandlerBuilder {
@@ -280,7 +280,7 @@ impl ClosePositionHandlerBuilder {
                         self.mpl_core_program = Some(mpl_core_program);
                     self
     }
-            /// `[optional account, default to '3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh']`
+            /// `[optional account, default to 'AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH']`
 #[inline(always)]
     pub fn nft_program(&mut self, nft_program: solana_pubkey::Pubkey) -> &mut Self {
                         self.nft_program = Some(nft_program);
@@ -319,7 +319,7 @@ impl ClosePositionHandlerBuilder {
                                         token_program: self.token_program.unwrap_or(solana_pubkey::pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")),
                                         associated_token_program: self.associated_token_program.unwrap_or(solana_pubkey::pubkey!("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")),
                                         mpl_core_program: self.mpl_core_program.unwrap_or(solana_pubkey::pubkey!("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")),
-                                        nft_program: self.nft_program.unwrap_or(solana_pubkey::pubkey!("3kLob38A4tG8m3fP9ZZwSWsjdr417DjQZ4bkqxGFjaUh")),
+                                        nft_program: self.nft_program.unwrap_or(solana_pubkey::pubkey!("AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH")),
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
                       };
     
