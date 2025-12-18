@@ -8,65 +8,58 @@
 use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
 
-pub const CREATE_VAULT_COLLECTION_DISCRIMINATOR: [u8; 8] = [162, 166, 28, 199, 66, 238, 251, 28];
+pub const BURN_ASSET_HANDLER_DISCRIMINATOR: [u8; 8] = [184, 55, 221, 84, 149, 186, 37, 1];
 
 /// Accounts.
 #[derive(Debug)]
-pub struct CreateVaultCollection {
+pub struct BurnAssetHandler {
       
+              
+          pub holder: solana_pubkey::Pubkey,
+          
+              
+          pub asset: solana_pubkey::Pubkey,
+          
+              
+          pub system_program: solana_pubkey::Pubkey,
+          
               
           pub collection: solana_pubkey::Pubkey,
           
               
-          pub update_authority: solana_pubkey::Pubkey,
-          
-              
-          pub config: solana_pubkey::Pubkey,
-          
-              
-          pub payer: solana_pubkey::Pubkey,
-          
-              
           pub mpl_core_program: solana_pubkey::Pubkey,
-          
-              
-          pub system_program: solana_pubkey::Pubkey,
       }
 
-impl CreateVaultCollection {
+impl BurnAssetHandler {
   pub fn instruction(&self) -> solana_instruction::Instruction {
     self.instruction_with_remaining_accounts(&[])
   }
   #[allow(clippy::arithmetic_side_effects)]
   #[allow(clippy::vec_init_then_push)]
   pub fn instruction_with_remaining_accounts(&self, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
-    let mut accounts = Vec::with_capacity(6+ remaining_accounts.len());
+    let mut accounts = Vec::with_capacity(5+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
-            self.collection,
+            self.holder,
             true
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
-            self.update_authority,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            self.config,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new(
-            self.payer,
-            true
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            self.mpl_core_program,
+            self.asset,
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.system_program,
             false
           ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+            self.collection,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+            self.mpl_core_program,
+            false
+          ));
                       accounts.extend_from_slice(remaining_accounts);
-    let data = CreateVaultCollectionInstructionData::new().try_to_vec().unwrap();
+    let data = BurnAssetHandlerInstructionData::new().try_to_vec().unwrap();
     
     solana_instruction::Instruction {
       program_id: crate::NFT_PROGRAM_ID,
@@ -78,14 +71,14 @@ impl CreateVaultCollection {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct CreateVaultCollectionInstructionData {
+ pub struct BurnAssetHandlerInstructionData {
             discriminator: [u8; 8],
       }
 
-impl CreateVaultCollectionInstructionData {
+impl BurnAssetHandlerInstructionData {
   pub fn new() -> Self {
     Self {
-                        discriminator: [162, 166, 28, 199, 66, 238, 251, 28],
+                        discriminator: [184, 55, 221, 84, 149, 186, 37, 1],
                   }
   }
 
@@ -94,7 +87,7 @@ impl CreateVaultCollectionInstructionData {
   }
   }
 
-impl Default for CreateVaultCollectionInstructionData {
+impl Default for BurnAssetHandlerInstructionData {
   fn default() -> Self {
     Self::new()
   }
@@ -102,61 +95,54 @@ impl Default for CreateVaultCollectionInstructionData {
 
 
 
-/// Instruction builder for `CreateVaultCollection`.
+/// Instruction builder for `BurnAssetHandler`.
 ///
 /// ### Accounts:
 ///
-                      ///   0. `[writable, signer]` collection
-          ///   1. `[]` update_authority
-          ///   2. `[]` config
-                      ///   3. `[writable, signer]` payer
+                      ///   0. `[writable, signer]` holder
+          ///   1. `[]` asset
+                ///   2. `[optional]` system_program (default to `11111111111111111111111111111111`)
+          ///   3. `[]` collection
                 ///   4. `[optional]` mpl_core_program (default to `CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d`)
-                ///   5. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
-pub struct CreateVaultCollectionBuilder {
-            collection: Option<solana_pubkey::Pubkey>,
-                update_authority: Option<solana_pubkey::Pubkey>,
-                config: Option<solana_pubkey::Pubkey>,
-                payer: Option<solana_pubkey::Pubkey>,
-                mpl_core_program: Option<solana_pubkey::Pubkey>,
+pub struct BurnAssetHandlerBuilder {
+            holder: Option<solana_pubkey::Pubkey>,
+                asset: Option<solana_pubkey::Pubkey>,
                 system_program: Option<solana_pubkey::Pubkey>,
+                collection: Option<solana_pubkey::Pubkey>,
+                mpl_core_program: Option<solana_pubkey::Pubkey>,
                 __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
-impl CreateVaultCollectionBuilder {
+impl BurnAssetHandlerBuilder {
   pub fn new() -> Self {
     Self::default()
   }
             #[inline(always)]
-    pub fn collection(&mut self, collection: solana_pubkey::Pubkey) -> &mut Self {
-                        self.collection = Some(collection);
+    pub fn holder(&mut self, holder: solana_pubkey::Pubkey) -> &mut Self {
+                        self.holder = Some(holder);
                     self
     }
             #[inline(always)]
-    pub fn update_authority(&mut self, update_authority: solana_pubkey::Pubkey) -> &mut Self {
-                        self.update_authority = Some(update_authority);
-                    self
-    }
-            #[inline(always)]
-    pub fn config(&mut self, config: solana_pubkey::Pubkey) -> &mut Self {
-                        self.config = Some(config);
-                    self
-    }
-            #[inline(always)]
-    pub fn payer(&mut self, payer: solana_pubkey::Pubkey) -> &mut Self {
-                        self.payer = Some(payer);
-                    self
-    }
-            /// `[optional account, default to 'CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d']`
-#[inline(always)]
-    pub fn mpl_core_program(&mut self, mpl_core_program: solana_pubkey::Pubkey) -> &mut Self {
-                        self.mpl_core_program = Some(mpl_core_program);
+    pub fn asset(&mut self, asset: solana_pubkey::Pubkey) -> &mut Self {
+                        self.asset = Some(asset);
                     self
     }
             /// `[optional account, default to '11111111111111111111111111111111']`
 #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_pubkey::Pubkey) -> &mut Self {
                         self.system_program = Some(system_program);
+                    self
+    }
+            #[inline(always)]
+    pub fn collection(&mut self, collection: solana_pubkey::Pubkey) -> &mut Self {
+                        self.collection = Some(collection);
+                    self
+    }
+            /// `[optional account, default to 'CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d']`
+#[inline(always)]
+    pub fn mpl_core_program(&mut self, mpl_core_program: solana_pubkey::Pubkey) -> &mut Self {
+                        self.mpl_core_program = Some(mpl_core_program);
                     self
     }
             /// Add an additional account to the instruction.
@@ -173,78 +159,70 @@ impl CreateVaultCollectionBuilder {
   }
   #[allow(clippy::clone_on_copy)]
   pub fn instruction(&self) -> solana_instruction::Instruction {
-    let accounts = CreateVaultCollection {
-                              collection: self.collection.expect("collection is not set"),
-                                        update_authority: self.update_authority.expect("update_authority is not set"),
-                                        config: self.config.expect("config is not set"),
-                                        payer: self.payer.expect("payer is not set"),
-                                        mpl_core_program: self.mpl_core_program.unwrap_or(solana_pubkey::pubkey!("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")),
+    let accounts = BurnAssetHandler {
+                              holder: self.holder.expect("holder is not set"),
+                                        asset: self.asset.expect("asset is not set"),
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
+                                        collection: self.collection.expect("collection is not set"),
+                                        mpl_core_program: self.mpl_core_program.unwrap_or(solana_pubkey::pubkey!("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")),
                       };
     
     accounts.instruction_with_remaining_accounts(&self.__remaining_accounts)
   }
 }
 
-  /// `create_vault_collection` CPI accounts.
-  pub struct CreateVaultCollectionCpiAccounts<'a, 'b> {
+  /// `burn_asset_handler` CPI accounts.
+  pub struct BurnAssetHandlerCpiAccounts<'a, 'b> {
           
+                    
+              pub holder: &'b solana_account_info::AccountInfo<'a>,
+                
+                    
+              pub asset: &'b solana_account_info::AccountInfo<'a>,
+                
+                    
+              pub system_program: &'b solana_account_info::AccountInfo<'a>,
+                
                     
               pub collection: &'b solana_account_info::AccountInfo<'a>,
                 
                     
-              pub update_authority: &'b solana_account_info::AccountInfo<'a>,
-                
-                    
-              pub config: &'b solana_account_info::AccountInfo<'a>,
-                
-                    
-              pub payer: &'b solana_account_info::AccountInfo<'a>,
-                
-                    
               pub mpl_core_program: &'b solana_account_info::AccountInfo<'a>,
-                
-                    
-              pub system_program: &'b solana_account_info::AccountInfo<'a>,
             }
 
-/// `create_vault_collection` CPI instruction.
-pub struct CreateVaultCollectionCpi<'a, 'b> {
+/// `burn_asset_handler` CPI instruction.
+pub struct BurnAssetHandlerCpi<'a, 'b> {
   /// The program to invoke.
   pub __program: &'b solana_account_info::AccountInfo<'a>,
       
               
-          pub collection: &'b solana_account_info::AccountInfo<'a>,
+          pub holder: &'b solana_account_info::AccountInfo<'a>,
           
               
-          pub update_authority: &'b solana_account_info::AccountInfo<'a>,
-          
-              
-          pub config: &'b solana_account_info::AccountInfo<'a>,
-          
-              
-          pub payer: &'b solana_account_info::AccountInfo<'a>,
-          
-              
-          pub mpl_core_program: &'b solana_account_info::AccountInfo<'a>,
+          pub asset: &'b solana_account_info::AccountInfo<'a>,
           
               
           pub system_program: &'b solana_account_info::AccountInfo<'a>,
+          
+              
+          pub collection: &'b solana_account_info::AccountInfo<'a>,
+          
+              
+          pub mpl_core_program: &'b solana_account_info::AccountInfo<'a>,
         }
 
-impl<'a, 'b> CreateVaultCollectionCpi<'a, 'b> {
+impl<'a, 'b> BurnAssetHandlerCpi<'a, 'b> {
   pub fn new(
     program: &'b solana_account_info::AccountInfo<'a>,
-          accounts: CreateVaultCollectionCpiAccounts<'a, 'b>,
+          accounts: BurnAssetHandlerCpiAccounts<'a, 'b>,
           ) -> Self {
     Self {
       __program: program,
-              collection: accounts.collection,
-              update_authority: accounts.update_authority,
-              config: accounts.config,
-              payer: accounts.payer,
-              mpl_core_program: accounts.mpl_core_program,
+              holder: accounts.holder,
+              asset: accounts.asset,
               system_program: accounts.system_program,
+              collection: accounts.collection,
+              mpl_core_program: accounts.mpl_core_program,
                 }
   }
   #[inline(always)]
@@ -267,29 +245,25 @@ impl<'a, 'b> CreateVaultCollectionCpi<'a, 'b> {
     signers_seeds: &[&[&[u8]]],
     remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)]
   ) -> solana_program_error::ProgramResult {
-    let mut accounts = Vec::with_capacity(6+ remaining_accounts.len());
+    let mut accounts = Vec::with_capacity(5+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
-            *self.collection.key,
+            *self.holder.key,
             true
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
-            *self.update_authority.key,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            *self.config.key,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new(
-            *self.payer.key,
-            true
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            *self.mpl_core_program.key,
+            *self.asset.key,
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.system_program.key,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+            *self.collection.key,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+            *self.mpl_core_program.key,
             false
           ));
                       remaining_accounts.iter().for_each(|remaining_account| {
@@ -299,21 +273,20 @@ impl<'a, 'b> CreateVaultCollectionCpi<'a, 'b> {
           is_writable: remaining_account.2,
       })
     });
-    let data = CreateVaultCollectionInstructionData::new().try_to_vec().unwrap();
+    let data = BurnAssetHandlerInstructionData::new().try_to_vec().unwrap();
     
     let instruction = solana_instruction::Instruction {
       program_id: crate::NFT_PROGRAM_ID,
       accounts,
       data,
     };
-    let mut account_infos = Vec::with_capacity(7 + remaining_accounts.len());
+    let mut account_infos = Vec::with_capacity(6 + remaining_accounts.len());
     account_infos.push(self.__program.clone());
-                  account_infos.push(self.collection.clone());
-                        account_infos.push(self.update_authority.clone());
-                        account_infos.push(self.config.clone());
-                        account_infos.push(self.payer.clone());
-                        account_infos.push(self.mpl_core_program.clone());
+                  account_infos.push(self.holder.clone());
+                        account_infos.push(self.asset.clone());
                         account_infos.push(self.system_program.clone());
+                        account_infos.push(self.collection.clone());
+                        account_infos.push(self.mpl_core_program.clone());
               remaining_accounts.iter().for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
     if signers_seeds.is_empty() {
@@ -324,63 +297,56 @@ impl<'a, 'b> CreateVaultCollectionCpi<'a, 'b> {
   }
 }
 
-/// Instruction builder for `CreateVaultCollection` via CPI.
+/// Instruction builder for `BurnAssetHandler` via CPI.
 ///
 /// ### Accounts:
 ///
-                      ///   0. `[writable, signer]` collection
-          ///   1. `[]` update_authority
-          ///   2. `[]` config
-                      ///   3. `[writable, signer]` payer
+                      ///   0. `[writable, signer]` holder
+          ///   1. `[]` asset
+          ///   2. `[]` system_program
+          ///   3. `[]` collection
           ///   4. `[]` mpl_core_program
-          ///   5. `[]` system_program
 #[derive(Clone, Debug)]
-pub struct CreateVaultCollectionCpiBuilder<'a, 'b> {
-  instruction: Box<CreateVaultCollectionCpiBuilderInstruction<'a, 'b>>,
+pub struct BurnAssetHandlerCpiBuilder<'a, 'b> {
+  instruction: Box<BurnAssetHandlerCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> CreateVaultCollectionCpiBuilder<'a, 'b> {
+impl<'a, 'b> BurnAssetHandlerCpiBuilder<'a, 'b> {
   pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
-    let instruction = Box::new(CreateVaultCollectionCpiBuilderInstruction {
+    let instruction = Box::new(BurnAssetHandlerCpiBuilderInstruction {
       __program: program,
-              collection: None,
-              update_authority: None,
-              config: None,
-              payer: None,
-              mpl_core_program: None,
+              holder: None,
+              asset: None,
               system_program: None,
+              collection: None,
+              mpl_core_program: None,
                                 __remaining_accounts: Vec::new(),
     });
     Self { instruction }
   }
+      #[inline(always)]
+    pub fn holder(&mut self, holder: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.holder = Some(holder);
+                    self
+    }
+      #[inline(always)]
+    pub fn asset(&mut self, asset: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.asset = Some(asset);
+                    self
+    }
+      #[inline(always)]
+    pub fn system_program(&mut self, system_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.system_program = Some(system_program);
+                    self
+    }
       #[inline(always)]
     pub fn collection(&mut self, collection: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
                         self.instruction.collection = Some(collection);
                     self
     }
       #[inline(always)]
-    pub fn update_authority(&mut self, update_authority: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.update_authority = Some(update_authority);
-                    self
-    }
-      #[inline(always)]
-    pub fn config(&mut self, config: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.config = Some(config);
-                    self
-    }
-      #[inline(always)]
-    pub fn payer(&mut self, payer: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.payer = Some(payer);
-                    self
-    }
-      #[inline(always)]
     pub fn mpl_core_program(&mut self, mpl_core_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
                         self.instruction.mpl_core_program = Some(mpl_core_program);
-                    self
-    }
-      #[inline(always)]
-    pub fn system_program(&mut self, system_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.system_program = Some(system_program);
                     self
     }
             /// Add an additional account to the instruction.
@@ -405,34 +371,31 @@ impl<'a, 'b> CreateVaultCollectionCpiBuilder<'a, 'b> {
   #[allow(clippy::clone_on_copy)]
   #[allow(clippy::vec_init_then_push)]
   pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-        let instruction = CreateVaultCollectionCpi {
+        let instruction = BurnAssetHandlerCpi {
         __program: self.instruction.__program,
+                  
+          holder: self.instruction.holder.expect("holder is not set"),
+                  
+          asset: self.instruction.asset.expect("asset is not set"),
+                  
+          system_program: self.instruction.system_program.expect("system_program is not set"),
                   
           collection: self.instruction.collection.expect("collection is not set"),
                   
-          update_authority: self.instruction.update_authority.expect("update_authority is not set"),
-                  
-          config: self.instruction.config.expect("config is not set"),
-                  
-          payer: self.instruction.payer.expect("payer is not set"),
-                  
           mpl_core_program: self.instruction.mpl_core_program.expect("mpl_core_program is not set"),
-                  
-          system_program: self.instruction.system_program.expect("system_program is not set"),
                     };
     instruction.invoke_signed_with_remaining_accounts(signers_seeds, &self.instruction.__remaining_accounts)
   }
 }
 
 #[derive(Clone, Debug)]
-struct CreateVaultCollectionCpiBuilderInstruction<'a, 'b> {
+struct BurnAssetHandlerCpiBuilderInstruction<'a, 'b> {
   __program: &'b solana_account_info::AccountInfo<'a>,
-            collection: Option<&'b solana_account_info::AccountInfo<'a>>,
-                update_authority: Option<&'b solana_account_info::AccountInfo<'a>>,
-                config: Option<&'b solana_account_info::AccountInfo<'a>>,
-                payer: Option<&'b solana_account_info::AccountInfo<'a>>,
-                mpl_core_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+            holder: Option<&'b solana_account_info::AccountInfo<'a>>,
+                asset: Option<&'b solana_account_info::AccountInfo<'a>>,
                 system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+                collection: Option<&'b solana_account_info::AccountInfo<'a>>,
+                mpl_core_program: Option<&'b solana_account_info::AccountInfo<'a>>,
                 /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
   __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }

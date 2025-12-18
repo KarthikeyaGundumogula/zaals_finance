@@ -5,7 +5,7 @@ use anchor_lang::prelude::*;
 pub struct InitNFTProgram<'info> {
     #[account(
     init,
-    seeds = [b"nft_config"],
+    seeds = [b"NFT_Config"],
     bump,
     payer = admin,
     space = NFTConfig::INIT_SPACE + 8

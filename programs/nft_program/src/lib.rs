@@ -15,7 +15,10 @@ pub mod nft_program {
 
     use super::*;
 
-    pub fn initialize_program(ctx: Context<InitNFTProgram>, capital_program: Pubkey) -> Result<()> {
+    pub fn init_nft_program_handler(
+        ctx: Context<InitNFTProgram>,
+        capital_program: Pubkey,
+    ) -> Result<()> {
         ctx.accounts.initialize(ctx.bumps, capital_program)?;
         msg!("Program initialized");
         emit!(ProgramInitializedEvent {
@@ -26,7 +29,7 @@ pub mod nft_program {
         Ok(())
     }
 
-    pub fn create_vault_collection(ctx: Context<CreateVaultCollection>) -> Result<()> {
+    pub fn create_vault_collection_handler(ctx: Context<CreateVaultCollection>) -> Result<()> {
         ctx.accounts.create_collection()?;
         msg!("Vault collection created");
         emit!(CollectionCreatedEvent {
@@ -37,7 +40,10 @@ pub mod nft_program {
         Ok(())
     }
 
-    pub fn create_core_asset(ctx: Context<CreateAsset>, args: CreateAssetArgs) -> Result<()> {
+    pub fn create_core_asset_handler(
+        ctx: Context<CreateAsset>,
+        args: CreateAssetArgs,
+    ) -> Result<()> {
         ctx.accounts.create_asset(args)?;
         msg!("Core asset created");
         emit!(AssetMintedEvent {
@@ -76,7 +82,7 @@ pub mod nft_program {
         });
         Ok(())
     }
-    pub fn burn_asset(ctx: Context<BurnAsset>) -> Result<()> {
+    pub fn burn_asset_handler(ctx: Context<BurnAsset>) -> Result<()> {
         ctx.accounts.burn()?;
         msg!("Asset burned");
         emit!(AssetBurnedEvent {

@@ -218,7 +218,7 @@ impl<'info> CreateVault<'info> {
             signer_seeds,
         );
 
-        nft_program::cpi::create_vault_collection(cpi_ctx)?;
+        nft_program::cpi::create_vault_collection_handler(cpi_ctx)?;
 
         Ok(())
     }

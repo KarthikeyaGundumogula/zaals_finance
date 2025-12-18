@@ -214,7 +214,7 @@ impl<'info> OpenPosition<'info> {
             uri: format!("https://api.vault.com/position/{}", self.position.key()),
         };
 
-        nft_program::cpi::create_core_asset(cpi_ctx, args)?;
+        nft_program::cpi::create_core_asset_handler(cpi_ctx, args)?;
 
         Ok(())
     }

@@ -18,7 +18,7 @@ pub mod capital_program {
 
     use super::*;
 
-    pub fn init_program_handler(
+    pub fn init_capital_program_handler(
         ctx: Context<InitProgram>,
         params: InitProgramConfig,
     ) -> Result<()> {

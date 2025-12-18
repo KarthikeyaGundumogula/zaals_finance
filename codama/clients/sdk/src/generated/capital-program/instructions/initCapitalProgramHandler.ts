@@ -40,17 +40,17 @@ import {
 import { CAPITAL_PROGRAM_PROGRAM_ADDRESS } from "../programs";
 import { getAccountMetaFactory, type ResolvedAccount } from "../shared";
 
-export const INIT_PROGRAM_HANDLER_DISCRIMINATOR = new Uint8Array([
-  31, 251, 14, 23, 137, 241, 226, 254,
+export const INIT_CAPITAL_PROGRAM_HANDLER_DISCRIMINATOR = new Uint8Array([
+  248, 187, 57, 89, 38, 219, 66, 222,
 ]);
 
-export function getInitProgramHandlerDiscriminatorBytes() {
+export function getInitCapitalProgramHandlerDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    INIT_PROGRAM_HANDLER_DISCRIMINATOR,
+    INIT_CAPITAL_PROGRAM_HANDLER_DISCRIMINATOR,
   );
 }
 
-export type InitProgramHandlerInstruction<
+export type InitCapitalProgramHandlerInstruction<
   TProgram extends string = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
   TAccountConfig extends string | AccountMeta<string> = string,
   TAccountNftConfig extends string | AccountMeta<string> = string,
@@ -84,7 +84,7 @@ export type InitProgramHandlerInstruction<
     ]
   >;
 
-export type InitProgramHandlerInstructionData = {
+export type InitCapitalProgramHandlerInstructionData = {
   discriminator: ReadonlyUint8Array;
   /** Agent address for administrative operations */
   agent: Address;
@@ -98,7 +98,7 @@ export type InitProgramHandlerInstructionData = {
   minLockDuration: bigint;
 };
 
-export type InitProgramHandlerInstructionDataArgs = {
+export type InitCapitalProgramHandlerInstructionDataArgs = {
   /** Agent address for administrative operations */
   agent: Address;
   /** Fee charged for early unlock (in lamports or basis points) */
@@ -111,7 +111,7 @@ export type InitProgramHandlerInstructionDataArgs = {
   minLockDuration: number | bigint;
 };
 
-export function getInitProgramHandlerInstructionDataEncoder(): FixedSizeEncoder<InitProgramHandlerInstructionDataArgs> {
+export function getInitCapitalProgramHandlerInstructionDataEncoder(): FixedSizeEncoder<InitCapitalProgramHandlerInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
@@ -123,12 +123,12 @@ export function getInitProgramHandlerInstructionDataEncoder(): FixedSizeEncoder<
     ]),
     (value) => ({
       ...value,
-      discriminator: INIT_PROGRAM_HANDLER_DISCRIMINATOR,
+      discriminator: INIT_CAPITAL_PROGRAM_HANDLER_DISCRIMINATOR,
     }),
   );
 }
 
-export function getInitProgramHandlerInstructionDataDecoder(): FixedSizeDecoder<InitProgramHandlerInstructionData> {
+export function getInitCapitalProgramHandlerInstructionDataDecoder(): FixedSizeDecoder<InitCapitalProgramHandlerInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["agent", getAddressDecoder()],
@@ -139,17 +139,17 @@ export function getInitProgramHandlerInstructionDataDecoder(): FixedSizeDecoder<
   ]);
 }
 
-export function getInitProgramHandlerInstructionDataCodec(): FixedSizeCodec<
-  InitProgramHandlerInstructionDataArgs,
-  InitProgramHandlerInstructionData
+export function getInitCapitalProgramHandlerInstructionDataCodec(): FixedSizeCodec<
+  InitCapitalProgramHandlerInstructionDataArgs,
+  InitCapitalProgramHandlerInstructionData
 > {
   return combineCodec(
-    getInitProgramHandlerInstructionDataEncoder(),
-    getInitProgramHandlerInstructionDataDecoder(),
+    getInitCapitalProgramHandlerInstructionDataEncoder(),
+    getInitCapitalProgramHandlerInstructionDataDecoder(),
   );
 }
 
-export type InitProgramHandlerAsyncInput<
+export type InitCapitalProgramHandlerAsyncInput<
   TAccountConfig extends string = string,
   TAccountNftConfig extends string = string,
   TAccountAdmin extends string = string,
@@ -165,14 +165,14 @@ export type InitProgramHandlerAsyncInput<
   /** NFT marketplace program */
   nftProgram?: Address<TAccountNftProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
-  agent: InitProgramHandlerInstructionDataArgs["agent"];
-  earlyUnlockFee: InitProgramHandlerInstructionDataArgs["earlyUnlockFee"];
-  disputeWindow: InitProgramHandlerInstructionDataArgs["disputeWindow"];
-  maxLockDuration: InitProgramHandlerInstructionDataArgs["maxLockDuration"];
-  minLockDuration: InitProgramHandlerInstructionDataArgs["minLockDuration"];
+  agent: InitCapitalProgramHandlerInstructionDataArgs["agent"];
+  earlyUnlockFee: InitCapitalProgramHandlerInstructionDataArgs["earlyUnlockFee"];
+  disputeWindow: InitCapitalProgramHandlerInstructionDataArgs["disputeWindow"];
+  maxLockDuration: InitCapitalProgramHandlerInstructionDataArgs["maxLockDuration"];
+  minLockDuration: InitCapitalProgramHandlerInstructionDataArgs["minLockDuration"];
 };
 
-export async function getInitProgramHandlerInstructionAsync<
+export async function getInitCapitalProgramHandlerInstructionAsync<
   TAccountConfig extends string,
   TAccountNftConfig extends string,
   TAccountAdmin extends string,
@@ -180,7 +180,7 @@ export async function getInitProgramHandlerInstructionAsync<
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: InitProgramHandlerAsyncInput<
+  input: InitCapitalProgramHandlerAsyncInput<
     TAccountConfig,
     TAccountNftConfig,
     TAccountAdmin,
@@ -189,7 +189,7 @@ export async function getInitProgramHandlerInstructionAsync<
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
-  InitProgramHandlerInstruction<
+  InitCapitalProgramHandlerInstruction<
     TProgramAddress,
     TAccountConfig,
     TAccountNftConfig,
@@ -245,11 +245,11 @@ export async function getInitProgramHandlerInstructionAsync<
       getAccountMeta(accounts.nftProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getInitProgramHandlerInstructionDataEncoder().encode(
-      args as InitProgramHandlerInstructionDataArgs,
+    data: getInitCapitalProgramHandlerInstructionDataEncoder().encode(
+      args as InitCapitalProgramHandlerInstructionDataArgs,
     ),
     programAddress,
-  } as InitProgramHandlerInstruction<
+  } as InitCapitalProgramHandlerInstruction<
     TProgramAddress,
     TAccountConfig,
     TAccountNftConfig,
@@ -259,7 +259,7 @@ export async function getInitProgramHandlerInstructionAsync<
   >);
 }
 
-export type InitProgramHandlerInput<
+export type InitCapitalProgramHandlerInput<
   TAccountConfig extends string = string,
   TAccountNftConfig extends string = string,
   TAccountAdmin extends string = string,
@@ -275,14 +275,14 @@ export type InitProgramHandlerInput<
   /** NFT marketplace program */
   nftProgram?: Address<TAccountNftProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
-  agent: InitProgramHandlerInstructionDataArgs["agent"];
-  earlyUnlockFee: InitProgramHandlerInstructionDataArgs["earlyUnlockFee"];
-  disputeWindow: InitProgramHandlerInstructionDataArgs["disputeWindow"];
-  maxLockDuration: InitProgramHandlerInstructionDataArgs["maxLockDuration"];
-  minLockDuration: InitProgramHandlerInstructionDataArgs["minLockDuration"];
+  agent: InitCapitalProgramHandlerInstructionDataArgs["agent"];
+  earlyUnlockFee: InitCapitalProgramHandlerInstructionDataArgs["earlyUnlockFee"];
+  disputeWindow: InitCapitalProgramHandlerInstructionDataArgs["disputeWindow"];
+  maxLockDuration: InitCapitalProgramHandlerInstructionDataArgs["maxLockDuration"];
+  minLockDuration: InitCapitalProgramHandlerInstructionDataArgs["minLockDuration"];
 };
 
-export function getInitProgramHandlerInstruction<
+export function getInitCapitalProgramHandlerInstruction<
   TAccountConfig extends string,
   TAccountNftConfig extends string,
   TAccountAdmin extends string,
@@ -290,7 +290,7 @@ export function getInitProgramHandlerInstruction<
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: InitProgramHandlerInput<
+  input: InitCapitalProgramHandlerInput<
     TAccountConfig,
     TAccountNftConfig,
     TAccountAdmin,
@@ -298,7 +298,7 @@ export function getInitProgramHandlerInstruction<
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
-): InitProgramHandlerInstruction<
+): InitCapitalProgramHandlerInstruction<
   TProgramAddress,
   TAccountConfig,
   TAccountNftConfig,
@@ -345,11 +345,11 @@ export function getInitProgramHandlerInstruction<
       getAccountMeta(accounts.nftProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getInitProgramHandlerInstructionDataEncoder().encode(
-      args as InitProgramHandlerInstructionDataArgs,
+    data: getInitCapitalProgramHandlerInstructionDataEncoder().encode(
+      args as InitCapitalProgramHandlerInstructionDataArgs,
     ),
     programAddress,
-  } as InitProgramHandlerInstruction<
+  } as InitCapitalProgramHandlerInstruction<
     TProgramAddress,
     TAccountConfig,
     TAccountNftConfig,
@@ -359,7 +359,7 @@ export function getInitProgramHandlerInstruction<
   >);
 }
 
-export type ParsedInitProgramHandlerInstruction<
+export type ParsedInitCapitalProgramHandlerInstruction<
   TProgram extends string = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -375,17 +375,17 @@ export type ParsedInitProgramHandlerInstruction<
     nftProgram: TAccountMetas[3];
     systemProgram: TAccountMetas[4];
   };
-  data: InitProgramHandlerInstructionData;
+  data: InitCapitalProgramHandlerInstructionData;
 };
 
-export function parseInitProgramHandlerInstruction<
+export function parseInitCapitalProgramHandlerInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedInitProgramHandlerInstruction<TProgram, TAccountMetas> {
+): ParsedInitCapitalProgramHandlerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
@@ -405,7 +405,7 @@ export function parseInitProgramHandlerInstruction<
       nftProgram: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getInitProgramHandlerInstructionDataDecoder().decode(
+    data: getInitCapitalProgramHandlerInstructionDataDecoder().decode(
       instruction.data,
     ),
   };

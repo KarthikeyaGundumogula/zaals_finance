@@ -22,7 +22,7 @@ import {
   type ParsedCreateVaultHandlerInstruction,
   type ParsedDepositRewardsHandlerInstruction,
   type ParsedFinalizeSlashReqHandlerInstruction,
-  type ParsedInitProgramHandlerInstruction,
+  type ParsedInitCapitalProgramHandlerInstruction,
   type ParsedOpenPositionHandlerInstruction,
   type ParsedUpdatePositionHandlerInstruction,
 } from "../instructions";
@@ -109,7 +109,7 @@ export enum CapitalProgramInstruction {
   CreateVaultHandler,
   DepositRewardsHandler,
   FinalizeSlashReqHandler,
-  InitProgramHandler,
+  InitCapitalProgramHandler,
   OpenPositionHandler,
   UpdatePositionHandler,
 }
@@ -210,12 +210,12 @@ export function identifyCapitalProgramInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([31, 251, 14, 23, 137, 241, 226, 254]),
+        new Uint8Array([248, 187, 57, 89, 38, 219, 66, 222]),
       ),
       0,
     )
   ) {
-    return CapitalProgramInstruction.InitProgramHandler;
+    return CapitalProgramInstruction.InitCapitalProgramHandler;
   }
   if (
     containsBytes(
@@ -272,8 +272,8 @@ export type ParsedCapitalProgramInstruction<
       instructionType: CapitalProgramInstruction.FinalizeSlashReqHandler;
     } & ParsedFinalizeSlashReqHandlerInstruction<TProgram>)
   | ({
-      instructionType: CapitalProgramInstruction.InitProgramHandler;
-    } & ParsedInitProgramHandlerInstruction<TProgram>)
+      instructionType: CapitalProgramInstruction.InitCapitalProgramHandler;
+    } & ParsedInitCapitalProgramHandlerInstruction<TProgram>)
   | ({
       instructionType: CapitalProgramInstruction.OpenPositionHandler;
     } & ParsedOpenPositionHandlerInstruction<TProgram>)

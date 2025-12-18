@@ -14,10 +14,10 @@ import {
   type ReadonlyUint8Array,
 } from "gill";
 import {
-  type ParsedBurnAssetInstruction,
-  type ParsedCreateCoreAssetInstruction,
-  type ParsedCreateVaultCollectionInstruction,
-  type ParsedInitializeProgramInstruction,
+  type ParsedBurnAssetHandlerInstruction,
+  type ParsedCreateCoreAssetHandlerInstruction,
+  type ParsedCreateVaultCollectionHandlerInstruction,
+  type ParsedInitNftProgramHandlerInstruction,
   type ParsedListAssetHandlerInstruction,
   type ParsedUnlistAssetHandlerInstruction,
 } from "../instructions";
@@ -72,10 +72,10 @@ export function identifyNftProgramAccount(
 }
 
 export enum NftProgramInstruction {
-  BurnAsset,
-  CreateCoreAsset,
-  CreateVaultCollection,
-  InitializeProgram,
+  BurnAssetHandler,
+  CreateCoreAssetHandler,
+  CreateVaultCollectionHandler,
+  InitNftProgramHandler,
   ListAssetHandler,
   UnlistAssetHandler,
 }
@@ -88,45 +88,45 @@ export function identifyNftProgramInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([136, 86, 28, 181, 100, 202, 225, 221]),
+        new Uint8Array([184, 55, 221, 84, 149, 186, 37, 1]),
       ),
       0,
     )
   ) {
-    return NftProgramInstruction.BurnAsset;
+    return NftProgramInstruction.BurnAssetHandler;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([11, 133, 33, 184, 158, 20, 227, 195]),
+        new Uint8Array([86, 115, 142, 198, 201, 252, 198, 75]),
       ),
       0,
     )
   ) {
-    return NftProgramInstruction.CreateCoreAsset;
+    return NftProgramInstruction.CreateCoreAssetHandler;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([162, 166, 28, 199, 66, 238, 251, 28]),
+        new Uint8Array([201, 227, 122, 178, 131, 228, 248, 113]),
       ),
       0,
     )
   ) {
-    return NftProgramInstruction.CreateVaultCollection;
+    return NftProgramInstruction.CreateVaultCollectionHandler;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([176, 107, 205, 168, 24, 157, 175, 103]),
+        new Uint8Array([246, 11, 44, 229, 225, 212, 181, 44]),
       ),
       0,
     )
   ) {
-    return NftProgramInstruction.InitializeProgram;
+    return NftProgramInstruction.InitNftProgramHandler;
   }
   if (
     containsBytes(
@@ -159,17 +159,17 @@ export type ParsedNftProgramInstruction<
   TProgram extends string = "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH",
 > =
   | ({
-      instructionType: NftProgramInstruction.BurnAsset;
-    } & ParsedBurnAssetInstruction<TProgram>)
+      instructionType: NftProgramInstruction.BurnAssetHandler;
+    } & ParsedBurnAssetHandlerInstruction<TProgram>)
   | ({
-      instructionType: NftProgramInstruction.CreateCoreAsset;
-    } & ParsedCreateCoreAssetInstruction<TProgram>)
+      instructionType: NftProgramInstruction.CreateCoreAssetHandler;
+    } & ParsedCreateCoreAssetHandlerInstruction<TProgram>)
   | ({
-      instructionType: NftProgramInstruction.CreateVaultCollection;
-    } & ParsedCreateVaultCollectionInstruction<TProgram>)
+      instructionType: NftProgramInstruction.CreateVaultCollectionHandler;
+    } & ParsedCreateVaultCollectionHandlerInstruction<TProgram>)
   | ({
-      instructionType: NftProgramInstruction.InitializeProgram;
-    } & ParsedInitializeProgramInstruction<TProgram>)
+      instructionType: NftProgramInstruction.InitNftProgramHandler;
+    } & ParsedInitNftProgramHandlerInstruction<TProgram>)
   | ({
       instructionType: NftProgramInstruction.ListAssetHandler;
     } & ParsedListAssetHandlerInstruction<TProgram>)

@@ -32,15 +32,17 @@ import {
 import { NFT_PROGRAM_PROGRAM_ADDRESS } from "../programs";
 import { getAccountMetaFactory, type ResolvedAccount } from "../shared";
 
-export const BURN_ASSET_DISCRIMINATOR = new Uint8Array([
-  136, 86, 28, 181, 100, 202, 225, 221,
+export const BURN_ASSET_HANDLER_DISCRIMINATOR = new Uint8Array([
+  184, 55, 221, 84, 149, 186, 37, 1,
 ]);
 
-export function getBurnAssetDiscriminatorBytes() {
-  return fixEncoderSize(getBytesEncoder(), 8).encode(BURN_ASSET_DISCRIMINATOR);
+export function getBurnAssetHandlerDiscriminatorBytes() {
+  return fixEncoderSize(getBytesEncoder(), 8).encode(
+    BURN_ASSET_HANDLER_DISCRIMINATOR,
+  );
 }
 
-export type BurnAssetInstruction<
+export type BurnAssetHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountHolder extends string | AccountMeta<string> = string,
   TAccountAsset extends string | AccountMeta<string> = string,
@@ -74,34 +76,36 @@ export type BurnAssetInstruction<
     ]
   >;
 
-export type BurnAssetInstructionData = { discriminator: ReadonlyUint8Array };
+export type BurnAssetHandlerInstructionData = {
+  discriminator: ReadonlyUint8Array;
+};
 
-export type BurnAssetInstructionDataArgs = {};
+export type BurnAssetHandlerInstructionDataArgs = {};
 
-export function getBurnAssetInstructionDataEncoder(): FixedSizeEncoder<BurnAssetInstructionDataArgs> {
+export function getBurnAssetHandlerInstructionDataEncoder(): FixedSizeEncoder<BurnAssetHandlerInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
-    (value) => ({ ...value, discriminator: BURN_ASSET_DISCRIMINATOR }),
+    (value) => ({ ...value, discriminator: BURN_ASSET_HANDLER_DISCRIMINATOR }),
   );
 }
 
-export function getBurnAssetInstructionDataDecoder(): FixedSizeDecoder<BurnAssetInstructionData> {
+export function getBurnAssetHandlerInstructionDataDecoder(): FixedSizeDecoder<BurnAssetHandlerInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
-export function getBurnAssetInstructionDataCodec(): FixedSizeCodec<
-  BurnAssetInstructionDataArgs,
-  BurnAssetInstructionData
+export function getBurnAssetHandlerInstructionDataCodec(): FixedSizeCodec<
+  BurnAssetHandlerInstructionDataArgs,
+  BurnAssetHandlerInstructionData
 > {
   return combineCodec(
-    getBurnAssetInstructionDataEncoder(),
-    getBurnAssetInstructionDataDecoder(),
+    getBurnAssetHandlerInstructionDataEncoder(),
+    getBurnAssetHandlerInstructionDataDecoder(),
   );
 }
 
-export type BurnAssetInput<
+export type BurnAssetHandlerInput<
   TAccountHolder extends string = string,
   TAccountAsset extends string = string,
   TAccountSystemProgram extends string = string,
@@ -115,7 +119,7 @@ export type BurnAssetInput<
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
 };
 
-export function getBurnAssetInstruction<
+export function getBurnAssetHandlerInstruction<
   TAccountHolder extends string,
   TAccountAsset extends string,
   TAccountSystemProgram extends string,
@@ -123,7 +127,7 @@ export function getBurnAssetInstruction<
   TAccountMplCoreProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: BurnAssetInput<
+  input: BurnAssetHandlerInput<
     TAccountHolder,
     TAccountAsset,
     TAccountSystemProgram,
@@ -131,7 +135,7 @@ export function getBurnAssetInstruction<
     TAccountMplCoreProgram
   >,
   config?: { programAddress?: TProgramAddress },
-): BurnAssetInstruction<
+): BurnAssetHandlerInstruction<
   TProgramAddress,
   TAccountHolder,
   TAccountAsset,
@@ -174,9 +178,9 @@ export function getBurnAssetInstruction<
       getAccountMeta(accounts.collection),
       getAccountMeta(accounts.mplCoreProgram),
     ],
-    data: getBurnAssetInstructionDataEncoder().encode({}),
+    data: getBurnAssetHandlerInstructionDataEncoder().encode({}),
     programAddress,
-  } as BurnAssetInstruction<
+  } as BurnAssetHandlerInstruction<
     TProgramAddress,
     TAccountHolder,
     TAccountAsset,
@@ -186,7 +190,7 @@ export function getBurnAssetInstruction<
   >);
 }
 
-export type ParsedBurnAssetInstruction<
+export type ParsedBurnAssetHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -198,17 +202,17 @@ export type ParsedBurnAssetInstruction<
     collection: TAccountMetas[3];
     mplCoreProgram: TAccountMetas[4];
   };
-  data: BurnAssetInstructionData;
+  data: BurnAssetHandlerInstructionData;
 };
 
-export function parseBurnAssetInstruction<
+export function parseBurnAssetHandlerInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedBurnAssetInstruction<TProgram, TAccountMetas> {
+): ParsedBurnAssetHandlerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 5) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
@@ -228,6 +232,6 @@ export function parseBurnAssetInstruction<
       collection: getNextAccount(),
       mplCoreProgram: getNextAccount(),
     },
-    data: getBurnAssetInstructionDataDecoder().decode(instruction.data),
+    data: getBurnAssetHandlerInstructionDataDecoder().decode(instruction.data),
   };
 }

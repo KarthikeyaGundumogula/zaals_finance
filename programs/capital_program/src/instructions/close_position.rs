@@ -166,7 +166,7 @@ impl<'info> ClosePosition<'info> {
             collection: self.collection.to_account_info(),
         };
         let burn_cpi = CpiContext::new(self.nft_program.to_account_info(), burn_asset_accounts);
-        nft_program::cpi::burn_asset(burn_cpi)?;
+        nft_program::cpi::burn_asset_handler(burn_cpi)?;
         Ok(())
     }
 }

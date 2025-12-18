@@ -6,9 +6,9 @@
  * @see https://github.com/codama-idl/codama
  */
 
-export * from "./burnAsset";
-export * from "./createCoreAsset";
-export * from "./createVaultCollection";
-export * from "./initializeProgram";
+export * from "./burnAssetHandler";
+export * from "./createCoreAssetHandler";
+export * from "./createVaultCollectionHandler";
+export * from "./initNftProgramHandler";
 export * from "./listAssetHandler";
 export * from "./unlistAssetHandler";

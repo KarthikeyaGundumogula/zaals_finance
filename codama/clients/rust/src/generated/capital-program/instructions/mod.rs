@@ -13,7 +13,7 @@
   pub(crate) mod r#create_vault_handler;
   pub(crate) mod r#deposit_rewards_handler;
   pub(crate) mod r#finalize_slash_req_handler;
-  pub(crate) mod r#init_program_handler;
+  pub(crate) mod r#init_capital_program_handler;
   pub(crate) mod r#open_position_handler;
   pub(crate) mod r#update_position_handler;
 
@@ -25,7 +25,7 @@
   pub use self::r#create_vault_handler::*;
   pub use self::r#deposit_rewards_handler::*;
   pub use self::r#finalize_slash_req_handler::*;
-  pub use self::r#init_program_handler::*;
+  pub use self::r#init_capital_program_handler::*;
   pub use self::r#open_position_handler::*;
   pub use self::r#update_position_handler::*;
 

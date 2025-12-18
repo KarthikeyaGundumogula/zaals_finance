@@ -8,11 +8,11 @@
 use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
 
-pub const CREATE_CORE_ASSET_DISCRIMINATOR: [u8; 8] = [11, 133, 33, 184, 158, 20, 227, 195];
+pub const CREATE_CORE_ASSET_HANDLER_DISCRIMINATOR: [u8; 8] = [86, 115, 142, 198, 201, 252, 198, 75];
 
 /// Accounts.
 #[derive(Debug)]
-pub struct CreateCoreAsset {
+pub struct CreateCoreAssetHandler {
       
               
           pub asset: solana_pubkey::Pubkey,
@@ -39,13 +39,13 @@ pub struct CreateCoreAsset {
           pub mpl_core_program: solana_pubkey::Pubkey,
       }
 
-impl CreateCoreAsset {
-  pub fn instruction(&self, args: CreateCoreAssetInstructionArgs) -> solana_instruction::Instruction {
+impl CreateCoreAssetHandler {
+  pub fn instruction(&self, args: CreateCoreAssetHandlerInstructionArgs) -> solana_instruction::Instruction {
     self.instruction_with_remaining_accounts(args, &[])
   }
   #[allow(clippy::arithmetic_side_effects)]
   #[allow(clippy::vec_init_then_push)]
-  pub fn instruction_with_remaining_accounts(&self, args: CreateCoreAssetInstructionArgs, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
+  pub fn instruction_with_remaining_accounts(&self, args: CreateCoreAssetHandlerInstructionArgs, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
     let mut accounts = Vec::with_capacity(8+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
             self.asset,
@@ -80,7 +80,7 @@ impl CreateCoreAsset {
             false
           ));
                       accounts.extend_from_slice(remaining_accounts);
-    let mut data = CreateCoreAssetInstructionData::new().try_to_vec().unwrap();
+    let mut data = CreateCoreAssetHandlerInstructionData::new().try_to_vec().unwrap();
           let mut args = args.try_to_vec().unwrap();
       data.append(&mut args);
     
@@ -94,14 +94,14 @@ impl CreateCoreAsset {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct CreateCoreAssetInstructionData {
+ pub struct CreateCoreAssetHandlerInstructionData {
             discriminator: [u8; 8],
                   }
 
-impl CreateCoreAssetInstructionData {
+impl CreateCoreAssetHandlerInstructionData {
   pub fn new() -> Self {
     Self {
-                        discriminator: [11, 133, 33, 184, 158, 20, 227, 195],
+                        discriminator: [86, 115, 142, 198, 201, 252, 198, 75],
                                               }
   }
 
@@ -110,7 +110,7 @@ impl CreateCoreAssetInstructionData {
   }
   }
 
-impl Default for CreateCoreAssetInstructionData {
+impl Default for CreateCoreAssetHandlerInstructionData {
   fn default() -> Self {
     Self::new()
   }
@@ -118,19 +118,19 @@ impl Default for CreateCoreAssetInstructionData {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct CreateCoreAssetInstructionArgs {
+ pub struct CreateCoreAssetHandlerInstructionArgs {
                   pub name: String,
                 pub uri: String,
       }
 
-impl CreateCoreAssetInstructionArgs {
+impl CreateCoreAssetHandlerInstructionArgs {
   pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
     borsh::to_vec(self)
   }
 }
 
 
-/// Instruction builder for `CreateCoreAsset`.
+/// Instruction builder for `CreateCoreAssetHandler`.
 ///
 /// ### Accounts:
 ///
@@ -143,7 +143,7 @@ impl CreateCoreAssetInstructionArgs {
                 ///   6. `[optional]` system_program (default to `11111111111111111111111111111111`)
                 ///   7. `[optional]` mpl_core_program (default to `CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d`)
 #[derive(Clone, Debug, Default)]
-pub struct CreateCoreAssetBuilder {
+pub struct CreateCoreAssetHandlerBuilder {
             asset: Option<solana_pubkey::Pubkey>,
                 config: Option<solana_pubkey::Pubkey>,
                 payer: Option<solana_pubkey::Pubkey>,
@@ -157,7 +157,7 @@ pub struct CreateCoreAssetBuilder {
         __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
-impl CreateCoreAssetBuilder {
+impl CreateCoreAssetHandlerBuilder {
   pub fn new() -> Self {
     Self::default()
   }
@@ -227,7 +227,7 @@ impl CreateCoreAssetBuilder {
   }
   #[allow(clippy::clone_on_copy)]
   pub fn instruction(&self) -> solana_instruction::Instruction {
-    let accounts = CreateCoreAsset {
+    let accounts = CreateCoreAssetHandler {
                               asset: self.asset.expect("asset is not set"),
                                         config: self.config.expect("config is not set"),
                                         payer: self.payer.expect("payer is not set"),
@@ -237,7 +237,7 @@ impl CreateCoreAssetBuilder {
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
                                         mpl_core_program: self.mpl_core_program.unwrap_or(solana_pubkey::pubkey!("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")),
                       };
-          let args = CreateCoreAssetInstructionArgs {
+          let args = CreateCoreAssetHandlerInstructionArgs {
                                                               name: self.name.clone().expect("name is not set"),
                                                                   uri: self.uri.clone().expect("uri is not set"),
                                     };
@@ -246,8 +246,8 @@ impl CreateCoreAssetBuilder {
   }
 }
 
-  /// `create_core_asset` CPI accounts.
-  pub struct CreateCoreAssetCpiAccounts<'a, 'b> {
+  /// `create_core_asset_handler` CPI accounts.
+  pub struct CreateCoreAssetHandlerCpiAccounts<'a, 'b> {
           
                     
               pub asset: &'b solana_account_info::AccountInfo<'a>,
@@ -274,8 +274,8 @@ impl CreateCoreAssetBuilder {
               pub mpl_core_program: &'b solana_account_info::AccountInfo<'a>,
             }
 
-/// `create_core_asset` CPI instruction.
-pub struct CreateCoreAssetCpi<'a, 'b> {
+/// `create_core_asset_handler` CPI instruction.
+pub struct CreateCoreAssetHandlerCpi<'a, 'b> {
   /// The program to invoke.
   pub __program: &'b solana_account_info::AccountInfo<'a>,
       
@@ -303,14 +303,14 @@ pub struct CreateCoreAssetCpi<'a, 'b> {
               
           pub mpl_core_program: &'b solana_account_info::AccountInfo<'a>,
             /// The arguments for the instruction.
-    pub __args: CreateCoreAssetInstructionArgs,
+    pub __args: CreateCoreAssetHandlerInstructionArgs,
   }
 
-impl<'a, 'b> CreateCoreAssetCpi<'a, 'b> {
+impl<'a, 'b> CreateCoreAssetHandlerCpi<'a, 'b> {
   pub fn new(
     program: &'b solana_account_info::AccountInfo<'a>,
-          accounts: CreateCoreAssetCpiAccounts<'a, 'b>,
-              args: CreateCoreAssetInstructionArgs,
+          accounts: CreateCoreAssetHandlerCpiAccounts<'a, 'b>,
+              args: CreateCoreAssetHandlerInstructionArgs,
       ) -> Self {
     Self {
       __program: program,
@@ -385,7 +385,7 @@ impl<'a, 'b> CreateCoreAssetCpi<'a, 'b> {
           is_writable: remaining_account.2,
       })
     });
-    let mut data = CreateCoreAssetInstructionData::new().try_to_vec().unwrap();
+    let mut data = CreateCoreAssetHandlerInstructionData::new().try_to_vec().unwrap();
           let mut args = self.__args.try_to_vec().unwrap();
       data.append(&mut args);
     
@@ -414,7 +414,7 @@ impl<'a, 'b> CreateCoreAssetCpi<'a, 'b> {
   }
 }
 
-/// Instruction builder for `CreateCoreAsset` via CPI.
+/// Instruction builder for `CreateCoreAssetHandler` via CPI.
 ///
 /// ### Accounts:
 ///
@@ -427,13 +427,13 @@ impl<'a, 'b> CreateCoreAssetCpi<'a, 'b> {
           ///   6. `[]` system_program
           ///   7. `[]` mpl_core_program
 #[derive(Clone, Debug)]
-pub struct CreateCoreAssetCpiBuilder<'a, 'b> {
-  instruction: Box<CreateCoreAssetCpiBuilderInstruction<'a, 'b>>,
+pub struct CreateCoreAssetHandlerCpiBuilder<'a, 'b> {
+  instruction: Box<CreateCoreAssetHandlerCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> CreateCoreAssetCpiBuilder<'a, 'b> {
+impl<'a, 'b> CreateCoreAssetHandlerCpiBuilder<'a, 'b> {
   pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
-    let instruction = Box::new(CreateCoreAssetCpiBuilderInstruction {
+    let instruction = Box::new(CreateCoreAssetHandlerCpiBuilderInstruction {
       __program: program,
               asset: None,
               config: None,
@@ -521,11 +521,11 @@ impl<'a, 'b> CreateCoreAssetCpiBuilder<'a, 'b> {
   #[allow(clippy::clone_on_copy)]
   #[allow(clippy::vec_init_then_push)]
   pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-          let args = CreateCoreAssetInstructionArgs {
+          let args = CreateCoreAssetHandlerInstructionArgs {
                                                               name: self.instruction.name.clone().expect("name is not set"),
                                                                   uri: self.instruction.uri.clone().expect("uri is not set"),
                                     };
-        let instruction = CreateCoreAssetCpi {
+        let instruction = CreateCoreAssetHandlerCpi {
         __program: self.instruction.__program,
                   
           asset: self.instruction.asset.expect("asset is not set"),
@@ -550,7 +550,7 @@ impl<'a, 'b> CreateCoreAssetCpiBuilder<'a, 'b> {
 }
 
 #[derive(Clone, Debug)]
-struct CreateCoreAssetCpiBuilderInstruction<'a, 'b> {
+struct CreateCoreAssetHandlerCpiBuilderInstruction<'a, 'b> {
   __program: &'b solana_account_info::AccountInfo<'a>,
             asset: Option<&'b solana_account_info::AccountInfo<'a>>,
                 config: Option<&'b solana_account_info::AccountInfo<'a>>,

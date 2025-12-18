@@ -14,7 +14,7 @@ pub struct CreateAsset<'info> {
     #[account(mut)]
     pub asset: Signer<'info>,
     #[account(
-       seeds = [b"nft_config"],
+       seeds = [b"NFT_Config"],
        bump = config.bump
     )]
     pub config: Account<'info, NFTConfig>,

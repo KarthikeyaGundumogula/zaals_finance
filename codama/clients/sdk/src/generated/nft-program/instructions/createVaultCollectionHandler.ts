@@ -33,17 +33,17 @@ import {
 import { NFT_PROGRAM_PROGRAM_ADDRESS } from "../programs";
 import { getAccountMetaFactory, type ResolvedAccount } from "../shared";
 
-export const CREATE_VAULT_COLLECTION_DISCRIMINATOR = new Uint8Array([
-  162, 166, 28, 199, 66, 238, 251, 28,
+export const CREATE_VAULT_COLLECTION_HANDLER_DISCRIMINATOR = new Uint8Array([
+  201, 227, 122, 178, 131, 228, 248, 113,
 ]);
 
-export function getCreateVaultCollectionDiscriminatorBytes() {
+export function getCreateVaultCollectionHandlerDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CREATE_VAULT_COLLECTION_DISCRIMINATOR,
+    CREATE_VAULT_COLLECTION_HANDLER_DISCRIMINATOR,
   );
 }
 
-export type CreateVaultCollectionInstruction<
+export type CreateVaultCollectionHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountCollection extends string | AccountMeta<string> = string,
   TAccountUpdateAuthority extends string | AccountMeta<string> = string,
@@ -82,39 +82,39 @@ export type CreateVaultCollectionInstruction<
     ]
   >;
 
-export type CreateVaultCollectionInstructionData = {
+export type CreateVaultCollectionHandlerInstructionData = {
   discriminator: ReadonlyUint8Array;
 };
 
-export type CreateVaultCollectionInstructionDataArgs = {};
+export type CreateVaultCollectionHandlerInstructionDataArgs = {};
 
-export function getCreateVaultCollectionInstructionDataEncoder(): FixedSizeEncoder<CreateVaultCollectionInstructionDataArgs> {
+export function getCreateVaultCollectionHandlerInstructionDataEncoder(): FixedSizeEncoder<CreateVaultCollectionHandlerInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
     (value) => ({
       ...value,
-      discriminator: CREATE_VAULT_COLLECTION_DISCRIMINATOR,
+      discriminator: CREATE_VAULT_COLLECTION_HANDLER_DISCRIMINATOR,
     }),
   );
 }
 
-export function getCreateVaultCollectionInstructionDataDecoder(): FixedSizeDecoder<CreateVaultCollectionInstructionData> {
+export function getCreateVaultCollectionHandlerInstructionDataDecoder(): FixedSizeDecoder<CreateVaultCollectionHandlerInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
-export function getCreateVaultCollectionInstructionDataCodec(): FixedSizeCodec<
-  CreateVaultCollectionInstructionDataArgs,
-  CreateVaultCollectionInstructionData
+export function getCreateVaultCollectionHandlerInstructionDataCodec(): FixedSizeCodec<
+  CreateVaultCollectionHandlerInstructionDataArgs,
+  CreateVaultCollectionHandlerInstructionData
 > {
   return combineCodec(
-    getCreateVaultCollectionInstructionDataEncoder(),
-    getCreateVaultCollectionInstructionDataDecoder(),
+    getCreateVaultCollectionHandlerInstructionDataEncoder(),
+    getCreateVaultCollectionHandlerInstructionDataDecoder(),
   );
 }
 
-export type CreateVaultCollectionAsyncInput<
+export type CreateVaultCollectionHandlerAsyncInput<
   TAccountCollection extends string = string,
   TAccountUpdateAuthority extends string = string,
   TAccountConfig extends string = string,
@@ -130,7 +130,7 @@ export type CreateVaultCollectionAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
-export async function getCreateVaultCollectionInstructionAsync<
+export async function getCreateVaultCollectionHandlerInstructionAsync<
   TAccountCollection extends string,
   TAccountUpdateAuthority extends string,
   TAccountConfig extends string,
@@ -139,7 +139,7 @@ export async function getCreateVaultCollectionInstructionAsync<
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: CreateVaultCollectionAsyncInput<
+  input: CreateVaultCollectionHandlerAsyncInput<
     TAccountCollection,
     TAccountUpdateAuthority,
     TAccountConfig,
@@ -149,7 +149,7 @@ export async function getCreateVaultCollectionInstructionAsync<
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
-  CreateVaultCollectionInstruction<
+  CreateVaultCollectionHandlerInstruction<
     TProgramAddress,
     TAccountCollection,
     TAccountUpdateAuthority,
@@ -185,7 +185,7 @@ export async function getCreateVaultCollectionInstructionAsync<
       programAddress,
       seeds: [
         getBytesEncoder().encode(
-          new Uint8Array([110, 102, 116, 95, 99, 111, 110, 102, 105, 103]),
+          new Uint8Array([78, 70, 84, 95, 67, 111, 110, 102, 105, 103]),
         ),
       ],
     });
@@ -209,9 +209,9 @@ export async function getCreateVaultCollectionInstructionAsync<
       getAccountMeta(accounts.mplCoreProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getCreateVaultCollectionInstructionDataEncoder().encode({}),
+    data: getCreateVaultCollectionHandlerInstructionDataEncoder().encode({}),
     programAddress,
-  } as CreateVaultCollectionInstruction<
+  } as CreateVaultCollectionHandlerInstruction<
     TProgramAddress,
     TAccountCollection,
     TAccountUpdateAuthority,
@@ -222,7 +222,7 @@ export async function getCreateVaultCollectionInstructionAsync<
   >);
 }
 
-export type CreateVaultCollectionInput<
+export type CreateVaultCollectionHandlerInput<
   TAccountCollection extends string = string,
   TAccountUpdateAuthority extends string = string,
   TAccountConfig extends string = string,
@@ -238,7 +238,7 @@ export type CreateVaultCollectionInput<
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
-export function getCreateVaultCollectionInstruction<
+export function getCreateVaultCollectionHandlerInstruction<
   TAccountCollection extends string,
   TAccountUpdateAuthority extends string,
   TAccountConfig extends string,
@@ -247,7 +247,7 @@ export function getCreateVaultCollectionInstruction<
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: CreateVaultCollectionInput<
+  input: CreateVaultCollectionHandlerInput<
     TAccountCollection,
     TAccountUpdateAuthority,
     TAccountConfig,
@@ -256,7 +256,7 @@ export function getCreateVaultCollectionInstruction<
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
-): CreateVaultCollectionInstruction<
+): CreateVaultCollectionHandlerInstruction<
   TProgramAddress,
   TAccountCollection,
   TAccountUpdateAuthority,
@@ -305,9 +305,9 @@ export function getCreateVaultCollectionInstruction<
       getAccountMeta(accounts.mplCoreProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getCreateVaultCollectionInstructionDataEncoder().encode({}),
+    data: getCreateVaultCollectionHandlerInstructionDataEncoder().encode({}),
     programAddress,
-  } as CreateVaultCollectionInstruction<
+  } as CreateVaultCollectionHandlerInstruction<
     TProgramAddress,
     TAccountCollection,
     TAccountUpdateAuthority,
@@ -318,7 +318,7 @@ export function getCreateVaultCollectionInstruction<
   >);
 }
 
-export type ParsedCreateVaultCollectionInstruction<
+export type ParsedCreateVaultCollectionHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -331,17 +331,17 @@ export type ParsedCreateVaultCollectionInstruction<
     mplCoreProgram: TAccountMetas[4];
     systemProgram: TAccountMetas[5];
   };
-  data: CreateVaultCollectionInstructionData;
+  data: CreateVaultCollectionHandlerInstructionData;
 };
 
-export function parseCreateVaultCollectionInstruction<
+export function parseCreateVaultCollectionHandlerInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedCreateVaultCollectionInstruction<TProgram, TAccountMetas> {
+): ParsedCreateVaultCollectionHandlerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
@@ -362,7 +362,7 @@ export function parseCreateVaultCollectionInstruction<
       mplCoreProgram: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getCreateVaultCollectionInstructionDataDecoder().decode(
+    data: getCreateVaultCollectionHandlerInstructionDataDecoder().decode(
       instruction.data,
     ),
   };

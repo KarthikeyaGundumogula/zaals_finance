@@ -11,7 +11,7 @@ pub struct CreateVaultCollection<'info> {
     #[account(address = config.authority)]
     pub update_authority: UncheckedAccount<'info>,
     #[account(
-       seeds = [b"nft_config"],
+       seeds = [b"NFT_Config"],
        bump = config.bump
     )]
     pub config: Account<'info, NFTConfig>,

@@ -14,6 +14,6 @@ export * from "./createSlasReqHandler";
 export * from "./createVaultHandler";
 export * from "./depositRewardsHandler";
 export * from "./finalizeSlashReqHandler";
-export * from "./initProgramHandler";
+export * from "./initCapitalProgramHandler";
 export * from "./openPositionHandler";
 export * from "./updatePositionHandler";

@@ -39,17 +39,17 @@ import {
 import { NFT_PROGRAM_PROGRAM_ADDRESS } from "../programs";
 import { getAccountMetaFactory, type ResolvedAccount } from "../shared";
 
-export const CREATE_CORE_ASSET_DISCRIMINATOR = new Uint8Array([
-  11, 133, 33, 184, 158, 20, 227, 195,
+export const CREATE_CORE_ASSET_HANDLER_DISCRIMINATOR = new Uint8Array([
+  86, 115, 142, 198, 201, 252, 198, 75,
 ]);
 
-export function getCreateCoreAssetDiscriminatorBytes() {
+export function getCreateCoreAssetHandlerDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    CREATE_CORE_ASSET_DISCRIMINATOR,
+    CREATE_CORE_ASSET_HANDLER_DISCRIMINATOR,
   );
 }
 
-export type CreateCoreAssetInstruction<
+export type CreateCoreAssetHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountAsset extends string | AccountMeta<string> = string,
   TAccountConfig extends string | AccountMeta<string> = string,
@@ -97,26 +97,32 @@ export type CreateCoreAssetInstruction<
     ]
   >;
 
-export type CreateCoreAssetInstructionData = {
+export type CreateCoreAssetHandlerInstructionData = {
   discriminator: ReadonlyUint8Array;
   name: string;
   uri: string;
 };
 
-export type CreateCoreAssetInstructionDataArgs = { name: string; uri: string };
+export type CreateCoreAssetHandlerInstructionDataArgs = {
+  name: string;
+  uri: string;
+};
 
-export function getCreateCoreAssetInstructionDataEncoder(): Encoder<CreateCoreAssetInstructionDataArgs> {
+export function getCreateCoreAssetHandlerInstructionDataEncoder(): Encoder<CreateCoreAssetHandlerInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
       ["name", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
       ["uri", addEncoderSizePrefix(getUtf8Encoder(), getU32Encoder())],
     ]),
-    (value) => ({ ...value, discriminator: CREATE_CORE_ASSET_DISCRIMINATOR }),
+    (value) => ({
+      ...value,
+      discriminator: CREATE_CORE_ASSET_HANDLER_DISCRIMINATOR,
+    }),
   );
 }
 
-export function getCreateCoreAssetInstructionDataDecoder(): Decoder<CreateCoreAssetInstructionData> {
+export function getCreateCoreAssetHandlerInstructionDataDecoder(): Decoder<CreateCoreAssetHandlerInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["name", addDecoderSizePrefix(getUtf8Decoder(), getU32Decoder())],
@@ -124,17 +130,17 @@ export function getCreateCoreAssetInstructionDataDecoder(): Decoder<CreateCoreAs
   ]);
 }
 
-export function getCreateCoreAssetInstructionDataCodec(): Codec<
-  CreateCoreAssetInstructionDataArgs,
-  CreateCoreAssetInstructionData
+export function getCreateCoreAssetHandlerInstructionDataCodec(): Codec<
+  CreateCoreAssetHandlerInstructionDataArgs,
+  CreateCoreAssetHandlerInstructionData
 > {
   return combineCodec(
-    getCreateCoreAssetInstructionDataEncoder(),
-    getCreateCoreAssetInstructionDataDecoder(),
+    getCreateCoreAssetHandlerInstructionDataEncoder(),
+    getCreateCoreAssetHandlerInstructionDataDecoder(),
   );
 }
 
-export type CreateCoreAssetAsyncInput<
+export type CreateCoreAssetHandlerAsyncInput<
   TAccountAsset extends string = string,
   TAccountConfig extends string = string,
   TAccountPayer extends string = string,
@@ -152,11 +158,11 @@ export type CreateCoreAssetAsyncInput<
   collectionUpdateAuthority: Address<TAccountCollectionUpdateAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
-  name: CreateCoreAssetInstructionDataArgs["name"];
-  uri: CreateCoreAssetInstructionDataArgs["uri"];
+  name: CreateCoreAssetHandlerInstructionDataArgs["name"];
+  uri: CreateCoreAssetHandlerInstructionDataArgs["uri"];
 };
 
-export async function getCreateCoreAssetInstructionAsync<
+export async function getCreateCoreAssetHandlerInstructionAsync<
   TAccountAsset extends string,
   TAccountConfig extends string,
   TAccountPayer extends string,
@@ -167,7 +173,7 @@ export async function getCreateCoreAssetInstructionAsync<
   TAccountMplCoreProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: CreateCoreAssetAsyncInput<
+  input: CreateCoreAssetHandlerAsyncInput<
     TAccountAsset,
     TAccountConfig,
     TAccountPayer,
@@ -179,7 +185,7 @@ export async function getCreateCoreAssetInstructionAsync<
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
-  CreateCoreAssetInstruction<
+  CreateCoreAssetHandlerInstruction<
     TProgramAddress,
     TAccountAsset,
     TAccountConfig,
@@ -222,7 +228,7 @@ export async function getCreateCoreAssetInstructionAsync<
       programAddress,
       seeds: [
         getBytesEncoder().encode(
-          new Uint8Array([110, 102, 116, 95, 99, 111, 110, 102, 105, 103]),
+          new Uint8Array([78, 70, 84, 95, 67, 111, 110, 102, 105, 103]),
         ),
       ],
     });
@@ -248,11 +254,11 @@ export async function getCreateCoreAssetInstructionAsync<
       getAccountMeta(accounts.systemProgram),
       getAccountMeta(accounts.mplCoreProgram),
     ],
-    data: getCreateCoreAssetInstructionDataEncoder().encode(
-      args as CreateCoreAssetInstructionDataArgs,
+    data: getCreateCoreAssetHandlerInstructionDataEncoder().encode(
+      args as CreateCoreAssetHandlerInstructionDataArgs,
     ),
     programAddress,
-  } as CreateCoreAssetInstruction<
+  } as CreateCoreAssetHandlerInstruction<
     TProgramAddress,
     TAccountAsset,
     TAccountConfig,
@@ -265,7 +271,7 @@ export async function getCreateCoreAssetInstructionAsync<
   >);
 }
 
-export type CreateCoreAssetInput<
+export type CreateCoreAssetHandlerInput<
   TAccountAsset extends string = string,
   TAccountConfig extends string = string,
   TAccountPayer extends string = string,
@@ -283,11 +289,11 @@ export type CreateCoreAssetInput<
   collectionUpdateAuthority: Address<TAccountCollectionUpdateAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
-  name: CreateCoreAssetInstructionDataArgs["name"];
-  uri: CreateCoreAssetInstructionDataArgs["uri"];
+  name: CreateCoreAssetHandlerInstructionDataArgs["name"];
+  uri: CreateCoreAssetHandlerInstructionDataArgs["uri"];
 };
 
-export function getCreateCoreAssetInstruction<
+export function getCreateCoreAssetHandlerInstruction<
   TAccountAsset extends string,
   TAccountConfig extends string,
   TAccountPayer extends string,
@@ -298,7 +304,7 @@ export function getCreateCoreAssetInstruction<
   TAccountMplCoreProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: CreateCoreAssetInput<
+  input: CreateCoreAssetHandlerInput<
     TAccountAsset,
     TAccountConfig,
     TAccountPayer,
@@ -309,7 +315,7 @@ export function getCreateCoreAssetInstruction<
     TAccountMplCoreProgram
   >,
   config?: { programAddress?: TProgramAddress },
-): CreateCoreAssetInstruction<
+): CreateCoreAssetHandlerInstruction<
   TProgramAddress,
   TAccountAsset,
   TAccountConfig,
@@ -367,11 +373,11 @@ export function getCreateCoreAssetInstruction<
       getAccountMeta(accounts.systemProgram),
       getAccountMeta(accounts.mplCoreProgram),
     ],
-    data: getCreateCoreAssetInstructionDataEncoder().encode(
-      args as CreateCoreAssetInstructionDataArgs,
+    data: getCreateCoreAssetHandlerInstructionDataEncoder().encode(
+      args as CreateCoreAssetHandlerInstructionDataArgs,
     ),
     programAddress,
-  } as CreateCoreAssetInstruction<
+  } as CreateCoreAssetHandlerInstruction<
     TProgramAddress,
     TAccountAsset,
     TAccountConfig,
@@ -384,7 +390,7 @@ export function getCreateCoreAssetInstruction<
   >);
 }
 
-export type ParsedCreateCoreAssetInstruction<
+export type ParsedCreateCoreAssetHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -399,17 +405,17 @@ export type ParsedCreateCoreAssetInstruction<
     systemProgram: TAccountMetas[6];
     mplCoreProgram: TAccountMetas[7];
   };
-  data: CreateCoreAssetInstructionData;
+  data: CreateCoreAssetHandlerInstructionData;
 };
 
-export function parseCreateCoreAssetInstruction<
+export function parseCreateCoreAssetHandlerInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedCreateCoreAssetInstruction<TProgram, TAccountMetas> {
+): ParsedCreateCoreAssetHandlerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 8) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
@@ -432,6 +438,8 @@ export function parseCreateCoreAssetInstruction<
       systemProgram: getNextAccount(),
       mplCoreProgram: getNextAccount(),
     },
-    data: getCreateCoreAssetInstructionDataDecoder().decode(instruction.data),
+    data: getCreateCoreAssetHandlerInstructionDataDecoder().decode(
+      instruction.data,
+    ),
   };
 }

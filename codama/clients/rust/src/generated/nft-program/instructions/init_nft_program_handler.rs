@@ -9,11 +9,11 @@ use solana_pubkey::Pubkey;
 use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
 
-pub const INITIALIZE_PROGRAM_DISCRIMINATOR: [u8; 8] = [176, 107, 205, 168, 24, 157, 175, 103];
+pub const INIT_NFT_PROGRAM_HANDLER_DISCRIMINATOR: [u8; 8] = [246, 11, 44, 229, 225, 212, 181, 44];
 
 /// Accounts.
 #[derive(Debug)]
-pub struct InitializeProgram {
+pub struct InitNftProgramHandler {
       
               
           pub config: solana_pubkey::Pubkey,
@@ -28,13 +28,13 @@ pub struct InitializeProgram {
           pub system_program: solana_pubkey::Pubkey,
       }
 
-impl InitializeProgram {
-  pub fn instruction(&self, args: InitializeProgramInstructionArgs) -> solana_instruction::Instruction {
+impl InitNftProgramHandler {
+  pub fn instruction(&self, args: InitNftProgramHandlerInstructionArgs) -> solana_instruction::Instruction {
     self.instruction_with_remaining_accounts(args, &[])
   }
   #[allow(clippy::arithmetic_side_effects)]
   #[allow(clippy::vec_init_then_push)]
-  pub fn instruction_with_remaining_accounts(&self, args: InitializeProgramInstructionArgs, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
+  pub fn instruction_with_remaining_accounts(&self, args: InitNftProgramHandlerInstructionArgs, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
     let mut accounts = Vec::with_capacity(4+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
             self.config,
@@ -53,7 +53,7 @@ impl InitializeProgram {
             false
           ));
                       accounts.extend_from_slice(remaining_accounts);
-    let mut data = InitializeProgramInstructionData::new().try_to_vec().unwrap();
+    let mut data = InitNftProgramHandlerInstructionData::new().try_to_vec().unwrap();
           let mut args = args.try_to_vec().unwrap();
       data.append(&mut args);
     
@@ -67,14 +67,14 @@ impl InitializeProgram {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct InitializeProgramInstructionData {
+ pub struct InitNftProgramHandlerInstructionData {
             discriminator: [u8; 8],
             }
 
-impl InitializeProgramInstructionData {
+impl InitNftProgramHandlerInstructionData {
   pub fn new() -> Self {
     Self {
-                        discriminator: [176, 107, 205, 168, 24, 157, 175, 103],
+                        discriminator: [246, 11, 44, 229, 225, 212, 181, 44],
                                 }
   }
 
@@ -83,7 +83,7 @@ impl InitializeProgramInstructionData {
   }
   }
 
-impl Default for InitializeProgramInstructionData {
+impl Default for InitNftProgramHandlerInstructionData {
   fn default() -> Self {
     Self::new()
   }
@@ -91,18 +91,18 @@ impl Default for InitializeProgramInstructionData {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct InitializeProgramInstructionArgs {
+ pub struct InitNftProgramHandlerInstructionArgs {
                   pub capital_program: Pubkey,
       }
 
-impl InitializeProgramInstructionArgs {
+impl InitNftProgramHandlerInstructionArgs {
   pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
     borsh::to_vec(self)
   }
 }
 
 
-/// Instruction builder for `InitializeProgram`.
+/// Instruction builder for `InitNftProgramHandler`.
 ///
 /// ### Accounts:
 ///
@@ -111,7 +111,7 @@ impl InitializeProgramInstructionArgs {
                 ///   2. `[signer]` authority
                 ///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
-pub struct InitializeProgramBuilder {
+pub struct InitNftProgramHandlerBuilder {
             config: Option<solana_pubkey::Pubkey>,
                 admin: Option<solana_pubkey::Pubkey>,
                 authority: Option<solana_pubkey::Pubkey>,
@@ -120,7 +120,7 @@ pub struct InitializeProgramBuilder {
         __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
-impl InitializeProgramBuilder {
+impl InitNftProgramHandlerBuilder {
   pub fn new() -> Self {
     Self::default()
   }
@@ -164,13 +164,13 @@ impl InitializeProgramBuilder {
   }
   #[allow(clippy::clone_on_copy)]
   pub fn instruction(&self) -> solana_instruction::Instruction {
-    let accounts = InitializeProgram {
+    let accounts = InitNftProgramHandler {
                               config: self.config.expect("config is not set"),
                                         admin: self.admin.expect("admin is not set"),
                                         authority: self.authority.expect("authority is not set"),
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
                       };
-          let args = InitializeProgramInstructionArgs {
+          let args = InitNftProgramHandlerInstructionArgs {
                                                               capital_program: self.capital_program.clone().expect("capital_program is not set"),
                                     };
     
@@ -178,8 +178,8 @@ impl InitializeProgramBuilder {
   }
 }
 
-  /// `initialize_program` CPI accounts.
-  pub struct InitializeProgramCpiAccounts<'a, 'b> {
+  /// `init_nft_program_handler` CPI accounts.
+  pub struct InitNftProgramHandlerCpiAccounts<'a, 'b> {
           
                     
               pub config: &'b solana_account_info::AccountInfo<'a>,
@@ -194,8 +194,8 @@ impl InitializeProgramBuilder {
               pub system_program: &'b solana_account_info::AccountInfo<'a>,
             }
 
-/// `initialize_program` CPI instruction.
-pub struct InitializeProgramCpi<'a, 'b> {
+/// `init_nft_program_handler` CPI instruction.
+pub struct InitNftProgramHandlerCpi<'a, 'b> {
   /// The program to invoke.
   pub __program: &'b solana_account_info::AccountInfo<'a>,
       
@@ -211,14 +211,14 @@ pub struct InitializeProgramCpi<'a, 'b> {
               
           pub system_program: &'b solana_account_info::AccountInfo<'a>,
             /// The arguments for the instruction.
-    pub __args: InitializeProgramInstructionArgs,
+    pub __args: InitNftProgramHandlerInstructionArgs,
   }
 
-impl<'a, 'b> InitializeProgramCpi<'a, 'b> {
+impl<'a, 'b> InitNftProgramHandlerCpi<'a, 'b> {
   pub fn new(
     program: &'b solana_account_info::AccountInfo<'a>,
-          accounts: InitializeProgramCpiAccounts<'a, 'b>,
-              args: InitializeProgramInstructionArgs,
+          accounts: InitNftProgramHandlerCpiAccounts<'a, 'b>,
+              args: InitNftProgramHandlerInstructionArgs,
       ) -> Self {
     Self {
       __program: program,
@@ -273,7 +273,7 @@ impl<'a, 'b> InitializeProgramCpi<'a, 'b> {
           is_writable: remaining_account.2,
       })
     });
-    let mut data = InitializeProgramInstructionData::new().try_to_vec().unwrap();
+    let mut data = InitNftProgramHandlerInstructionData::new().try_to_vec().unwrap();
           let mut args = self.__args.try_to_vec().unwrap();
       data.append(&mut args);
     
@@ -298,7 +298,7 @@ impl<'a, 'b> InitializeProgramCpi<'a, 'b> {
   }
 }
 
-/// Instruction builder for `InitializeProgram` via CPI.
+/// Instruction builder for `InitNftProgramHandler` via CPI.
 ///
 /// ### Accounts:
 ///
@@ -307,13 +307,13 @@ impl<'a, 'b> InitializeProgramCpi<'a, 'b> {
                 ///   2. `[signer]` authority
           ///   3. `[]` system_program
 #[derive(Clone, Debug)]
-pub struct InitializeProgramCpiBuilder<'a, 'b> {
-  instruction: Box<InitializeProgramCpiBuilderInstruction<'a, 'b>>,
+pub struct InitNftProgramHandlerCpiBuilder<'a, 'b> {
+  instruction: Box<InitNftProgramHandlerCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> InitializeProgramCpiBuilder<'a, 'b> {
+impl<'a, 'b> InitNftProgramHandlerCpiBuilder<'a, 'b> {
   pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
-    let instruction = Box::new(InitializeProgramCpiBuilderInstruction {
+    let instruction = Box::new(InitNftProgramHandlerCpiBuilderInstruction {
       __program: program,
               config: None,
               admin: None,
@@ -371,10 +371,10 @@ impl<'a, 'b> InitializeProgramCpiBuilder<'a, 'b> {
   #[allow(clippy::clone_on_copy)]
   #[allow(clippy::vec_init_then_push)]
   pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-          let args = InitializeProgramInstructionArgs {
+          let args = InitNftProgramHandlerInstructionArgs {
                                                               capital_program: self.instruction.capital_program.clone().expect("capital_program is not set"),
                                     };
-        let instruction = InitializeProgramCpi {
+        let instruction = InitNftProgramHandlerCpi {
         __program: self.instruction.__program,
                   
           config: self.instruction.config.expect("config is not set"),
@@ -391,7 +391,7 @@ impl<'a, 'b> InitializeProgramCpiBuilder<'a, 'b> {
 }
 
 #[derive(Clone, Debug)]
-struct InitializeProgramCpiBuilderInstruction<'a, 'b> {
+struct InitNftProgramHandlerCpiBuilderInstruction<'a, 'b> {
   __program: &'b solana_account_info::AccountInfo<'a>,
             config: Option<&'b solana_account_info::AccountInfo<'a>>,
                 admin: Option<&'b solana_account_info::AccountInfo<'a>>,

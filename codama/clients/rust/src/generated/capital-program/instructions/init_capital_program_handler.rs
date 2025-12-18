@@ -9,11 +9,11 @@ use solana_pubkey::Pubkey;
 use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
 
-pub const INIT_PROGRAM_HANDLER_DISCRIMINATOR: [u8; 8] = [31, 251, 14, 23, 137, 241, 226, 254];
+pub const INIT_CAPITAL_PROGRAM_HANDLER_DISCRIMINATOR: [u8; 8] = [248, 187, 57, 89, 38, 219, 66, 222];
 
 /// Accounts.
 #[derive(Debug)]
-pub struct InitProgramHandler {
+pub struct InitCapitalProgramHandler {
             /// Global authority configuration account
 
     
@@ -39,13 +39,13 @@ pub struct InitProgramHandler {
           pub system_program: solana_pubkey::Pubkey,
       }
 
-impl InitProgramHandler {
-  pub fn instruction(&self, args: InitProgramHandlerInstructionArgs) -> solana_instruction::Instruction {
+impl InitCapitalProgramHandler {
+  pub fn instruction(&self, args: InitCapitalProgramHandlerInstructionArgs) -> solana_instruction::Instruction {
     self.instruction_with_remaining_accounts(args, &[])
   }
   #[allow(clippy::arithmetic_side_effects)]
   #[allow(clippy::vec_init_then_push)]
-  pub fn instruction_with_remaining_accounts(&self, args: InitProgramHandlerInstructionArgs, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
+  pub fn instruction_with_remaining_accounts(&self, args: InitCapitalProgramHandlerInstructionArgs, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
     let mut accounts = Vec::with_capacity(5+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
             self.config,
@@ -68,7 +68,7 @@ impl InitProgramHandler {
             false
           ));
                       accounts.extend_from_slice(remaining_accounts);
-    let mut data = InitProgramHandlerInstructionData::new().try_to_vec().unwrap();
+    let mut data = InitCapitalProgramHandlerInstructionData::new().try_to_vec().unwrap();
           let mut args = args.try_to_vec().unwrap();
       data.append(&mut args);
     
@@ -82,14 +82,14 @@ impl InitProgramHandler {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct InitProgramHandlerInstructionData {
+ pub struct InitCapitalProgramHandlerInstructionData {
             discriminator: [u8; 8],
                                     }
 
-impl InitProgramHandlerInstructionData {
+impl InitCapitalProgramHandlerInstructionData {
   pub fn new() -> Self {
     Self {
-                        discriminator: [31, 251, 14, 23, 137, 241, 226, 254],
+                        discriminator: [248, 187, 57, 89, 38, 219, 66, 222],
                                                                                         }
   }
 
@@ -98,7 +98,7 @@ impl InitProgramHandlerInstructionData {
   }
   }
 
-impl Default for InitProgramHandlerInstructionData {
+impl Default for InitCapitalProgramHandlerInstructionData {
   fn default() -> Self {
     Self::new()
   }
@@ -106,7 +106,7 @@ impl Default for InitProgramHandlerInstructionData {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct InitProgramHandlerInstructionArgs {
+ pub struct InitCapitalProgramHandlerInstructionArgs {
                   pub agent: Pubkey,
                 pub early_unlock_fee: u64,
                 pub dispute_window: i64,
@@ -114,14 +114,14 @@ impl Default for InitProgramHandlerInstructionData {
                 pub min_lock_duration: i64,
       }
 
-impl InitProgramHandlerInstructionArgs {
+impl InitCapitalProgramHandlerInstructionArgs {
   pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
     borsh::to_vec(self)
   }
 }
 
 
-/// Instruction builder for `InitProgramHandler`.
+/// Instruction builder for `InitCapitalProgramHandler`.
 ///
 /// ### Accounts:
 ///
@@ -131,7 +131,7 @@ impl InitProgramHandlerInstructionArgs {
                 ///   3. `[optional]` nft_program (default to `AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH`)
                 ///   4. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
-pub struct InitProgramHandlerBuilder {
+pub struct InitCapitalProgramHandlerBuilder {
             config: Option<solana_pubkey::Pubkey>,
                 nft_config: Option<solana_pubkey::Pubkey>,
                 admin: Option<solana_pubkey::Pubkey>,
@@ -145,7 +145,7 @@ pub struct InitProgramHandlerBuilder {
         __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
-impl InitProgramHandlerBuilder {
+impl InitCapitalProgramHandlerBuilder {
   pub fn new() -> Self {
     Self::default()
   }
@@ -219,14 +219,14 @@ impl InitProgramHandlerBuilder {
   }
   #[allow(clippy::clone_on_copy)]
   pub fn instruction(&self) -> solana_instruction::Instruction {
-    let accounts = InitProgramHandler {
+    let accounts = InitCapitalProgramHandler {
                               config: self.config.expect("config is not set"),
                                         nft_config: self.nft_config.expect("nft_config is not set"),
                                         admin: self.admin.expect("admin is not set"),
                                         nft_program: self.nft_program.unwrap_or(solana_pubkey::pubkey!("AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH")),
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
                       };
-          let args = InitProgramHandlerInstructionArgs {
+          let args = InitCapitalProgramHandlerInstructionArgs {
                                                               agent: self.agent.clone().expect("agent is not set"),
                                                                   early_unlock_fee: self.early_unlock_fee.clone().expect("early_unlock_fee is not set"),
                                                                   dispute_window: self.dispute_window.clone().expect("dispute_window is not set"),
@@ -238,8 +238,8 @@ impl InitProgramHandlerBuilder {
   }
 }
 
-  /// `init_program_handler` CPI accounts.
-  pub struct InitProgramHandlerCpiAccounts<'a, 'b> {
+  /// `init_capital_program_handler` CPI accounts.
+  pub struct InitCapitalProgramHandlerCpiAccounts<'a, 'b> {
                   /// Global authority configuration account
 
       
@@ -265,8 +265,8 @@ impl InitProgramHandlerBuilder {
               pub system_program: &'b solana_account_info::AccountInfo<'a>,
             }
 
-/// `init_program_handler` CPI instruction.
-pub struct InitProgramHandlerCpi<'a, 'b> {
+/// `init_capital_program_handler` CPI instruction.
+pub struct InitCapitalProgramHandlerCpi<'a, 'b> {
   /// The program to invoke.
   pub __program: &'b solana_account_info::AccountInfo<'a>,
             /// Global authority configuration account
@@ -293,14 +293,14 @@ pub struct InitProgramHandlerCpi<'a, 'b> {
               
           pub system_program: &'b solana_account_info::AccountInfo<'a>,
             /// The arguments for the instruction.
-    pub __args: InitProgramHandlerInstructionArgs,
+    pub __args: InitCapitalProgramHandlerInstructionArgs,
   }
 
-impl<'a, 'b> InitProgramHandlerCpi<'a, 'b> {
+impl<'a, 'b> InitCapitalProgramHandlerCpi<'a, 'b> {
   pub fn new(
     program: &'b solana_account_info::AccountInfo<'a>,
-          accounts: InitProgramHandlerCpiAccounts<'a, 'b>,
-              args: InitProgramHandlerInstructionArgs,
+          accounts: InitCapitalProgramHandlerCpiAccounts<'a, 'b>,
+              args: InitCapitalProgramHandlerInstructionArgs,
       ) -> Self {
     Self {
       __program: program,
@@ -360,7 +360,7 @@ impl<'a, 'b> InitProgramHandlerCpi<'a, 'b> {
           is_writable: remaining_account.2,
       })
     });
-    let mut data = InitProgramHandlerInstructionData::new().try_to_vec().unwrap();
+    let mut data = InitCapitalProgramHandlerInstructionData::new().try_to_vec().unwrap();
           let mut args = self.__args.try_to_vec().unwrap();
       data.append(&mut args);
     
@@ -386,7 +386,7 @@ impl<'a, 'b> InitProgramHandlerCpi<'a, 'b> {
   }
 }
 
-/// Instruction builder for `InitProgramHandler` via CPI.
+/// Instruction builder for `InitCapitalProgramHandler` via CPI.
 ///
 /// ### Accounts:
 ///
@@ -396,13 +396,13 @@ impl<'a, 'b> InitProgramHandlerCpi<'a, 'b> {
           ///   3. `[]` nft_program
           ///   4. `[]` system_program
 #[derive(Clone, Debug)]
-pub struct InitProgramHandlerCpiBuilder<'a, 'b> {
-  instruction: Box<InitProgramHandlerCpiBuilderInstruction<'a, 'b>>,
+pub struct InitCapitalProgramHandlerCpiBuilder<'a, 'b> {
+  instruction: Box<InitCapitalProgramHandlerCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> InitProgramHandlerCpiBuilder<'a, 'b> {
+impl<'a, 'b> InitCapitalProgramHandlerCpiBuilder<'a, 'b> {
   pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
-    let instruction = Box::new(InitProgramHandlerCpiBuilderInstruction {
+    let instruction = Box::new(InitCapitalProgramHandlerCpiBuilderInstruction {
       __program: program,
               config: None,
               nft_config: None,
@@ -494,14 +494,14 @@ impl<'a, 'b> InitProgramHandlerCpiBuilder<'a, 'b> {
   #[allow(clippy::clone_on_copy)]
   #[allow(clippy::vec_init_then_push)]
   pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-          let args = InitProgramHandlerInstructionArgs {
+          let args = InitCapitalProgramHandlerInstructionArgs {
                                                               agent: self.instruction.agent.clone().expect("agent is not set"),
                                                                   early_unlock_fee: self.instruction.early_unlock_fee.clone().expect("early_unlock_fee is not set"),
                                                                   dispute_window: self.instruction.dispute_window.clone().expect("dispute_window is not set"),
                                                                   max_lock_duration: self.instruction.max_lock_duration.clone().expect("max_lock_duration is not set"),
                                                                   min_lock_duration: self.instruction.min_lock_duration.clone().expect("min_lock_duration is not set"),
                                     };
-        let instruction = InitProgramHandlerCpi {
+        let instruction = InitCapitalProgramHandlerCpi {
         __program: self.instruction.__program,
                   
           config: self.instruction.config.expect("config is not set"),
@@ -520,7 +520,7 @@ impl<'a, 'b> InitProgramHandlerCpiBuilder<'a, 'b> {
 }
 
 #[derive(Clone, Debug)]
-struct InitProgramHandlerCpiBuilderInstruction<'a, 'b> {
+struct InitCapitalProgramHandlerCpiBuilderInstruction<'a, 'b> {
   __program: &'b solana_account_info::AccountInfo<'a>,
             config: Option<&'b solana_account_info::AccountInfo<'a>>,
                 nft_config: Option<&'b solana_account_info::AccountInfo<'a>>,

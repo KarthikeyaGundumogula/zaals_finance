@@ -37,17 +37,17 @@ import {
 import { NFT_PROGRAM_PROGRAM_ADDRESS } from "../programs";
 import { getAccountMetaFactory, type ResolvedAccount } from "../shared";
 
-export const INITIALIZE_PROGRAM_DISCRIMINATOR = new Uint8Array([
-  176, 107, 205, 168, 24, 157, 175, 103,
+export const INIT_NFT_PROGRAM_HANDLER_DISCRIMINATOR = new Uint8Array([
+  246, 11, 44, 229, 225, 212, 181, 44,
 ]);
 
-export function getInitializeProgramDiscriminatorBytes() {
+export function getInitNftProgramHandlerDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    INITIALIZE_PROGRAM_DISCRIMINATOR,
+    INIT_NFT_PROGRAM_HANDLER_DISCRIMINATOR,
   );
 }
 
-export type InitializeProgramInstruction<
+export type InitNftProgramHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountConfig extends string | AccountMeta<string> = string,
   TAccountAdmin extends string | AccountMeta<string> = string,
@@ -77,41 +77,46 @@ export type InitializeProgramInstruction<
     ]
   >;
 
-export type InitializeProgramInstructionData = {
+export type InitNftProgramHandlerInstructionData = {
   discriminator: ReadonlyUint8Array;
   capitalProgram: Address;
 };
 
-export type InitializeProgramInstructionDataArgs = { capitalProgram: Address };
+export type InitNftProgramHandlerInstructionDataArgs = {
+  capitalProgram: Address;
+};
 
-export function getInitializeProgramInstructionDataEncoder(): FixedSizeEncoder<InitializeProgramInstructionDataArgs> {
+export function getInitNftProgramHandlerInstructionDataEncoder(): FixedSizeEncoder<InitNftProgramHandlerInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
       ["capitalProgram", getAddressEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: INITIALIZE_PROGRAM_DISCRIMINATOR }),
+    (value) => ({
+      ...value,
+      discriminator: INIT_NFT_PROGRAM_HANDLER_DISCRIMINATOR,
+    }),
   );
 }
 
-export function getInitializeProgramInstructionDataDecoder(): FixedSizeDecoder<InitializeProgramInstructionData> {
+export function getInitNftProgramHandlerInstructionDataDecoder(): FixedSizeDecoder<InitNftProgramHandlerInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["capitalProgram", getAddressDecoder()],
   ]);
 }
 
-export function getInitializeProgramInstructionDataCodec(): FixedSizeCodec<
-  InitializeProgramInstructionDataArgs,
-  InitializeProgramInstructionData
+export function getInitNftProgramHandlerInstructionDataCodec(): FixedSizeCodec<
+  InitNftProgramHandlerInstructionDataArgs,
+  InitNftProgramHandlerInstructionData
 > {
   return combineCodec(
-    getInitializeProgramInstructionDataEncoder(),
-    getInitializeProgramInstructionDataDecoder(),
+    getInitNftProgramHandlerInstructionDataEncoder(),
+    getInitNftProgramHandlerInstructionDataDecoder(),
   );
 }
 
-export type InitializeProgramAsyncInput<
+export type InitNftProgramHandlerAsyncInput<
   TAccountConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountAuthority extends string = string,
@@ -121,17 +126,17 @@ export type InitializeProgramAsyncInput<
   admin: TransactionSigner<TAccountAdmin>;
   authority: TransactionSigner<TAccountAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
-  capitalProgram: InitializeProgramInstructionDataArgs["capitalProgram"];
+  capitalProgram: InitNftProgramHandlerInstructionDataArgs["capitalProgram"];
 };
 
-export async function getInitializeProgramInstructionAsync<
+export async function getInitNftProgramHandlerInstructionAsync<
   TAccountConfig extends string,
   TAccountAdmin extends string,
   TAccountAuthority extends string,
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: InitializeProgramAsyncInput<
+  input: InitNftProgramHandlerAsyncInput<
     TAccountConfig,
     TAccountAdmin,
     TAccountAuthority,
@@ -139,7 +144,7 @@ export async function getInitializeProgramInstructionAsync<
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
-  InitializeProgramInstruction<
+  InitNftProgramHandlerInstruction<
     TProgramAddress,
     TAccountConfig,
     TAccountAdmin,
@@ -171,7 +176,7 @@ export async function getInitializeProgramInstructionAsync<
       programAddress,
       seeds: [
         getBytesEncoder().encode(
-          new Uint8Array([110, 102, 116, 95, 99, 111, 110, 102, 105, 103]),
+          new Uint8Array([78, 70, 84, 95, 67, 111, 110, 102, 105, 103]),
         ),
       ],
     });
@@ -189,11 +194,11 @@ export async function getInitializeProgramInstructionAsync<
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getInitializeProgramInstructionDataEncoder().encode(
-      args as InitializeProgramInstructionDataArgs,
+    data: getInitNftProgramHandlerInstructionDataEncoder().encode(
+      args as InitNftProgramHandlerInstructionDataArgs,
     ),
     programAddress,
-  } as InitializeProgramInstruction<
+  } as InitNftProgramHandlerInstruction<
     TProgramAddress,
     TAccountConfig,
     TAccountAdmin,
@@ -202,7 +207,7 @@ export async function getInitializeProgramInstructionAsync<
   >);
 }
 
-export type InitializeProgramInput<
+export type InitNftProgramHandlerInput<
   TAccountConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountAuthority extends string = string,
@@ -212,24 +217,24 @@ export type InitializeProgramInput<
   admin: TransactionSigner<TAccountAdmin>;
   authority: TransactionSigner<TAccountAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
-  capitalProgram: InitializeProgramInstructionDataArgs["capitalProgram"];
+  capitalProgram: InitNftProgramHandlerInstructionDataArgs["capitalProgram"];
 };
 
-export function getInitializeProgramInstruction<
+export function getInitNftProgramHandlerInstruction<
   TAccountConfig extends string,
   TAccountAdmin extends string,
   TAccountAuthority extends string,
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: InitializeProgramInput<
+  input: InitNftProgramHandlerInput<
     TAccountConfig,
     TAccountAdmin,
     TAccountAuthority,
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
-): InitializeProgramInstruction<
+): InitNftProgramHandlerInstruction<
   TProgramAddress,
   TAccountConfig,
   TAccountAdmin,
@@ -268,11 +273,11 @@ export function getInitializeProgramInstruction<
       getAccountMeta(accounts.authority),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getInitializeProgramInstructionDataEncoder().encode(
-      args as InitializeProgramInstructionDataArgs,
+    data: getInitNftProgramHandlerInstructionDataEncoder().encode(
+      args as InitNftProgramHandlerInstructionDataArgs,
     ),
     programAddress,
-  } as InitializeProgramInstruction<
+  } as InitNftProgramHandlerInstruction<
     TProgramAddress,
     TAccountConfig,
     TAccountAdmin,
@@ -281,7 +286,7 @@ export function getInitializeProgramInstruction<
   >);
 }
 
-export type ParsedInitializeProgramInstruction<
+export type ParsedInitNftProgramHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -292,17 +297,17 @@ export type ParsedInitializeProgramInstruction<
     authority: TAccountMetas[2];
     systemProgram: TAccountMetas[3];
   };
-  data: InitializeProgramInstructionData;
+  data: InitNftProgramHandlerInstructionData;
 };
 
-export function parseInitializeProgramInstruction<
+export function parseInitNftProgramHandlerInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedInitializeProgramInstruction<TProgram, TAccountMetas> {
+): ParsedInitNftProgramHandlerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 4) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
@@ -321,6 +326,8 @@ export function parseInitializeProgramInstruction<
       authority: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getInitializeProgramInstructionDataDecoder().decode(instruction.data),
+    data: getInitNftProgramHandlerInstructionDataDecoder().decode(
+      instruction.data,
+    ),
   };
 }

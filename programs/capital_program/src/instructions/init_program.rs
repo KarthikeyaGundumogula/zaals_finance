@@ -115,7 +115,7 @@ impl<'info> InitProgram<'info> {
             signer_seeds,
         );
 
-        nft_program::cpi::initialize_program(cpi_ctx, capital_program_id)?;
+        nft_program::cpi::init_nft_program_handler(cpi_ctx, capital_program_id)?;
 
         Ok(())
     }
