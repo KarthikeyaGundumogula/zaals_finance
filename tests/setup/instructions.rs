@@ -52,3 +52,6 @@ pub fn init_capital_program(test_config: &mut TestConfig) -> TransactionResult {
         ],
     )
 }
+
+#[allow(dead_code)]
+pub fn create_vault(test_config: &mut TestConfig) {}

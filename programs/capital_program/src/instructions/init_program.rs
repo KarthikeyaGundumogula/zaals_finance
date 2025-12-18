@@ -12,6 +12,7 @@ use crate::state::AuthorityConfig;
 #[instruction(params: InitProgramConfig)]
 pub struct InitProgram<'info> {
     /// Global authority configuration account
+    /// re-initialization is not possible because of the init constraint
     #[account(
         init,
         payer = admin,
