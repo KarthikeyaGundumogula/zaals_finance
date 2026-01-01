@@ -30,6 +30,13 @@ idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 anchor-lang = "0.31.1"
 anchor-spl = "0.31.1"
 
+[dev-dependencies]
+anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
+litesvm = "0.8.2"
+litesvm-token = "0.8.2"
+solana-sdk = "3.0.0"
+zaals-finance-client = {path = "codama/clients/rust"}
+
 [[test]]
 name = "nft_program"
 path = "tests/nft_program.rs"
@@ -37,10 +44,4 @@ path = "tests/nft_program.rs"
 [[test]]
 name = "capital_program"
 path = "tests/capital_program.rs"
-
-[dev-dependencies]
-anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
-litesvm = "0.8.2"
-solana-sdk = "3.0.0"
-zaals-finance-client = {path = "codama/clients/rust"}
 

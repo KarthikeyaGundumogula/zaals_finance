@@ -1,12 +1,12 @@
 #!/bin/bash
 set -e
 
-echo "Generating clients for all programs..."
+echo "Generating clients for programs..."
 
-echo "Generating sol-mind-protocol clients..."
+echo "Generating capital-program clients..."
 npx codama run --all -c codama/scripts/capital-program.json
 
-echo "Generating nft-operations clients..."
+echo "Generating nft-program clients..."
 npx codama run --all -c codama/scripts/nft-program.json
 
-echo "All clients generated successfully!"
+echo "Clients generated successfully!"

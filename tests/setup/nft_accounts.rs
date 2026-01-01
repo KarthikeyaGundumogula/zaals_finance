@@ -1,6 +1,6 @@
 use litesvm::LiteSVM;
 use solana_sdk::pubkey::Pubkey;
-use zaals_finance_client::{accounts::NFTConfig, NFT_PROGRAM_ID};
+use zaals_finance_client::{ NFT_PROGRAM_ID, capital_program::accounts::NFTConfig};
 
 pub fn get_nft_config_pda() -> Pubkey {
     let try_find_program_address = Pubkey::try_find_program_address(&[b"NFT_Config"], &NFT_PROGRAM_ID);
