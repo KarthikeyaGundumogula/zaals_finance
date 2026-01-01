@@ -53,7 +53,6 @@ export function getInitCapitalProgramHandlerDiscriminatorBytes() {
 export type InitCapitalProgramHandlerInstruction<
   TProgram extends string = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
   TAccountConfig extends string | AccountMeta<string> = string,
-  TAccountNftConfig extends string | AccountMeta<string> = string,
   TAccountAdmin extends string | AccountMeta<string> = string,
   TAccountNftProgram extends string | AccountMeta<string> =
     "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH",
@@ -67,9 +66,6 @@ export type InitCapitalProgramHandlerInstruction<
       TAccountConfig extends string
         ? WritableAccount<TAccountConfig>
         : TAccountConfig,
-      TAccountNftConfig extends string
-        ? ReadonlyAccount<TAccountNftConfig>
-        : TAccountNftConfig,
       TAccountAdmin extends string
         ? WritableSignerAccount<TAccountAdmin> &
             AccountSignerMeta<TAccountAdmin>
@@ -151,15 +147,15 @@ export function getInitCapitalProgramHandlerInstructionDataCodec(): FixedSizeCod
 
 export type InitCapitalProgramHandlerAsyncInput<
   TAccountConfig extends string = string,
-  TAccountNftConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountNftProgram extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
-  /** Global authority configuration account */
+  /**
+   * Global authority configuration account
+   * re-initialization is not possible because of the init constraint
+   */
   config?: Address<TAccountConfig>;
-  /** NFT program configuration account */
-  nftConfig: Address<TAccountNftConfig>;
   /** Program administrator with initialization authority */
   admin: TransactionSigner<TAccountAdmin>;
   /** NFT marketplace program */
@@ -174,7 +170,6 @@ export type InitCapitalProgramHandlerAsyncInput<
 
 export async function getInitCapitalProgramHandlerInstructionAsync<
   TAccountConfig extends string,
-  TAccountNftConfig extends string,
   TAccountAdmin extends string,
   TAccountNftProgram extends string,
   TAccountSystemProgram extends string,
@@ -182,7 +177,6 @@ export async function getInitCapitalProgramHandlerInstructionAsync<
 >(
   input: InitCapitalProgramHandlerAsyncInput<
     TAccountConfig,
-    TAccountNftConfig,
     TAccountAdmin,
     TAccountNftProgram,
     TAccountSystemProgram
@@ -192,7 +186,6 @@ export async function getInitCapitalProgramHandlerInstructionAsync<
   InitCapitalProgramHandlerInstruction<
     TProgramAddress,
     TAccountConfig,
-    TAccountNftConfig,
     TAccountAdmin,
     TAccountNftProgram,
     TAccountSystemProgram
@@ -205,7 +198,6 @@ export async function getInitCapitalProgramHandlerInstructionAsync<
   // Original accounts.
   const originalAccounts = {
     config: { value: input.config ?? null, isWritable: true },
-    nftConfig: { value: input.nftConfig ?? null, isWritable: false },
     admin: { value: input.admin ?? null, isWritable: true },
     nftProgram: { value: input.nftProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
@@ -240,7 +232,6 @@ export async function getInitCapitalProgramHandlerInstructionAsync<
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.config),
-      getAccountMeta(accounts.nftConfig),
       getAccountMeta(accounts.admin),
       getAccountMeta(accounts.nftProgram),
       getAccountMeta(accounts.systemProgram),
@@ -252,7 +243,6 @@ export async function getInitCapitalProgramHandlerInstructionAsync<
   } as InitCapitalProgramHandlerInstruction<
     TProgramAddress,
     TAccountConfig,
-    TAccountNftConfig,
     TAccountAdmin,
     TAccountNftProgram,
     TAccountSystemProgram
@@ -261,15 +251,15 @@ export async function getInitCapitalProgramHandlerInstructionAsync<
 
 export type InitCapitalProgramHandlerInput<
   TAccountConfig extends string = string,
-  TAccountNftConfig extends string = string,
   TAccountAdmin extends string = string,
   TAccountNftProgram extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
-  /** Global authority configuration account */
+  /**
+   * Global authority configuration account
+   * re-initialization is not possible because of the init constraint
+   */
   config: Address<TAccountConfig>;
-  /** NFT program configuration account */
-  nftConfig: Address<TAccountNftConfig>;
   /** Program administrator with initialization authority */
   admin: TransactionSigner<TAccountAdmin>;
   /** NFT marketplace program */
@@ -284,7 +274,6 @@ export type InitCapitalProgramHandlerInput<
 
 export function getInitCapitalProgramHandlerInstruction<
   TAccountConfig extends string,
-  TAccountNftConfig extends string,
   TAccountAdmin extends string,
   TAccountNftProgram extends string,
   TAccountSystemProgram extends string,
@@ -292,7 +281,6 @@ export function getInitCapitalProgramHandlerInstruction<
 >(
   input: InitCapitalProgramHandlerInput<
     TAccountConfig,
-    TAccountNftConfig,
     TAccountAdmin,
     TAccountNftProgram,
     TAccountSystemProgram
@@ -301,7 +289,6 @@ export function getInitCapitalProgramHandlerInstruction<
 ): InitCapitalProgramHandlerInstruction<
   TProgramAddress,
   TAccountConfig,
-  TAccountNftConfig,
   TAccountAdmin,
   TAccountNftProgram,
   TAccountSystemProgram
@@ -313,7 +300,6 @@ export function getInitCapitalProgramHandlerInstruction<
   // Original accounts.
   const originalAccounts = {
     config: { value: input.config ?? null, isWritable: true },
-    nftConfig: { value: input.nftConfig ?? null, isWritable: false },
     admin: { value: input.admin ?? null, isWritable: true },
     nftProgram: { value: input.nftProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
@@ -340,7 +326,6 @@ export function getInitCapitalProgramHandlerInstruction<
   return Object.freeze({
     accounts: [
       getAccountMeta(accounts.config),
-      getAccountMeta(accounts.nftConfig),
       getAccountMeta(accounts.admin),
       getAccountMeta(accounts.nftProgram),
       getAccountMeta(accounts.systemProgram),
@@ -352,7 +337,6 @@ export function getInitCapitalProgramHandlerInstruction<
   } as InitCapitalProgramHandlerInstruction<
     TProgramAddress,
     TAccountConfig,
-    TAccountNftConfig,
     TAccountAdmin,
     TAccountNftProgram,
     TAccountSystemProgram
@@ -365,15 +349,16 @@ export type ParsedInitCapitalProgramHandlerInstruction<
 > = {
   programAddress: Address<TProgram>;
   accounts: {
-    /** Global authority configuration account */
+    /**
+     * Global authority configuration account
+     * re-initialization is not possible because of the init constraint
+     */
     config: TAccountMetas[0];
-    /** NFT program configuration account */
-    nftConfig: TAccountMetas[1];
     /** Program administrator with initialization authority */
-    admin: TAccountMetas[2];
+    admin: TAccountMetas[1];
     /** NFT marketplace program */
-    nftProgram: TAccountMetas[3];
-    systemProgram: TAccountMetas[4];
+    nftProgram: TAccountMetas[2];
+    systemProgram: TAccountMetas[3];
   };
   data: InitCapitalProgramHandlerInstructionData;
 };
@@ -386,7 +371,7 @@ export function parseInitCapitalProgramHandlerInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedInitCapitalProgramHandlerInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 5) {
+  if (instruction.accounts.length < 4) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -400,7 +385,6 @@ export function parseInitCapitalProgramHandlerInstruction<
     programAddress: instruction.programAddress,
     accounts: {
       config: getNextAccount(),
-      nftConfig: getNextAccount(),
       admin: getNextAccount(),
       nftProgram: getNextAccount(),
       systemProgram: getNextAccount(),

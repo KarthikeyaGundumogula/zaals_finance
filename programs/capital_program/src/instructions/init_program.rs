@@ -1,8 +1,5 @@
 use anchor_lang::prelude::*;
-
-use nft_program::cpi::accounts::InitNFTProgram;
 use nft_program::program::NftProgram;
-use nft_program::state::NFTConfig;
 
 use crate::constants::*;
 use crate::errors::*;
@@ -22,11 +19,6 @@ pub struct InitProgram<'info> {
     )]
     pub config: Account<'info, AuthorityConfig>,
 
-    /// NFT program configuration account
-    #[account(
-        owner = nft_program.key() @ NFTProgramError::InvalidNFTConfigOwner
-    )]
-    pub nft_config: Account<'info, NFTConfig>,
 
     /// Program administrator with initialization authority
     #[account(mut)]
@@ -43,13 +35,7 @@ pub struct InitProgram<'info> {
 }
 
 impl<'info> InitProgram<'info> {
-    /// Validates all initialization parameters
-    ///
-    /// Checks:
-    /// - Fee amounts are within acceptable ranges
-    /// - Dispute window is reasonable
-    /// - Lock duration constraints are valid
-    /// - Agent address is valid
+    
     pub fn validate_params(&self, params: &InitProgramConfig) -> Result<()> {
         // Validate agent address
         require_keys_neq!(params.agent, Pubkey::default(), SignerError::InvalidAddress);
@@ -92,31 +78,6 @@ impl<'info> InitProgram<'info> {
             // PDA bump
             bump: bumps.config,
         });
-
-        Ok(())
-    }
-
-    /// Initializes the NFT program via CPI
-    pub fn initialize_nft_program(&self, capital_program_id: Pubkey) -> Result<()> {
-        // Prepare CPI accounts
-        let cpi_accounts = InitNFTProgram {
-            admin: self.admin.to_account_info(),
-            authority: self.config.to_account_info(),
-            config: self.nft_config.to_account_info(),
-            system_program: self.system_program.to_account_info(),
-        };
-
-        // Prepare signer seeds
-        let signer_seeds: &[&[&[u8]]] = &[&[b"Config", &[self.config.bump]]];
-
-        // Execute CPI
-        let cpi_ctx = CpiContext::new_with_signer(
-            self.nft_program.to_account_info(),
-            cpi_accounts,
-            signer_seeds,
-        );
-
-        nft_program::cpi::init_nft_program_handler(cpi_ctx, capital_program_id)?;
 
         Ok(())
     }

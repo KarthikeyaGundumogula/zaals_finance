@@ -46,7 +46,7 @@ impl InitNftProgramHandler {
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.authority,
-            true
+            false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.system_program,
@@ -108,7 +108,7 @@ impl InitNftProgramHandlerInstructionArgs {
 ///
                 ///   0. `[writable]` config
                       ///   1. `[writable, signer]` admin
-                ///   2. `[signer]` authority
+          ///   2. `[]` authority
                 ///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct InitNftProgramHandlerBuilder {
@@ -260,7 +260,7 @@ impl<'a, 'b> InitNftProgramHandlerCpi<'a, 'b> {
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.authority.key,
-            true
+            false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.system_program.key,
@@ -304,7 +304,7 @@ impl<'a, 'b> InitNftProgramHandlerCpi<'a, 'b> {
 ///
                 ///   0. `[writable]` config
                       ///   1. `[writable, signer]` admin
-                ///   2. `[signer]` authority
+          ///   2. `[]` authority
           ///   3. `[]` system_program
 #[derive(Clone, Debug)]
 pub struct InitNftProgramHandlerCpiBuilder<'a, 'b> {

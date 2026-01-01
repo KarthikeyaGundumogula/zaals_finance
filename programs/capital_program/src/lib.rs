@@ -28,9 +28,6 @@ pub mod capital_program {
         // Step 2: Initialize config account
         ctx.accounts.initialize_config(params.clone(), &ctx.bumps)?;
 
-        // Step 3: Initialize NFT program via CPI
-        ctx.accounts.initialize_nft_program(*ctx.program_id)?;
-
         // Emit initialization event
         emit!(ProgramInitializedEvent {
             config: ctx.accounts.config.key(),
@@ -65,8 +62,8 @@ pub mod capital_program {
         // Emit event for indexing
         emit!(VaultCreatedEvent {
             vault: ctx.accounts.vault.key(),
-            provider: ctx.accounts.provider.key(),
-            node_operator: config.node_operator,
+            provider: ctx.accounts.node_operator.key(),
+            node_operator: ctx.accounts.node_operator.key(),
             staking_token: ctx.accounts.lock_mint.key(),
             reward_token: ctx.accounts.reward_token_mint.key(),
             nft_collection: ctx.accounts.nft_collection.key(),

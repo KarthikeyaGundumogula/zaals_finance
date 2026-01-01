@@ -16,13 +16,13 @@ use anchor_spl::{
 pub struct CreateVault<'info> {
     /// The vault provider/creator who pays for account initialization
     #[account(mut)]
-    pub provider: Signer<'info>,
+    pub node_operator: Signer<'info>,
 
     /// The vault account to be created
     #[account(
         init,
-        payer = provider,
-        seeds = [b"Vault", provider.key().as_ref()],
+        payer = node_operator,
+        seeds = [b"Vault", node_operator.key().as_ref()],
         space = Vault::INIT_SPACE + 8,
         bump,
     )]
@@ -71,14 +71,7 @@ pub struct CreateVault<'info> {
 }
 
 impl<'info> CreateVault<'info> {
-    /// Validates all configuration parameters for vault creation
-    ///
-    /// Checks:
-    /// - Total BPS allocation doesn't exceed 100%
-    /// - Lock phase duration meets minimum requirements
-    /// - Capital caps are properly ordered
-    /// - Timing constraints are satisfied
-    /// - Beneficiary configuration is valid
+    
     pub fn validate_config(&self, config: &InitVaultConfig) -> Result<()> {
         // Validate no duplicate beneficiaries and calculate total BPS
         let mut total_beneficiary_bps: u16 = 0;
@@ -168,6 +161,7 @@ impl<'info> CreateVault<'info> {
             total_capital_collected: 0,
             total_rewards_deposited: 0,
             capital_after_slashing: 0,
+            node_operator: *self.node_operator.key,
 
             // Beneficiary configuration
             beneficiaries: config.beneficiaries,
@@ -176,14 +170,10 @@ impl<'info> CreateVault<'info> {
             // Slash configuration
             max_slash_bps: config.max_slash_bps,
             pending_slash_amount: 0,
-            slash_claimant: config.slash_claimant,
+            slash_claimant: *self.node_operator.key,
 
             // NFT configuration
             nft_collection: self.nft_collection.key(),
-
-            // Authority configuration
-            reward_distributor: config.reward_distributor,
-            node_operator: config.node_operator,
 
             // Timing configuration
             lock_phase_start_at: config.lock_phase_start_time,
@@ -207,7 +197,7 @@ impl<'info> CreateVault<'info> {
             collection: self.nft_collection.to_account_info(),
             update_authority: self.config_account.to_account_info(),
             config: self.nft_config.to_account_info(),
-            payer: self.provider.to_account_info(),
+            payer: self.node_operator.to_account_info(),
             mpl_core_program: self.mpl_core_program.to_account_info(),
             system_program: self.system_program.to_account_info(),
         };
@@ -237,11 +227,6 @@ pub struct InitVaultConfig {
 
     // Slash configuration
     pub max_slash_bps: u16,
-    pub slash_claimant: Pubkey,
-
-    // Authority configuration
-    pub reward_distributor: Pubkey,
-    pub node_operator: Pubkey,
 
     // Timing configuration
     pub lock_phase_duration: i64,

@@ -13,7 +13,8 @@ pub struct InitNFTProgram<'info> {
     pub config: Account<'info, NFTConfig>,
     #[account(mut)]
     pub admin: Signer<'info>,
-    pub authority: Signer<'info>,
+    /// CHECK: THIS WILL BE THE AUTHORITY CONFIG IN CAPITAL_PROGRAM
+    pub authority: UncheckedAccount<'info>,
     pub system_program: Program<'info, System>,
 }
 

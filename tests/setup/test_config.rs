@@ -8,7 +8,9 @@ use solana_sdk::{
     signature::{Keypair, Signer},
 };
 
-use zaals_finance_client::{CAPITAL_PROGRAM_ID, NFT_PROGRAM_ID};
+use zaals_finance_client::{
+    capital_program::types::Beneficiary, CAPITAL_PROGRAM_ID, NFT_PROGRAM_ID,
+};
 
 use crate::setup::{capital_accounts::get_position_vault_pda, constants::DECIMALS, utils};
 
@@ -23,11 +25,8 @@ pub struct TestConfig {
     pub node_operator: Keypair,
     pub capital_provider: Keypair,
     pub slash_claimant: Pubkey,
-    pub beneficiary_1: Keypair,
-    pub beneficiary_2: Keypair,
-    pub beneficiary_3: Keypair,
-    pub beneficiary_4: Keypair,
-    pub beneficiary_5: Keypair,
+    pub beneficiary_signers: Vec<Keypair>,
+    pub beneficiaries: Vec<Beneficiary>,
     pub extra_beneficiary: Keypair,
 }
 
@@ -40,11 +39,23 @@ impl TestConfig {
         let node_operator = Keypair::new(); //("I'M YOUR GAME BD PROVIDER");
         let capital_provider = Keypair::new(); //("I INVEST MY SAVINGS");
         let slash_claimant = Pubkey::new_unique(); //("I LOST SERVICE");
-        let beneficiary_1 = Keypair::new(); //("OWNS WAREHOUSE");
-        let beneficiary_2 = Keypair::new(); //("OWNS HARDWARE");
-        let beneficiary_3 = Keypair::new(); //("SYSTEMS_ENGINEER");
-        let beneficiary_4 = Keypair::new(); //("SETUP COSTS LENDER");
-        let beneficiary_5 = Keypair::new(); //("SECURITY GAURD");
+                                                   // beneficiary_1 -- OWNS WAREHOUSE
+                                                   // beneficiary_2 -- OWNS HARDWARE
+                                                   // beneficiary_3 -- SYSTEMS_ENGINEER
+                                                   // beneficiary_4 -- SETUP COSTS LENDER
+                                                   // beneficiary_5 -- SECURITY GAURD
+
+        let mut beneficiaries: Vec<Beneficiary> = Vec::new();
+        let mut beneficiary_signers: Vec<Keypair> = Vec::new();
+        for i in 1..6 {
+            let b = Keypair::new();
+            beneficiaries.push(Beneficiary {
+                address: b.pubkey(),
+                share_bps: i * 250,
+                total_claimed: 0,
+            });
+            beneficiary_signers.push(b);
+        }
         let extra_beneficiary = Keypair::new(); //("LATE-COMER");
         let capital_program_id = CAPITAL_PROGRAM_ID;
         let nft_program_id = NFT_PROGRAM_ID;
@@ -57,6 +68,7 @@ impl TestConfig {
 
         utils::deploy_nft_program(&mut svm).expect("nft_program deployment failed");
         utils::deploy_capital_program(&mut svm).expect("capital_program deployment failed");
+        utils::deploy_mpl_program(&mut svm).expect("mpl_core deployment failed");
 
         TestConfig {
             nft_program_id,
@@ -65,14 +77,11 @@ impl TestConfig {
             admin,
             agent,
             god,
+            beneficiaries,
+            beneficiary_signers,
             node_operator,
             capital_provider,
             slash_claimant,
-            beneficiary_1,
-            beneficiary_2,
-            beneficiary_3,
-            beneficiary_4,
-            beneficiary_5,
             extra_beneficiary,
         }
     }
@@ -86,7 +95,7 @@ pub struct Tokens {
     pub agent_reward_ata: Pubkey,
     pub vault_reward_ata: Pubkey,
     pub vault_lock_ata: Pubkey,
-    pub collection: Keypair
+    pub collection: Keypair,
 }
 
 impl Tokens {
@@ -130,7 +139,7 @@ impl Tokens {
             agent_reward_ata,
             vault_lock_ata,
             vault_reward_ata,
-            collection
+            collection,
         }
     }
 

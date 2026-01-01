@@ -6,7 +6,6 @@
 //!
 
 use crate::generated::types::Beneficiary;
-use solana_pubkey::Pubkey;
 use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
 
@@ -19,7 +18,7 @@ pub struct CreateVaultHandler {
 
     
               
-          pub provider: solana_pubkey::Pubkey,
+          pub node_operator: solana_pubkey::Pubkey,
                 /// The vault account to be created
 
     
@@ -76,7 +75,7 @@ impl CreateVaultHandler {
   pub fn instruction_with_remaining_accounts(&self, args: CreateVaultHandlerInstructionArgs, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
     let mut accounts = Vec::with_capacity(12+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
-            self.provider,
+            self.node_operator,
             true
           ));
                                           accounts.push(solana_instruction::AccountMeta::new(
@@ -140,13 +139,13 @@ impl CreateVaultHandler {
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
  pub struct CreateVaultHandlerInstructionData {
             discriminator: [u8; 8],
-                                                                        }
+                                                      }
 
 impl CreateVaultHandlerInstructionData {
   pub fn new() -> Self {
     Self {
                         discriminator: [166, 83, 111, 163, 111, 146, 16, 162],
-                                                                                                                                                                            }
+                                                                                                                                  }
   }
 
     pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
@@ -169,9 +168,6 @@ impl Default for CreateVaultHandlerInstructionData {
                 pub beneficiaries: Vec<Beneficiary>,
                 pub investor_bps: u16,
                 pub max_slash_bps: u16,
-                pub slash_claimant: Pubkey,
-                pub reward_distributor: Pubkey,
-                pub node_operator: Pubkey,
                 pub lock_phase_duration: i64,
                 pub lock_phase_start_time: i64,
       }
@@ -187,7 +183,7 @@ impl CreateVaultHandlerInstructionArgs {
 ///
 /// ### Accounts:
 ///
-                      ///   0. `[writable, signer]` provider
+                      ///   0. `[writable, signer]` node_operator
                 ///   1. `[writable]` vault
           ///   2. `[]` config_account
           ///   3. `[]` nft_config
@@ -201,7 +197,7 @@ impl CreateVaultHandlerInstructionArgs {
                 ///   11. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct CreateVaultHandlerBuilder {
-            provider: Option<solana_pubkey::Pubkey>,
+            node_operator: Option<solana_pubkey::Pubkey>,
                 vault: Option<solana_pubkey::Pubkey>,
                 config_account: Option<solana_pubkey::Pubkey>,
                 nft_config: Option<solana_pubkey::Pubkey>,
@@ -219,9 +215,6 @@ pub struct CreateVaultHandlerBuilder {
                 beneficiaries: Option<Vec<Beneficiary>>,
                 investor_bps: Option<u16>,
                 max_slash_bps: Option<u16>,
-                slash_claimant: Option<Pubkey>,
-                reward_distributor: Option<Pubkey>,
-                node_operator: Option<Pubkey>,
                 lock_phase_duration: Option<i64>,
                 lock_phase_start_time: Option<i64>,
         __remaining_accounts: Vec<solana_instruction::AccountMeta>,
@@ -233,8 +226,8 @@ impl CreateVaultHandlerBuilder {
   }
             /// The vault provider/creator who pays for account initialization
 #[inline(always)]
-    pub fn provider(&mut self, provider: solana_pubkey::Pubkey) -> &mut Self {
-                        self.provider = Some(provider);
+    pub fn node_operator(&mut self, node_operator: solana_pubkey::Pubkey) -> &mut Self {
+                        self.node_operator = Some(node_operator);
                     self
     }
             /// The vault account to be created
@@ -334,21 +327,6 @@ impl CreateVaultHandlerBuilder {
         self
       }
                 #[inline(always)]
-      pub fn slash_claimant(&mut self, slash_claimant: Pubkey) -> &mut Self {
-        self.slash_claimant = Some(slash_claimant);
-        self
-      }
-                #[inline(always)]
-      pub fn reward_distributor(&mut self, reward_distributor: Pubkey) -> &mut Self {
-        self.reward_distributor = Some(reward_distributor);
-        self
-      }
-                #[inline(always)]
-      pub fn node_operator(&mut self, node_operator: Pubkey) -> &mut Self {
-        self.node_operator = Some(node_operator);
-        self
-      }
-                #[inline(always)]
       pub fn lock_phase_duration(&mut self, lock_phase_duration: i64) -> &mut Self {
         self.lock_phase_duration = Some(lock_phase_duration);
         self
@@ -373,7 +351,7 @@ impl CreateVaultHandlerBuilder {
   #[allow(clippy::clone_on_copy)]
   pub fn instruction(&self) -> solana_instruction::Instruction {
     let accounts = CreateVaultHandler {
-                              provider: self.provider.expect("provider is not set"),
+                              node_operator: self.node_operator.expect("node_operator is not set"),
                                         vault: self.vault.expect("vault is not set"),
                                         config_account: self.config_account.expect("config_account is not set"),
                                         nft_config: self.nft_config.expect("nft_config is not set"),
@@ -393,9 +371,6 @@ impl CreateVaultHandlerBuilder {
                                                                   beneficiaries: self.beneficiaries.clone().expect("beneficiaries is not set"),
                                                                   investor_bps: self.investor_bps.clone().expect("investor_bps is not set"),
                                                                   max_slash_bps: self.max_slash_bps.clone().expect("max_slash_bps is not set"),
-                                                                  slash_claimant: self.slash_claimant.clone().expect("slash_claimant is not set"),
-                                                                  reward_distributor: self.reward_distributor.clone().expect("reward_distributor is not set"),
-                                                                  node_operator: self.node_operator.clone().expect("node_operator is not set"),
                                                                   lock_phase_duration: self.lock_phase_duration.clone().expect("lock_phase_duration is not set"),
                                                                   lock_phase_start_time: self.lock_phase_start_time.clone().expect("lock_phase_start_time is not set"),
                                     };
@@ -410,7 +385,7 @@ impl CreateVaultHandlerBuilder {
 
       
                     
-              pub provider: &'b solana_account_info::AccountInfo<'a>,
+              pub node_operator: &'b solana_account_info::AccountInfo<'a>,
                         /// The vault account to be created
 
       
@@ -466,7 +441,7 @@ pub struct CreateVaultHandlerCpi<'a, 'b> {
 
     
               
-          pub provider: &'b solana_account_info::AccountInfo<'a>,
+          pub node_operator: &'b solana_account_info::AccountInfo<'a>,
                 /// The vault account to be created
 
     
@@ -524,7 +499,7 @@ impl<'a, 'b> CreateVaultHandlerCpi<'a, 'b> {
       ) -> Self {
     Self {
       __program: program,
-              provider: accounts.provider,
+              node_operator: accounts.node_operator,
               vault: accounts.vault,
               config_account: accounts.config_account,
               nft_config: accounts.nft_config,
@@ -561,7 +536,7 @@ impl<'a, 'b> CreateVaultHandlerCpi<'a, 'b> {
   ) -> solana_program_error::ProgramResult {
     let mut accounts = Vec::with_capacity(12+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
-            *self.provider.key,
+            *self.node_operator.key,
             true
           ));
                                           accounts.push(solana_instruction::AccountMeta::new(
@@ -626,7 +601,7 @@ impl<'a, 'b> CreateVaultHandlerCpi<'a, 'b> {
     };
     let mut account_infos = Vec::with_capacity(13 + remaining_accounts.len());
     account_infos.push(self.__program.clone());
-                  account_infos.push(self.provider.clone());
+                  account_infos.push(self.node_operator.clone());
                         account_infos.push(self.vault.clone());
                         account_infos.push(self.config_account.clone());
                         account_infos.push(self.nft_config.clone());
@@ -652,7 +627,7 @@ impl<'a, 'b> CreateVaultHandlerCpi<'a, 'b> {
 ///
 /// ### Accounts:
 ///
-                      ///   0. `[writable, signer]` provider
+                      ///   0. `[writable, signer]` node_operator
                 ///   1. `[writable]` vault
           ///   2. `[]` config_account
           ///   3. `[]` nft_config
@@ -673,7 +648,7 @@ impl<'a, 'b> CreateVaultHandlerCpiBuilder<'a, 'b> {
   pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
     let instruction = Box::new(CreateVaultHandlerCpiBuilderInstruction {
       __program: program,
-              provider: None,
+              node_operator: None,
               vault: None,
               config_account: None,
               nft_config: None,
@@ -691,9 +666,6 @@ impl<'a, 'b> CreateVaultHandlerCpiBuilder<'a, 'b> {
                                 beneficiaries: None,
                                 investor_bps: None,
                                 max_slash_bps: None,
-                                slash_claimant: None,
-                                reward_distributor: None,
-                                node_operator: None,
                                 lock_phase_duration: None,
                                 lock_phase_start_time: None,
                     __remaining_accounts: Vec::new(),
@@ -702,8 +674,8 @@ impl<'a, 'b> CreateVaultHandlerCpiBuilder<'a, 'b> {
   }
       /// The vault provider/creator who pays for account initialization
 #[inline(always)]
-    pub fn provider(&mut self, provider: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.provider = Some(provider);
+    pub fn node_operator(&mut self, node_operator: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.node_operator = Some(node_operator);
                     self
     }
       /// The vault account to be created
@@ -798,21 +770,6 @@ impl<'a, 'b> CreateVaultHandlerCpiBuilder<'a, 'b> {
         self
       }
                 #[inline(always)]
-      pub fn slash_claimant(&mut self, slash_claimant: Pubkey) -> &mut Self {
-        self.instruction.slash_claimant = Some(slash_claimant);
-        self
-      }
-                #[inline(always)]
-      pub fn reward_distributor(&mut self, reward_distributor: Pubkey) -> &mut Self {
-        self.instruction.reward_distributor = Some(reward_distributor);
-        self
-      }
-                #[inline(always)]
-      pub fn node_operator(&mut self, node_operator: Pubkey) -> &mut Self {
-        self.instruction.node_operator = Some(node_operator);
-        self
-      }
-                #[inline(always)]
       pub fn lock_phase_duration(&mut self, lock_phase_duration: i64) -> &mut Self {
         self.instruction.lock_phase_duration = Some(lock_phase_duration);
         self
@@ -851,16 +808,13 @@ impl<'a, 'b> CreateVaultHandlerCpiBuilder<'a, 'b> {
                                                                   beneficiaries: self.instruction.beneficiaries.clone().expect("beneficiaries is not set"),
                                                                   investor_bps: self.instruction.investor_bps.clone().expect("investor_bps is not set"),
                                                                   max_slash_bps: self.instruction.max_slash_bps.clone().expect("max_slash_bps is not set"),
-                                                                  slash_claimant: self.instruction.slash_claimant.clone().expect("slash_claimant is not set"),
-                                                                  reward_distributor: self.instruction.reward_distributor.clone().expect("reward_distributor is not set"),
-                                                                  node_operator: self.instruction.node_operator.clone().expect("node_operator is not set"),
                                                                   lock_phase_duration: self.instruction.lock_phase_duration.clone().expect("lock_phase_duration is not set"),
                                                                   lock_phase_start_time: self.instruction.lock_phase_start_time.clone().expect("lock_phase_start_time is not set"),
                                     };
         let instruction = CreateVaultHandlerCpi {
         __program: self.instruction.__program,
                   
-          provider: self.instruction.provider.expect("provider is not set"),
+          node_operator: self.instruction.node_operator.expect("node_operator is not set"),
                   
           vault: self.instruction.vault.expect("vault is not set"),
                   
@@ -892,7 +846,7 @@ impl<'a, 'b> CreateVaultHandlerCpiBuilder<'a, 'b> {
 #[derive(Clone, Debug)]
 struct CreateVaultHandlerCpiBuilderInstruction<'a, 'b> {
   __program: &'b solana_account_info::AccountInfo<'a>,
-            provider: Option<&'b solana_account_info::AccountInfo<'a>>,
+            node_operator: Option<&'b solana_account_info::AccountInfo<'a>>,
                 vault: Option<&'b solana_account_info::AccountInfo<'a>>,
                 config_account: Option<&'b solana_account_info::AccountInfo<'a>>,
                 nft_config: Option<&'b solana_account_info::AccountInfo<'a>>,
@@ -910,9 +864,6 @@ struct CreateVaultHandlerCpiBuilderInstruction<'a, 'b> {
                 beneficiaries: Option<Vec<Beneficiary>>,
                 investor_bps: Option<u16>,
                 max_slash_bps: Option<u16>,
-                slash_claimant: Option<Pubkey>,
-                reward_distributor: Option<Pubkey>,
-                node_operator: Option<Pubkey>,
                 lock_phase_duration: Option<i64>,
                 lock_phase_start_time: Option<i64>,
         /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.

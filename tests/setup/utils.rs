@@ -1,5 +1,7 @@
-use crate::constants::{NFT_PROGRAM_KEY_PAIR, NFT_PROGRAM_SO_FILE};
-use crate::setup::constants::{CAPITAL_PROGRAM_KEY_PAIR, CAPITAL_PROGRAM_SO_FILE};
+use std::str::FromStr;
+
+use crate::constants::{NFT_PROGRAM_KEY_PAIR, NFT_PROGRAM_SO_FILE,MPL_CORE_ID};
+use crate::setup::constants::{CAPITAL_PROGRAM_KEY_PAIR, CAPITAL_PROGRAM_SO_FILE, MPL_CORE_SO_FILE};
 use litesvm::LiteSVM;
 use litesvm::{error::LiteSVMError, types::TransactionResult};
 use solana_sdk::{
@@ -25,6 +27,11 @@ pub fn deploy_capital_program(svm: &mut LiteSVM) -> Result<(), LiteSVMError> {
     let program_id = program_keypair.pubkey();
     println!("Deploying program from keypair: {}", program_id);
     svm.add_program_from_file(program_id, CAPITAL_PROGRAM_SO_FILE)
+}
+
+pub fn deploy_mpl_program(svm: &mut LiteSVM) -> Result<(), LiteSVMError> {
+    let program_id = Pubkey::from_str(MPL_CORE_ID).expect("Invalid MPL_CORE_ID");
+    svm.add_program_from_file(program_id, MPL_CORE_SO_FILE)
 }
 
 pub fn fund(svm: &mut LiteSVM, claimant: Pubkey) -> TransactionResult {

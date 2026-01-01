@@ -32,7 +32,6 @@ pub struct Vault {
     pub max_slash_bps: u16,
     pub nft_collection: Pubkey,
 
-    pub reward_distributor: Pubkey,
     pub node_operator: Pubkey,
 
     pub lock_phase_start_at: i64,

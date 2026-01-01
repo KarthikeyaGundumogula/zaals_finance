@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+echo "building.."
+anchor build
+
 echo "Generating clients for programs..."
 
 echo "Generating capital-program clients..."

@@ -28,7 +28,6 @@ import {
   type InstructionWithAccounts,
   type InstructionWithData,
   type ReadonlyAccount,
-  type ReadonlySignerAccount,
   type ReadonlyUint8Array,
   type TransactionSigner,
   type WritableAccount,
@@ -67,8 +66,7 @@ export type InitNftProgramHandlerInstruction<
             AccountSignerMeta<TAccountAdmin>
         : TAccountAdmin,
       TAccountAuthority extends string
-        ? ReadonlySignerAccount<TAccountAuthority> &
-            AccountSignerMeta<TAccountAuthority>
+        ? ReadonlyAccount<TAccountAuthority>
         : TAccountAuthority,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
@@ -124,7 +122,7 @@ export type InitNftProgramHandlerAsyncInput<
 > = {
   config?: Address<TAccountConfig>;
   admin: TransactionSigner<TAccountAdmin>;
-  authority: TransactionSigner<TAccountAuthority>;
+  authority: Address<TAccountAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
   capitalProgram: InitNftProgramHandlerInstructionDataArgs["capitalProgram"];
 };
@@ -215,7 +213,7 @@ export type InitNftProgramHandlerInput<
 > = {
   config: Address<TAccountConfig>;
   admin: TransactionSigner<TAccountAdmin>;
-  authority: TransactionSigner<TAccountAuthority>;
+  authority: Address<TAccountAuthority>;
   systemProgram?: Address<TAccountSystemProgram>;
   capitalProgram: InitNftProgramHandlerInstructionDataArgs["capitalProgram"];
 };

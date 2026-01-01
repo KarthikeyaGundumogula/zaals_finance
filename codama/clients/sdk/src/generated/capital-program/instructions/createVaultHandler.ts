@@ -10,7 +10,6 @@ import {
   combineCodec,
   fixDecoderSize,
   fixEncoderSize,
-  getAddressDecoder,
   getAddressEncoder,
   getArrayDecoder,
   getArrayEncoder,
@@ -66,7 +65,7 @@ export function getCreateVaultHandlerDiscriminatorBytes() {
 
 export type CreateVaultHandlerInstruction<
   TProgram extends string = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
-  TAccountProvider extends string | AccountMeta<string> = string,
+  TAccountNodeOperator extends string | AccountMeta<string> = string,
   TAccountVault extends string | AccountMeta<string> = string,
   TAccountConfigAccount extends string | AccountMeta<string> = string,
   TAccountNftConfig extends string | AccountMeta<string> = string,
@@ -88,10 +87,10 @@ export type CreateVaultHandlerInstruction<
   InstructionWithData<ReadonlyUint8Array> &
   InstructionWithAccounts<
     [
-      TAccountProvider extends string
-        ? WritableSignerAccount<TAccountProvider> &
-            AccountSignerMeta<TAccountProvider>
-        : TAccountProvider,
+      TAccountNodeOperator extends string
+        ? WritableSignerAccount<TAccountNodeOperator> &
+            AccountSignerMeta<TAccountNodeOperator>
+        : TAccountNodeOperator,
       TAccountVault extends string
         ? WritableAccount<TAccountVault>
         : TAccountVault,
@@ -138,9 +137,6 @@ export type CreateVaultHandlerInstructionData = {
   beneficiaries: Array<Beneficiary>;
   investorBps: number;
   maxSlashBps: number;
-  slashClaimant: Address;
-  rewardDistributor: Address;
-  nodeOperator: Address;
   lockPhaseDuration: bigint;
   lockPhaseStartTime: bigint;
 };
@@ -152,9 +148,6 @@ export type CreateVaultHandlerInstructionDataArgs = {
   beneficiaries: Array<BeneficiaryArgs>;
   investorBps: number;
   maxSlashBps: number;
-  slashClaimant: Address;
-  rewardDistributor: Address;
-  nodeOperator: Address;
   lockPhaseDuration: number | bigint;
   lockPhaseStartTime: number | bigint;
 };
@@ -169,9 +162,6 @@ export function getCreateVaultHandlerInstructionDataEncoder(): Encoder<CreateVau
       ["beneficiaries", getArrayEncoder(getBeneficiaryEncoder())],
       ["investorBps", getU16Encoder()],
       ["maxSlashBps", getU16Encoder()],
-      ["slashClaimant", getAddressEncoder()],
-      ["rewardDistributor", getAddressEncoder()],
-      ["nodeOperator", getAddressEncoder()],
       ["lockPhaseDuration", getI64Encoder()],
       ["lockPhaseStartTime", getI64Encoder()],
     ]),
@@ -191,9 +181,6 @@ export function getCreateVaultHandlerInstructionDataDecoder(): Decoder<CreateVau
     ["beneficiaries", getArrayDecoder(getBeneficiaryDecoder())],
     ["investorBps", getU16Decoder()],
     ["maxSlashBps", getU16Decoder()],
-    ["slashClaimant", getAddressDecoder()],
-    ["rewardDistributor", getAddressDecoder()],
-    ["nodeOperator", getAddressDecoder()],
     ["lockPhaseDuration", getI64Decoder()],
     ["lockPhaseStartTime", getI64Decoder()],
   ]);
@@ -210,7 +197,7 @@ export function getCreateVaultHandlerInstructionDataCodec(): Codec<
 }
 
 export type CreateVaultHandlerAsyncInput<
-  TAccountProvider extends string = string,
+  TAccountNodeOperator extends string = string,
   TAccountVault extends string = string,
   TAccountConfigAccount extends string = string,
   TAccountNftConfig extends string = string,
@@ -224,7 +211,7 @@ export type CreateVaultHandlerAsyncInput<
   TAccountSystemProgram extends string = string,
 > = {
   /** The vault provider/creator who pays for account initialization */
-  provider: TransactionSigner<TAccountProvider>;
+  nodeOperator: TransactionSigner<TAccountNodeOperator>;
   /** The vault account to be created */
   vault?: Address<TAccountVault>;
   /** Global authority configuration */
@@ -248,15 +235,12 @@ export type CreateVaultHandlerAsyncInput<
   beneficiaries: CreateVaultHandlerInstructionDataArgs["beneficiaries"];
   investorBps: CreateVaultHandlerInstructionDataArgs["investorBps"];
   maxSlashBps: CreateVaultHandlerInstructionDataArgs["maxSlashBps"];
-  slashClaimant: CreateVaultHandlerInstructionDataArgs["slashClaimant"];
-  rewardDistributor: CreateVaultHandlerInstructionDataArgs["rewardDistributor"];
-  nodeOperator: CreateVaultHandlerInstructionDataArgs["nodeOperator"];
   lockPhaseDuration: CreateVaultHandlerInstructionDataArgs["lockPhaseDuration"];
   lockPhaseStartTime: CreateVaultHandlerInstructionDataArgs["lockPhaseStartTime"];
 };
 
 export async function getCreateVaultHandlerInstructionAsync<
-  TAccountProvider extends string,
+  TAccountNodeOperator extends string,
   TAccountVault extends string,
   TAccountConfigAccount extends string,
   TAccountNftConfig extends string,
@@ -271,7 +255,7 @@ export async function getCreateVaultHandlerInstructionAsync<
   TProgramAddress extends Address = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: CreateVaultHandlerAsyncInput<
-    TAccountProvider,
+    TAccountNodeOperator,
     TAccountVault,
     TAccountConfigAccount,
     TAccountNftConfig,
@@ -288,7 +272,7 @@ export async function getCreateVaultHandlerInstructionAsync<
 ): Promise<
   CreateVaultHandlerInstruction<
     TProgramAddress,
-    TAccountProvider,
+    TAccountNodeOperator,
     TAccountVault,
     TAccountConfigAccount,
     TAccountNftConfig,
@@ -308,7 +292,7 @@ export async function getCreateVaultHandlerInstructionAsync<
 
   // Original accounts.
   const originalAccounts = {
-    provider: { value: input.provider ?? null, isWritable: true },
+    nodeOperator: { value: input.nodeOperator ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     configAccount: { value: input.configAccount ?? null, isWritable: false },
     nftConfig: { value: input.nftConfig ?? null, isWritable: false },
@@ -341,7 +325,7 @@ export async function getCreateVaultHandlerInstructionAsync<
       programAddress,
       seeds: [
         getBytesEncoder().encode(new Uint8Array([86, 97, 117, 108, 116])),
-        getAddressEncoder().encode(expectAddress(accounts.provider.value)),
+        getAddressEncoder().encode(expectAddress(accounts.nodeOperator.value)),
       ],
     });
   }
@@ -377,7 +361,7 @@ export async function getCreateVaultHandlerInstructionAsync<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.provider),
+      getAccountMeta(accounts.nodeOperator),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.configAccount),
       getAccountMeta(accounts.nftConfig),
@@ -396,7 +380,7 @@ export async function getCreateVaultHandlerInstructionAsync<
     programAddress,
   } as CreateVaultHandlerInstruction<
     TProgramAddress,
-    TAccountProvider,
+    TAccountNodeOperator,
     TAccountVault,
     TAccountConfigAccount,
     TAccountNftConfig,
@@ -412,7 +396,7 @@ export async function getCreateVaultHandlerInstructionAsync<
 }
 
 export type CreateVaultHandlerInput<
-  TAccountProvider extends string = string,
+  TAccountNodeOperator extends string = string,
   TAccountVault extends string = string,
   TAccountConfigAccount extends string = string,
   TAccountNftConfig extends string = string,
@@ -426,7 +410,7 @@ export type CreateVaultHandlerInput<
   TAccountSystemProgram extends string = string,
 > = {
   /** The vault provider/creator who pays for account initialization */
-  provider: TransactionSigner<TAccountProvider>;
+  nodeOperator: TransactionSigner<TAccountNodeOperator>;
   /** The vault account to be created */
   vault: Address<TAccountVault>;
   /** Global authority configuration */
@@ -450,15 +434,12 @@ export type CreateVaultHandlerInput<
   beneficiaries: CreateVaultHandlerInstructionDataArgs["beneficiaries"];
   investorBps: CreateVaultHandlerInstructionDataArgs["investorBps"];
   maxSlashBps: CreateVaultHandlerInstructionDataArgs["maxSlashBps"];
-  slashClaimant: CreateVaultHandlerInstructionDataArgs["slashClaimant"];
-  rewardDistributor: CreateVaultHandlerInstructionDataArgs["rewardDistributor"];
-  nodeOperator: CreateVaultHandlerInstructionDataArgs["nodeOperator"];
   lockPhaseDuration: CreateVaultHandlerInstructionDataArgs["lockPhaseDuration"];
   lockPhaseStartTime: CreateVaultHandlerInstructionDataArgs["lockPhaseStartTime"];
 };
 
 export function getCreateVaultHandlerInstruction<
-  TAccountProvider extends string,
+  TAccountNodeOperator extends string,
   TAccountVault extends string,
   TAccountConfigAccount extends string,
   TAccountNftConfig extends string,
@@ -473,7 +454,7 @@ export function getCreateVaultHandlerInstruction<
   TProgramAddress extends Address = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: CreateVaultHandlerInput<
-    TAccountProvider,
+    TAccountNodeOperator,
     TAccountVault,
     TAccountConfigAccount,
     TAccountNftConfig,
@@ -489,7 +470,7 @@ export function getCreateVaultHandlerInstruction<
   config?: { programAddress?: TProgramAddress },
 ): CreateVaultHandlerInstruction<
   TProgramAddress,
-  TAccountProvider,
+  TAccountNodeOperator,
   TAccountVault,
   TAccountConfigAccount,
   TAccountNftConfig,
@@ -508,7 +489,7 @@ export function getCreateVaultHandlerInstruction<
 
   // Original accounts.
   const originalAccounts = {
-    provider: { value: input.provider ?? null, isWritable: true },
+    nodeOperator: { value: input.nodeOperator ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     configAccount: { value: input.configAccount ?? null, isWritable: false },
     nftConfig: { value: input.nftConfig ?? null, isWritable: false },
@@ -560,7 +541,7 @@ export function getCreateVaultHandlerInstruction<
   const getAccountMeta = getAccountMetaFactory(programAddress, "programId");
   return Object.freeze({
     accounts: [
-      getAccountMeta(accounts.provider),
+      getAccountMeta(accounts.nodeOperator),
       getAccountMeta(accounts.vault),
       getAccountMeta(accounts.configAccount),
       getAccountMeta(accounts.nftConfig),
@@ -579,7 +560,7 @@ export function getCreateVaultHandlerInstruction<
     programAddress,
   } as CreateVaultHandlerInstruction<
     TProgramAddress,
-    TAccountProvider,
+    TAccountNodeOperator,
     TAccountVault,
     TAccountConfigAccount,
     TAccountNftConfig,
@@ -601,7 +582,7 @@ export type ParsedCreateVaultHandlerInstruction<
   programAddress: Address<TProgram>;
   accounts: {
     /** The vault provider/creator who pays for account initialization */
-    provider: TAccountMetas[0];
+    nodeOperator: TAccountMetas[0];
     /** The vault account to be created */
     vault: TAccountMetas[1];
     /** Global authority configuration */
@@ -644,7 +625,7 @@ export function parseCreateVaultHandlerInstruction<
   return {
     programAddress: instruction.programAddress,
     accounts: {
-      provider: getNextAccount(),
+      nodeOperator: getNextAccount(),
       vault: getNextAccount(),
       configAccount: getNextAccount(),
       nftConfig: getNextAccount(),

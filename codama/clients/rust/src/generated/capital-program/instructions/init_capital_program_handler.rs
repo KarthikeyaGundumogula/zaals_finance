@@ -15,15 +15,11 @@ pub const INIT_CAPITAL_PROGRAM_HANDLER_DISCRIMINATOR: [u8; 8] = [248, 187, 57, 8
 #[derive(Debug)]
 pub struct InitCapitalProgramHandler {
             /// Global authority configuration account
+/// re-initialization is not possible because of the init constraint
 
     
               
           pub config: solana_pubkey::Pubkey,
-                /// NFT program configuration account
-
-    
-              
-          pub nft_config: solana_pubkey::Pubkey,
                 /// Program administrator with initialization authority
 
     
@@ -46,13 +42,9 @@ impl InitCapitalProgramHandler {
   #[allow(clippy::arithmetic_side_effects)]
   #[allow(clippy::vec_init_then_push)]
   pub fn instruction_with_remaining_accounts(&self, args: InitCapitalProgramHandlerInstructionArgs, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
-    let mut accounts = Vec::with_capacity(5+ remaining_accounts.len());
+    let mut accounts = Vec::with_capacity(4+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
             self.config,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            self.nft_config,
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new(
@@ -126,14 +118,12 @@ impl InitCapitalProgramHandlerInstructionArgs {
 /// ### Accounts:
 ///
                 ///   0. `[writable]` config
-          ///   1. `[]` nft_config
-                      ///   2. `[writable, signer]` admin
-                ///   3. `[optional]` nft_program (default to `AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH`)
-                ///   4. `[optional]` system_program (default to `11111111111111111111111111111111`)
+                      ///   1. `[writable, signer]` admin
+                ///   2. `[optional]` nft_program (default to `AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH`)
+                ///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct InitCapitalProgramHandlerBuilder {
             config: Option<solana_pubkey::Pubkey>,
-                nft_config: Option<solana_pubkey::Pubkey>,
                 admin: Option<solana_pubkey::Pubkey>,
                 nft_program: Option<solana_pubkey::Pubkey>,
                 system_program: Option<solana_pubkey::Pubkey>,
@@ -150,15 +140,10 @@ impl InitCapitalProgramHandlerBuilder {
     Self::default()
   }
             /// Global authority configuration account
+/// re-initialization is not possible because of the init constraint
 #[inline(always)]
     pub fn config(&mut self, config: solana_pubkey::Pubkey) -> &mut Self {
                         self.config = Some(config);
-                    self
-    }
-            /// NFT program configuration account
-#[inline(always)]
-    pub fn nft_config(&mut self, nft_config: solana_pubkey::Pubkey) -> &mut Self {
-                        self.nft_config = Some(nft_config);
                     self
     }
             /// Program administrator with initialization authority
@@ -221,7 +206,6 @@ impl InitCapitalProgramHandlerBuilder {
   pub fn instruction(&self) -> solana_instruction::Instruction {
     let accounts = InitCapitalProgramHandler {
                               config: self.config.expect("config is not set"),
-                                        nft_config: self.nft_config.expect("nft_config is not set"),
                                         admin: self.admin.expect("admin is not set"),
                                         nft_program: self.nft_program.unwrap_or(solana_pubkey::pubkey!("AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH")),
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
@@ -241,15 +225,11 @@ impl InitCapitalProgramHandlerBuilder {
   /// `init_capital_program_handler` CPI accounts.
   pub struct InitCapitalProgramHandlerCpiAccounts<'a, 'b> {
                   /// Global authority configuration account
+/// re-initialization is not possible because of the init constraint
 
       
                     
               pub config: &'b solana_account_info::AccountInfo<'a>,
-                        /// NFT program configuration account
-
-      
-                    
-              pub nft_config: &'b solana_account_info::AccountInfo<'a>,
                         /// Program administrator with initialization authority
 
       
@@ -270,15 +250,11 @@ pub struct InitCapitalProgramHandlerCpi<'a, 'b> {
   /// The program to invoke.
   pub __program: &'b solana_account_info::AccountInfo<'a>,
             /// Global authority configuration account
+/// re-initialization is not possible because of the init constraint
 
     
               
           pub config: &'b solana_account_info::AccountInfo<'a>,
-                /// NFT program configuration account
-
-    
-              
-          pub nft_config: &'b solana_account_info::AccountInfo<'a>,
                 /// Program administrator with initialization authority
 
     
@@ -305,7 +281,6 @@ impl<'a, 'b> InitCapitalProgramHandlerCpi<'a, 'b> {
     Self {
       __program: program,
               config: accounts.config,
-              nft_config: accounts.nft_config,
               admin: accounts.admin,
               nft_program: accounts.nft_program,
               system_program: accounts.system_program,
@@ -332,13 +307,9 @@ impl<'a, 'b> InitCapitalProgramHandlerCpi<'a, 'b> {
     signers_seeds: &[&[&[u8]]],
     remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)]
   ) -> solana_program_error::ProgramResult {
-    let mut accounts = Vec::with_capacity(5+ remaining_accounts.len());
+    let mut accounts = Vec::with_capacity(4+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
             *self.config.key,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            *self.nft_config.key,
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new(
@@ -369,10 +340,9 @@ impl<'a, 'b> InitCapitalProgramHandlerCpi<'a, 'b> {
       accounts,
       data,
     };
-    let mut account_infos = Vec::with_capacity(6 + remaining_accounts.len());
+    let mut account_infos = Vec::with_capacity(5 + remaining_accounts.len());
     account_infos.push(self.__program.clone());
                   account_infos.push(self.config.clone());
-                        account_infos.push(self.nft_config.clone());
                         account_infos.push(self.admin.clone());
                         account_infos.push(self.nft_program.clone());
                         account_infos.push(self.system_program.clone());
@@ -391,10 +361,9 @@ impl<'a, 'b> InitCapitalProgramHandlerCpi<'a, 'b> {
 /// ### Accounts:
 ///
                 ///   0. `[writable]` config
-          ///   1. `[]` nft_config
-                      ///   2. `[writable, signer]` admin
-          ///   3. `[]` nft_program
-          ///   4. `[]` system_program
+                      ///   1. `[writable, signer]` admin
+          ///   2. `[]` nft_program
+          ///   3. `[]` system_program
 #[derive(Clone, Debug)]
 pub struct InitCapitalProgramHandlerCpiBuilder<'a, 'b> {
   instruction: Box<InitCapitalProgramHandlerCpiBuilderInstruction<'a, 'b>>,
@@ -405,7 +374,6 @@ impl<'a, 'b> InitCapitalProgramHandlerCpiBuilder<'a, 'b> {
     let instruction = Box::new(InitCapitalProgramHandlerCpiBuilderInstruction {
       __program: program,
               config: None,
-              nft_config: None,
               admin: None,
               nft_program: None,
               system_program: None,
@@ -419,15 +387,10 @@ impl<'a, 'b> InitCapitalProgramHandlerCpiBuilder<'a, 'b> {
     Self { instruction }
   }
       /// Global authority configuration account
+/// re-initialization is not possible because of the init constraint
 #[inline(always)]
     pub fn config(&mut self, config: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
                         self.instruction.config = Some(config);
-                    self
-    }
-      /// NFT program configuration account
-#[inline(always)]
-    pub fn nft_config(&mut self, nft_config: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.nft_config = Some(nft_config);
                     self
     }
       /// Program administrator with initialization authority
@@ -506,8 +469,6 @@ impl<'a, 'b> InitCapitalProgramHandlerCpiBuilder<'a, 'b> {
                   
           config: self.instruction.config.expect("config is not set"),
                   
-          nft_config: self.instruction.nft_config.expect("nft_config is not set"),
-                  
           admin: self.instruction.admin.expect("admin is not set"),
                   
           nft_program: self.instruction.nft_program.expect("nft_program is not set"),
@@ -523,7 +484,6 @@ impl<'a, 'b> InitCapitalProgramHandlerCpiBuilder<'a, 'b> {
 struct InitCapitalProgramHandlerCpiBuilderInstruction<'a, 'b> {
   __program: &'b solana_account_info::AccountInfo<'a>,
             config: Option<&'b solana_account_info::AccountInfo<'a>>,
-                nft_config: Option<&'b solana_account_info::AccountInfo<'a>>,
                 admin: Option<&'b solana_account_info::AccountInfo<'a>>,
                 nft_program: Option<&'b solana_account_info::AccountInfo<'a>>,
                 system_program: Option<&'b solana_account_info::AccountInfo<'a>>,

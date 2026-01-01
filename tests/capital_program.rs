@@ -15,11 +15,32 @@ pub fn test_init_capital_program() {
     match result {
         Ok(result) => {
             println!("instructions logs, {:?} ", result);
-            let authority_config:AuthorityConfig = capital_accounts::get_data_from_pda_address(&mut test_config.svm,get_authority_config_pda());
-            assert_eq!(authority_config.agent,test_config.agent.pubkey());
+            let authority_config: AuthorityConfig = capital_accounts::get_data_from_pda_address(
+                &mut test_config.svm,
+                get_authority_config_pda(),
+            );
+            assert_eq!(authority_config.agent, test_config.agent.pubkey());
         }
         Err(e) => {
-            println!("capital program initialization failed with {:?}", e);
+            panic!("capital program initialization failed with {:?}", e);
+        }
+    }
+}
+
+#[test]
+
+pub fn test_create_vault() {
+    let mut test_config = TestConfig::new();
+    let _ = test_core_instructions::init_nft_program(&mut test_config);
+    let _ = test_core_instructions::init_capital_program(&mut test_config);
+
+    let result = test_core_instructions::capital_program_create_vault(&mut test_config);
+    match result {
+        Ok(result) => {
+            println!("instructions logs, {:?} ", result);
+        }
+        Err(e) => {
+            panic!("instruction faiileed with {:?}",e);
         }
     }
 }

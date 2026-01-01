@@ -75,7 +75,6 @@ export type Vault = {
   investorBps: number;
   maxSlashBps: number;
   nftCollection: Address;
-  rewardDistributor: Address;
   nodeOperator: Address;
   lockPhaseStartAt: bigint;
   lockPhaseDuration: bigint;
@@ -99,7 +98,6 @@ export type VaultArgs = {
   investorBps: number;
   maxSlashBps: number;
   nftCollection: Address;
-  rewardDistributor: Address;
   nodeOperator: Address;
   lockPhaseStartAt: number | bigint;
   lockPhaseDuration: number | bigint;
@@ -127,7 +125,6 @@ export function getVaultEncoder(): Encoder<VaultArgs> {
       ["investorBps", getU16Encoder()],
       ["maxSlashBps", getU16Encoder()],
       ["nftCollection", getAddressEncoder()],
-      ["rewardDistributor", getAddressEncoder()],
       ["nodeOperator", getAddressEncoder()],
       ["lockPhaseStartAt", getI64Encoder()],
       ["lockPhaseDuration", getI64Encoder()],
@@ -157,7 +154,6 @@ export function getVaultDecoder(): Decoder<Vault> {
     ["investorBps", getU16Decoder()],
     ["maxSlashBps", getU16Decoder()],
     ["nftCollection", getAddressDecoder()],
-    ["rewardDistributor", getAddressDecoder()],
     ["nodeOperator", getAddressDecoder()],
     ["lockPhaseStartAt", getI64Decoder()],
     ["lockPhaseDuration", getI64Decoder()],

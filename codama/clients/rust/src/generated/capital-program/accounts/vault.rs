@@ -31,8 +31,6 @@ pub max_slash_bps: u16,
 #[cfg_attr(feature = "serde", serde(with = "serde_with::As::<serde_with::DisplayFromStr>"))]
 pub nft_collection: Pubkey,
 #[cfg_attr(feature = "serde", serde(with = "serde_with::As::<serde_with::DisplayFromStr>"))]
-pub reward_distributor: Pubkey,
-#[cfg_attr(feature = "serde", serde(with = "serde_with::As::<serde_with::DisplayFromStr>"))]
 pub node_operator: Pubkey,
 pub lock_phase_start_at: i64,
 pub lock_phase_duration: i64,
