@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use crate::setup::test_config::TestConfig;
+use anchor_spl::associated_token;
 use litesvm::LiteSVM;
 use litesvm_token::{
     get_spl_account, spl_token, spl_token::state::Account as TokenAccount, MintTo,
@@ -31,14 +32,6 @@ impl_from_account_bytes!(AuthorityConfig);
 impl_from_account_bytes!(Vault);
 impl_from_account_bytes!(NFTConfig);
 
-pub fn get_ata(mint: Pubkey, owner: Pubkey) -> Pubkey {
-    let (ata, _) = Pubkey::find_program_address(
-        &[owner.as_ref(), spl_token::id().as_ref(), mint.as_ref()],
-        &spl_token::id(), // ATA program
-    );
-    ata
-}
-
 pub fn get_nft_config_pda() -> Pubkey {
     let try_find_program_address =
         Pubkey::try_find_program_address(&[b"NFT_Config"], &NFT_PROGRAM_ID);
@@ -51,14 +44,18 @@ pub fn get_authority_config_pda() -> Pubkey {
     authority_config.unwrap().0
 }
 
-#[allow(dead_code)]
-pub fn get_position_vault_pda(provider: Pubkey) -> Pubkey {
+pub fn get_vault_pda(operator: Pubkey) -> Pubkey {
     let position_vault =
-        Pubkey::try_find_program_address(&[b"Vault", provider.as_ref()], &CAPITAL_PROGRAM_ID);
+        Pubkey::try_find_program_address(&[b"Vault", operator.as_ref()], &CAPITAL_PROGRAM_ID);
     position_vault.unwrap().0
 }
 
-#[allow(dead_code)]
+pub fn get_position_pda(asset: Pubkey) -> Pubkey {
+    let position_pda =
+        Pubkey::try_find_program_address(&[b"Position", asset.as_ref()], &CAPITAL_PROGRAM_ID);
+    position_pda.unwrap().0
+}
+
 pub fn get_data_from_pda_address<T>(svm: &mut LiteSVM, pda_address: Pubkey) -> T
 where
     T: FromAccountBytes,
@@ -69,14 +66,8 @@ where
     T::from_bytes(&account.data).expect("unable to deserialize data")
 }
 
-pub fn fund_ata(
-    svm: &mut LiteSVM,
-    test_config: TestConfig,
-    ata: Pubkey,
-    mint: Pubkey,
-    amount: u64,
-) {
-    MintTo::new(svm, &test_config.god, &mint, &ata, amount)
+pub fn fund_ata(test_config: &mut TestConfig, ata: &Pubkey, mint: Pubkey, amount: u64) {
+    MintTo::new(&mut test_config.svm, &test_config.god, &mint, ata, amount)
         .owner(&test_config.god)
         .send()
         .unwrap()

@@ -1,4 +1,5 @@
 #![allow(unused)]
+use anchor_spl::associated_token::get_associated_token_address;
 use litesvm::LiteSVM;
 use litesvm_token::{
     get_spl_account, spl_token, spl_token::state::Account as TokenAccount,
@@ -129,10 +130,16 @@ impl Tokens {
                 .owner(&test_config.agent.pubkey())
                 .send()
                 .unwrap();
-        let position_vault =
-            accounts::get_position_vault_pda(test_config.capital_provider.pubkey());
-        let vault_reward_ata = accounts::get_ata(reward_mint, position_vault);
-        let vault_lock_ata = accounts::get_ata(lock_mint, position_vault);
+        let position_vault = accounts::get_vault_pda(test_config.capital_provider.pubkey());
+        let vault_lock_ata = CreateAssociatedTokenAccount::new(svm, &test_config.god, &lock_mint)
+            .owner(&position_vault)
+            .send()
+            .unwrap();
+        let vault_reward_ata =
+            CreateAssociatedTokenAccount::new(svm, &test_config.god, &reward_mint)
+                .owner(&position_vault)
+                .send()
+                .unwrap();
         let collection = Keypair::new();
         let asset = Keypair::new();
         Tokens {

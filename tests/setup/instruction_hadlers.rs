@@ -1,16 +1,20 @@
 #![allow(dead_code)]
 #![allow(unused)]
 use crate::setup::{
-    accounts, constants::{
+    accounts,
+    constants::{
         FUND_RAISE_PERIOD, INVESTOR_BPS, MAX_SLASH_BPS, MAX_VAULT_THRESHOLD, MIN_LOCK_AMOUNT,
         MIN_VAULT_TARGET, ONE_DAY,
-    },  test_config::{TestConfig, Tokens}, *
+    },
+    test_config::{TestConfig, Tokens},
+    *,
 };
+use anchor_lang::solana_program::example_mocks::solana_transaction::Transaction;
 use litesvm::types::TransactionResult;
 use solana_sdk::{clock::Clock, signature::Signer};
 
 use zaals_finance_client::{
-    capital_program::instructions::{CreateVaultHandlerBuilder, InitCapitalProgramHandlerBuilder},
+    capital_program::instructions::{CreateVaultHandlerBuilder, InitCapitalProgramHandlerBuilder, OpenPositionHandlerBuilder},
     nft_program::instructions::InitNftProgramHandlerBuilder,
 };
 
@@ -60,9 +64,11 @@ pub fn init_capital_program(test_config: &mut TestConfig) -> TransactionResult {
 }
 
 #[allow(dead_code)]
-pub fn capital_program_create_vault(test_config: &mut TestConfig, token_data: &mut Tokens) -> TransactionResult {
-    let position_vault =
-        accounts::get_position_vault_pda(test_config.node_operator.pubkey());
+pub fn capital_program_create_vault(
+    test_config: &mut TestConfig,
+    token_data: &mut Tokens,
+) -> TransactionResult {
+    let position_vault = accounts::get_vault_pda(test_config.node_operator.pubkey());
     let authority_config = accounts::get_authority_config_pda();
     let nft_config = accounts::get_nft_config_pda();
     let reward_mint = token_data.reward_mint;
@@ -103,8 +109,36 @@ pub fn capital_program_create_vault(test_config: &mut TestConfig, token_data: &m
 }
 
 #[allow(dead_code)]
-pub fn capital_program_open_position(test_config: &mut TestConfig) {
-    let vault_ata = accounts::get_position_vault_pda(test_config.capital_provider.pubkey());
+pub fn capital_program_open_position(
+    test_config: &mut TestConfig,
+    token_data: &mut Tokens,
+    amount: u64,
+) -> TransactionResult {
+    let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
     let authority_config = accounts::get_authority_config_pda();
     let nft_config = accounts::get_nft_config_pda();
+    let position_pda = accounts::get_position_pda(token_data.asset.pubkey());
+    let inxs = OpenPositionHandlerBuilder::new()
+        .capital_provider(test_config.capital_provider.pubkey())
+        .asset(token_data.asset.pubkey())
+        .vault_collection(token_data.collection.pubkey())
+        .vault(vault_pda)
+        .config(authority_config)
+        .nft_config(nft_config)
+        .position(position_pda)
+        .capital_provider_token_ata(token_data.provider_lock_ata)
+        .vault_ata(token_data.vault_lock_ata)
+        .locked_token_mint(token_data.lock_mint)
+        .amount(amount)
+        .instruction();
+    utils::send_transaction(
+        &mut test_config.svm,
+        &[inxs],
+        &test_config.god.pubkey(),
+        &[
+            &test_config.capital_provider.insecure_clone(),
+            &test_config.god.insecure_clone(),
+            &token_data.asset.insecure_clone(),
+        ],
+    )   
 }
