@@ -3,12 +3,11 @@ use anchor_spl::{
     associated_token::AssociatedToken,
     token_interface::{transfer_checked, Mint, TokenAccount, TokenInterface, TransferChecked},
 };
+use mpl_core::{instructions::CreateV2CpiBuilder, ID as MPL_CORE_ID};
 
 use crate::errors::*;
 use crate::state::*;
 
-use nft_program::cpi::accounts::CreateAsset;
-use nft_program::instructions::CreateAssetArgs;
 use nft_program::program::NftProgram;
 use nft_program::state::NFTConfig;
 
@@ -23,8 +22,9 @@ pub struct OpenPosition<'info> {
     pub asset: Signer<'info>,
 
     /// The vault's NFT collection
-    /// CHECK: Validated by MPL Core program during CPI
+    /// CHECK: Validated by MPL Core program
     #[account(
+        mut,
         constraint = vault_collection.key() == vault.nft_collection @ PositionError::InvalidCollection
     )]
     pub vault_collection: UncheckedAccount<'info>,
@@ -40,6 +40,7 @@ pub struct OpenPosition<'info> {
 
     /// Global configuration account
     #[account(
+        mut,
         seeds = [b"Config"],
         bump = config.bump
     )]
@@ -88,7 +89,7 @@ pub struct OpenPosition<'info> {
     pub token_program: Interface<'info, TokenInterface>,
 
     /// CHECK: Validated by NFT program during CPI
-    #[account(executable)]
+    #[account(address = MPL_CORE_ID)]
     pub mpl_core_program: UncheckedAccount<'info>,
 
     pub nft_program: Program<'info, NftProgram>,
@@ -188,34 +189,24 @@ impl<'info> OpenPosition<'info> {
     pub fn mint_position_nft(&self) -> Result<()> {
         let signer_seeds: &[&[&[u8]]] = &[&[b"Config", &[self.config.bump]]];
 
-        let cpi_accounts = CreateAsset {
-            asset: self.asset.to_account_info(),
-            payer: self.capital_provider.to_account_info(),
-            owner: self.capital_provider.to_account_info(),
-            system_program: self.system_program.to_account_info(),
-            mpl_core_program: self.mpl_core_program.to_account_info(),
-            collection: self.vault_collection.to_account_info(),
-            config: self.nft_config.to_account_info(),
-            collection_update_authority: self.config.to_account_info(),
-        };
-
-        let cpi_ctx = CpiContext::new_with_signer(
-            self.nft_program.to_account_info(),
-            cpi_accounts,
-            signer_seeds,
-        );
-
         // Create dynamic NFT metadata based on position
-        let args = CreateAssetArgs {
-            name: format!(
-                "Vault Position #{}",
-                self.position.key().to_string()[..8].to_string()
-            ),
-            uri: format!("https://api.vault.com/position/{}", self.position.key()),
-        };
+        let name = format!(
+            "Vault Position #{}",
+            self.position.key().to_string()[..8].to_string()
+        );
+        let uri = format!("https://api.vault.com/position/{}", self.position.key());
 
-        nft_program::cpi::create_core_asset_handler(cpi_ctx, args)?;
-
+        CreateV2CpiBuilder::new(&self.mpl_core_program.to_account_info())
+            .asset(&self.asset.to_account_info())
+            .collection(Some(&self.vault_collection.to_account_info()))
+            .authority(Some(&self.config.to_account_info()))
+            .payer(&self.capital_provider.to_account_info())
+            .owner(Some(self.capital_provider.as_ref()))
+            .update_authority(None)
+            .system_program(&self.system_program.to_account_info())
+            .name(name)
+            .uri(uri)
+            .invoke_signed(signer_seeds)?;
         Ok(())
     }
 }

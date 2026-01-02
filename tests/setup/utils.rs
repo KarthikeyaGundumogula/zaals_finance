@@ -13,6 +13,9 @@ use solana_sdk::{
     transaction::Transaction,
 };
 
+use mpl_core::{Asset, Collection};
+
+
 pub fn deploy_nft_program(svm: &mut LiteSVM) -> Result<(), LiteSVMError> {
     let program_keypair =
         read_keypair_file(NFT_PROGRAM_KEY_PAIR).expect("Failed to read keypair file");
@@ -54,4 +57,21 @@ pub fn send_transaction(
     svm.warp_to_slot(clock.slot + 100);
 
     result
+}
+pub struct MplUtils;
+
+impl MplUtils {
+    pub fn get_collection(svm: &LiteSVM, mint: &Pubkey) -> Collection {
+        let account = svm
+            .get_account(mint)
+            .expect("Collection Asset account not found");
+
+        *Collection::deserialize(&account.data).expect("Failed to deserialize collection account")
+    }
+
+    pub fn get_asset(svm: &LiteSVM, mint: &Pubkey) -> Asset {
+        let account = svm.get_account(mint).expect("Asset account not found");
+
+        *Asset::deserialize(&account.data).expect("Failed to deserialize asset account")
+    }
 }

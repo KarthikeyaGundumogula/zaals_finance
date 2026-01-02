@@ -15,7 +15,6 @@ import {
 } from "gill";
 import {
   type ParsedBurnAssetHandlerInstruction,
-  type ParsedCreateCoreAssetHandlerInstruction,
   type ParsedCreateVaultCollectionHandlerInstruction,
   type ParsedInitNftProgramHandlerInstruction,
   type ParsedListAssetHandlerInstruction,
@@ -73,7 +72,6 @@ export function identifyNftProgramAccount(
 
 export enum NftProgramInstruction {
   BurnAssetHandler,
-  CreateCoreAssetHandler,
   CreateVaultCollectionHandler,
   InitNftProgramHandler,
   ListAssetHandler,
@@ -94,17 +92,6 @@ export function identifyNftProgramInstruction(
     )
   ) {
     return NftProgramInstruction.BurnAssetHandler;
-  }
-  if (
-    containsBytes(
-      data,
-      fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([86, 115, 142, 198, 201, 252, 198, 75]),
-      ),
-      0,
-    )
-  ) {
-    return NftProgramInstruction.CreateCoreAssetHandler;
   }
   if (
     containsBytes(
@@ -161,9 +148,6 @@ export type ParsedNftProgramInstruction<
   | ({
       instructionType: NftProgramInstruction.BurnAssetHandler;
     } & ParsedBurnAssetHandlerInstruction<TProgram>)
-  | ({
-      instructionType: NftProgramInstruction.CreateCoreAssetHandler;
-    } & ParsedCreateCoreAssetHandlerInstruction<TProgram>)
   | ({
       instructionType: NftProgramInstruction.CreateVaultCollectionHandler;
     } & ParsedCreateVaultCollectionHandlerInstruction<TProgram>)

@@ -7,7 +7,6 @@
  */
 
 export * from "./burnAssetHandler";
-export * from "./createCoreAssetHandler";
 export * from "./createVaultCollectionHandler";
 export * from "./initNftProgramHandler";
 export * from "./listAssetHandler";

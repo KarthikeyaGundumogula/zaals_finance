@@ -130,7 +130,7 @@ impl Tokens {
                 .owner(&test_config.agent.pubkey())
                 .send()
                 .unwrap();
-        let position_vault = accounts::get_vault_pda(test_config.capital_provider.pubkey());
+        let position_vault = accounts::get_vault_pda(test_config.node_operator.pubkey());
         let vault_lock_ata = CreateAssociatedTokenAccount::new(svm, &test_config.god, &lock_mint)
             .owner(&position_vault)
             .send()

@@ -8190,6 +8190,7 @@ dependencies = [
  "anchor-spl",
  "litesvm",
  "litesvm-token",
+ "mpl-core",
  "solana-sdk",
  "zaals-finance-client",
 ]

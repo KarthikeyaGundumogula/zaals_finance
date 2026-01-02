@@ -35,6 +35,7 @@ anchor-lang = { version = "0.31.1", features = ["init-if-needed"] }
 litesvm = "0.8.2"
 litesvm-token = "0.8.2"
 solana-sdk = "3.0.0"
+mpl-core = { version = "0.11.1", features = ["anchor"] }
 zaals-finance-client = {path = "codama/clients/rust"}
 
 [[test]]

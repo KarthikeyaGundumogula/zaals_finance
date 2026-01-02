@@ -14,15 +14,20 @@ import {
 } from "gill";
 import { NFT_PROGRAM_PROGRAM_ADDRESS } from "../programs";
 
-/** InvalidOwner: Vault should be the owner of NFT */
-export const NFT_PROGRAM_ERROR__INVALID_OWNER = 0x1770; // 6000
+/** InvalidMint: Mint does not match seller listed token mint */
+export const NFT_PROGRAM_ERROR__INVALID_MINT = 0x1770; // 6000
+/** InvalidSeller: Seller must be the one in the offer */
+export const NFT_PROGRAM_ERROR__INVALID_SELLER = 0x1771; // 6001
 
-export type NftProgramError = typeof NFT_PROGRAM_ERROR__INVALID_OWNER;
+export type NftProgramError =
+  | typeof NFT_PROGRAM_ERROR__INVALID_MINT
+  | typeof NFT_PROGRAM_ERROR__INVALID_SELLER;
 
 let nftProgramErrorMessages: Record<NftProgramError, string> | undefined;
 if (process.env.NODE_ENV !== "production") {
   nftProgramErrorMessages = {
-    [NFT_PROGRAM_ERROR__INVALID_OWNER]: `Vault should be the owner of NFT`,
+    [NFT_PROGRAM_ERROR__INVALID_MINT]: `Mint does not match seller listed token mint`,
+    [NFT_PROGRAM_ERROR__INVALID_SELLER]: `Seller must be the one in the offer`,
   };
 }
 

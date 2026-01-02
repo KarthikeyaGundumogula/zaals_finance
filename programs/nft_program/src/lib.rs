@@ -40,21 +40,6 @@ pub mod nft_program {
         Ok(())
     }
 
-    pub fn create_core_asset_handler(
-        ctx: Context<CreateAsset>,
-        args: CreateAssetArgs,
-    ) -> Result<()> {
-        ctx.accounts.create_asset(args)?;
-        msg!("Core asset created");
-        emit!(AssetMintedEvent {
-            owner: *ctx.accounts.owner.key,
-            asset: *ctx.accounts.asset.key,
-            collection: *ctx.accounts.collection.key,
-            time_stamp: Clock::get()?.unix_timestamp,
-        });
-        Ok(())
-    }
-
     pub fn list_asset_handler(
         ctx: Context<ListPosition>,
         price: u64,

@@ -11,6 +11,8 @@ use crate::setup::{
     test_config::Tokens,
 };
 
+use utils::MplUtils;
+
 #[test]
 pub fn test_init_capital_program() {
     let mut test_config = TestConfig::new();
@@ -43,7 +45,9 @@ pub fn test_create_vault() {
         instruction_hadlers::capital_program_create_vault(&mut test_config, &mut token_data);
     match result {
         Ok(result) => {
-            println!("instructions logs, {:?} ", result);
+            for log in result.logs {
+                println!("instruction log: {:?}", log);
+            }
             let vault_config: Vault = accounts::get_data_from_pda_address(
                 &mut test_config.svm,
                 get_vault_pda(test_config.node_operator.pubkey()),
@@ -52,6 +56,9 @@ pub fn test_create_vault() {
                 vault_config.node_operator,
                 test_config.node_operator.pubkey()
             );
+            let mpl_collection =
+                MplUtils::get_collection(&test_config.svm, &token_data.collection.pubkey());
+            println!("MPL Collection: {:?}", mpl_collection);
             assert_eq!(vault_config.nft_collection, token_data.collection.pubkey());
             assert_eq!(vault_config.reward_token_mint, token_data.reward_mint);
             assert_eq!(vault_config.locking_token_mint, token_data.lock_mint);
@@ -74,6 +81,9 @@ pub fn test_open_position() {
     instruction_hadlers::init_nft_program(&mut test_config).unwrap();
     instruction_hadlers::init_capital_program(&mut test_config).unwrap();
     instruction_hadlers::capital_program_create_vault(&mut test_config, &mut token_data).unwrap();
+    let mpl_collection =
+        MplUtils::get_collection(&test_config.svm, &token_data.collection.pubkey());
+    println!("MPL Collection: {:?}", mpl_collection);
 
     let capital_provider = token_data.provider_lock_ata;
     let lock_mint = token_data.lock_mint;
@@ -84,17 +94,21 @@ pub fn test_open_position() {
         lock_mint,
         DEPOSIT_AMOUNT,
     );
-    let result =
-        instruction_hadlers::capital_program_open_position(&mut test_config, &mut token_data, DEPOSIT_AMOUNT);
+    let result = instruction_hadlers::capital_program_open_position(
+        &mut test_config,
+        &mut token_data,
+        DEPOSIT_AMOUNT,
+    );
     match result {
         Ok(result) => {
-            println!("instructions logs, {:?} ", result);
+            for log in result.logs {
+                println!("instruction log: {:?}", log);
+            }
             // let position_pda = accounts::get_position_pda(capital_provider);
         }
-    
+
         Err(e) => {
             panic!("instruction failed with {:?}", e);
         }
     }
 }
-

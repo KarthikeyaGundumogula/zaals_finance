@@ -14,11 +14,12 @@ use litesvm::types::TransactionResult;
 use solana_sdk::{clock::Clock, signature::Signer};
 
 use zaals_finance_client::{
-    capital_program::instructions::{CreateVaultHandlerBuilder, InitCapitalProgramHandlerBuilder, OpenPositionHandlerBuilder},
+    capital_program::instructions::{
+        CreateVaultHandlerBuilder, InitCapitalProgramHandlerBuilder, OpenPositionHandlerBuilder,
+    },
     nft_program::instructions::InitNftProgramHandlerBuilder,
 };
 
-#[allow(dead_code)]
 pub fn init_nft_program(test_config: &mut TestConfig) -> TransactionResult {
     let config_address = accounts::get_nft_config_pda();
     let authority_config = accounts::get_authority_config_pda();
@@ -39,7 +40,6 @@ pub fn init_nft_program(test_config: &mut TestConfig) -> TransactionResult {
     )
 }
 
-#[allow(dead_code)]
 pub fn init_capital_program(test_config: &mut TestConfig) -> TransactionResult {
     let authority_config_address = accounts::get_authority_config_pda();
     let inxs = InitCapitalProgramHandlerBuilder::new()
@@ -63,7 +63,6 @@ pub fn init_capital_program(test_config: &mut TestConfig) -> TransactionResult {
     )
 }
 
-#[allow(dead_code)]
 pub fn capital_program_create_vault(
     test_config: &mut TestConfig,
     token_data: &mut Tokens,
@@ -108,7 +107,6 @@ pub fn capital_program_create_vault(
     )
 }
 
-#[allow(dead_code)]
 pub fn capital_program_open_position(
     test_config: &mut TestConfig,
     token_data: &mut Tokens,
@@ -131,6 +129,21 @@ pub fn capital_program_open_position(
         .locked_token_mint(token_data.lock_mint)
         .amount(amount)
         .instruction();
+
+    // logs of all accounts involved in the transaction
+    println!(
+        "Capital Provider: {:?}",
+        test_config.capital_provider.pubkey()
+    );
+    println!("Asset: {:?}", token_data.asset.pubkey());
+    println!("Vault Collection: {:?}", token_data.collection.pubkey());
+    println!("Vault PDA: {:?}", vault_pda);
+    println!("Position PDA: {:?}", position_pda);
+    println!("Provider Lock ATA: {:?}", token_data.provider_lock_ata);
+    println!("Vault Lock ATA: {:?}", token_data.vault_lock_ata);
+    println!("Locked Token Mint: {:?}", token_data.lock_mint);
+    println!("Vault Lock ATA: {:?}", token_data.vault_lock_ata);
+
     utils::send_transaction(
         &mut test_config.svm,
         &[inxs],
@@ -140,5 +153,5 @@ pub fn capital_program_open_position(
             &test_config.god.insecure_clone(),
             &token_data.asset.insecure_clone(),
         ],
-    )   
+    )
 }

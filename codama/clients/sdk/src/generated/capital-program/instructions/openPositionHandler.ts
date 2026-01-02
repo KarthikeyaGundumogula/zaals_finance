@@ -87,13 +87,13 @@ export type OpenPositionHandlerInstruction<
             AccountSignerMeta<TAccountAsset>
         : TAccountAsset,
       TAccountVaultCollection extends string
-        ? ReadonlyAccount<TAccountVaultCollection>
+        ? WritableAccount<TAccountVaultCollection>
         : TAccountVaultCollection,
       TAccountVault extends string
         ? WritableAccount<TAccountVault>
         : TAccountVault,
       TAccountConfig extends string
-        ? ReadonlyAccount<TAccountConfig>
+        ? WritableAccount<TAccountConfig>
         : TAccountConfig,
       TAccountNftConfig extends string
         ? ReadonlyAccount<TAccountNftConfig>
@@ -277,12 +277,9 @@ export async function getOpenPositionHandlerInstructionAsync<
   const originalAccounts = {
     capitalProvider: { value: input.capitalProvider ?? null, isWritable: true },
     asset: { value: input.asset ?? null, isWritable: true },
-    vaultCollection: {
-      value: input.vaultCollection ?? null,
-      isWritable: false,
-    },
+    vaultCollection: { value: input.vaultCollection ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
-    config: { value: input.config ?? null, isWritable: false },
+    config: { value: input.config ?? null, isWritable: true },
     nftConfig: { value: input.nftConfig ?? null, isWritable: false },
     position: { value: input.position ?? null, isWritable: true },
     capitalProviderTokenAta: {
@@ -530,12 +527,9 @@ export function getOpenPositionHandlerInstruction<
   const originalAccounts = {
     capitalProvider: { value: input.capitalProvider ?? null, isWritable: true },
     asset: { value: input.asset ?? null, isWritable: true },
-    vaultCollection: {
-      value: input.vaultCollection ?? null,
-      isWritable: false,
-    },
+    vaultCollection: { value: input.vaultCollection ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
-    config: { value: input.config ?? null, isWritable: false },
+    config: { value: input.config ?? null, isWritable: true },
     nftConfig: { value: input.nftConfig ?? null, isWritable: false },
     position: { value: input.position ?? null, isWritable: true },
     capitalProviderTokenAta: {

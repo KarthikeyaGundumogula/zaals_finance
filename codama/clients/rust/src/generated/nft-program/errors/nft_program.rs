@@ -10,9 +10,12 @@ use thiserror::Error;
 
 #[derive(Clone, Debug, Eq, Error, FromPrimitive, PartialEq)]
 pub enum NftProgramError {
-    /// 6000 - Vault should be the owner of NFT
-    #[error("Vault should be the owner of NFT")]
-    InvalidOwner = 0x1770,
+    /// 6000 - Mint does not match seller listed token mint
+    #[error("Mint does not match seller listed token mint")]
+    InvalidMint = 0x1770,
+    /// 6001 - Seller must be the one in the offer
+    #[error("Seller must be the one in the offer")]
+    InvalidSeller = 0x1771,
 }
 
 impl From<NftProgramError> for solana_program_error::ProgramError {

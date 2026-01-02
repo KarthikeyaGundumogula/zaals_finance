@@ -96,7 +96,7 @@ impl OpenPositionHandler {
             self.asset,
             true
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
             self.vault_collection,
             false
           ));
@@ -104,7 +104,7 @@ impl OpenPositionHandler {
             self.vault,
             false
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
             self.config,
             false
           ));
@@ -204,9 +204,9 @@ impl OpenPositionHandlerInstructionArgs {
 ///
                       ///   0. `[writable, signer]` capital_provider
                       ///   1. `[writable, signer]` asset
-          ///   2. `[]` vault_collection
+                ///   2. `[writable]` vault_collection
                 ///   3. `[writable]` vault
-          ///   4. `[]` config
+                ///   4. `[writable]` config
           ///   5. `[]` nft_config
                 ///   6. `[writable]` position
                 ///   7. `[writable]` capital_provider_token_ata
@@ -573,7 +573,7 @@ impl<'a, 'b> OpenPositionHandlerCpi<'a, 'b> {
             *self.asset.key,
             true
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
             *self.vault_collection.key,
             false
           ));
@@ -581,7 +581,7 @@ impl<'a, 'b> OpenPositionHandlerCpi<'a, 'b> {
             *self.vault.key,
             false
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
             *self.config.key,
             false
           ));
@@ -674,9 +674,9 @@ impl<'a, 'b> OpenPositionHandlerCpi<'a, 'b> {
 ///
                       ///   0. `[writable, signer]` capital_provider
                       ///   1. `[writable, signer]` asset
-          ///   2. `[]` vault_collection
+                ///   2. `[writable]` vault_collection
                 ///   3. `[writable]` vault
-          ///   4. `[]` config
+                ///   4. `[writable]` config
           ///   5. `[]` nft_config
                 ///   6. `[writable]` position
                 ///   7. `[writable]` capital_provider_token_ata
