@@ -1,7 +1,8 @@
+#![allow(unused)]
 use litesvm::LiteSVM;
 use litesvm_token::{
     get_spl_account, spl_token, spl_token::state::Account as TokenAccount,
-    CreateAssociatedTokenAccount, CreateMint, MintTo,
+    CreateAssociatedTokenAccount, CreateMint,
 };
 use solana_sdk::{
     pubkey::Pubkey,
@@ -12,7 +13,7 @@ use zaals_finance_client::{
     capital_program::types::Beneficiary, CAPITAL_PROGRAM_ID, NFT_PROGRAM_ID,
 };
 
-use crate::setup::{capital_accounts::get_position_vault_pda, constants::DECIMALS, utils};
+use crate::setup::{accounts, constants::DECIMALS, utils};
 
 #[allow(dead_code)]
 pub struct TestConfig {
@@ -96,6 +97,7 @@ pub struct Tokens {
     pub vault_reward_ata: Pubkey,
     pub vault_lock_ata: Pubkey,
     pub collection: Keypair,
+    pub asset: Keypair,
 }
 
 impl Tokens {
@@ -127,10 +129,12 @@ impl Tokens {
                 .owner(&test_config.agent.pubkey())
                 .send()
                 .unwrap();
-        let position_vault = get_position_vault_pda(test_config.capital_provider.pubkey());
-        let vault_reward_ata = get_ata(reward_mint, position_vault);
-        let vault_lock_ata = get_ata(lock_mint, position_vault);
+        let position_vault =
+            accounts::get_position_vault_pda(test_config.capital_provider.pubkey());
+        let vault_reward_ata = accounts::get_ata(reward_mint, position_vault);
+        let vault_lock_ata = accounts::get_ata(lock_mint, position_vault);
         let collection = Keypair::new();
+        let asset = Keypair::new();
         Tokens {
             reward_mint,
             lock_mint,
@@ -140,32 +144,7 @@ impl Tokens {
             vault_lock_ata,
             vault_reward_ata,
             collection,
+            asset,
         }
     }
-
-    pub fn fund_ata(
-        svm: &mut LiteSVM,
-        test_config: TestConfig,
-        ata: Pubkey,
-        mint: Pubkey,
-        amount: u64,
-    ) {
-        MintTo::new(svm, &test_config.god, &mint, &ata, amount)
-            .owner(&test_config.god)
-            .send()
-            .unwrap()
-    }
-
-    pub fn get_ata_balance(svm: &mut LiteSVM, ata: Pubkey) -> u64 {
-        let ata_account: TokenAccount = get_spl_account(svm, &ata).unwrap();
-        ata_account.amount
-    }
-}
-
-pub fn get_ata(mint: Pubkey, owner: Pubkey) -> Pubkey {
-    let (ata, bump) = Pubkey::find_program_address(
-        &[owner.as_ref(), spl_token::id().as_ref(), mint.as_ref()],
-        &spl_token::id(), // ATA program
-    );
-    ata
 }

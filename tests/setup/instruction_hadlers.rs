@@ -1,11 +1,10 @@
+#![allow(dead_code)]
+#![allow(unused)]
 use crate::setup::{
-    capital_accounts::get_authority_config_pda,
-    constants::{
+    accounts, constants::{
         FUND_RAISE_PERIOD, INVESTOR_BPS, MAX_SLASH_BPS, MAX_VAULT_THRESHOLD, MIN_LOCK_AMOUNT,
         MIN_VAULT_TARGET, ONE_DAY,
-    },
-    test_config::{TestConfig, Tokens},
-    *,
+    },  test_config::{TestConfig, Tokens}, *
 };
 use litesvm::types::TransactionResult;
 use solana_sdk::{clock::Clock, signature::Signer};
@@ -17,9 +16,9 @@ use zaals_finance_client::{
 
 #[allow(dead_code)]
 pub fn init_nft_program(test_config: &mut TestConfig) -> TransactionResult {
-    let config_address = nft_accounts::get_nft_config_pda();
-    let authority_config = get_authority_config_pda();
-    let inxs = test_core_instructions::InitNftProgramHandlerBuilder::new()
+    let config_address = accounts::get_nft_config_pda();
+    let authority_config = accounts::get_authority_config_pda();
+    let inxs = instruction_hadlers::InitNftProgramHandlerBuilder::new()
         .admin(test_config.admin.pubkey())
         .authority(authority_config)
         .capital_program(test_config.capital_program_id)
@@ -38,7 +37,7 @@ pub fn init_nft_program(test_config: &mut TestConfig) -> TransactionResult {
 
 #[allow(dead_code)]
 pub fn init_capital_program(test_config: &mut TestConfig) -> TransactionResult {
-    let authority_config_address = capital_accounts::get_authority_config_pda();
+    let authority_config_address = accounts::get_authority_config_pda();
     let inxs = InitCapitalProgramHandlerBuilder::new()
         .admin(test_config.admin.pubkey())
         .agent(test_config.agent.pubkey())
@@ -61,15 +60,14 @@ pub fn init_capital_program(test_config: &mut TestConfig) -> TransactionResult {
 }
 
 #[allow(dead_code)]
-pub fn capital_program_create_vault(test_config: &mut TestConfig) -> TransactionResult {
-    let token_data = Tokens::create(test_config);
+pub fn capital_program_create_vault(test_config: &mut TestConfig, token_data: &mut Tokens) -> TransactionResult {
     let position_vault =
-        capital_accounts::get_position_vault_pda(test_config.node_operator.pubkey());
-    let authority_config = capital_accounts::get_authority_config_pda();
-    let nft_config = nft_accounts::get_nft_config_pda();
+        accounts::get_position_vault_pda(test_config.node_operator.pubkey());
+    let authority_config = accounts::get_authority_config_pda();
+    let nft_config = accounts::get_nft_config_pda();
     let reward_mint = token_data.reward_mint;
     let lock_mint = token_data.lock_mint;
-    let collection = token_data.collection;
+    let collection = token_data.collection.insecure_clone();
 
     let clock: Clock = test_config.svm.get_sysvar();
     let beneficiaries = test_config.beneficiaries.clone();
@@ -102,4 +100,11 @@ pub fn capital_program_create_vault(test_config: &mut TestConfig) -> Transaction
             &collection.insecure_clone(),
         ],
     )
+}
+
+#[allow(dead_code)]
+pub fn capital_program_open_position(test_config: &mut TestConfig) {
+    let vault_ata = accounts::get_position_vault_pda(test_config.capital_provider.pubkey());
+    let authority_config = accounts::get_authority_config_pda();
+    let nft_config = accounts::get_nft_config_pda();
 }

@@ -1,3 +1,4 @@
+#![allow(unused)]
 use solana_sdk::native_token::LAMPORTS_PER_SOL;
 
 pub const NFT_PROGRAM_KEY_PAIR: &str = "target/deploy/nft_program-keypair.json";
