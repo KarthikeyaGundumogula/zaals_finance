@@ -108,3 +108,21 @@ pub fn get_investor_accrued_rewards(
         .try_into()
         .expect("position rewards exceed u64")
 }
+
+pub fn get_beneficiary_accrued_rewards(
+    vault: Vault,
+    beneficiary_index: usize,
+) -> u64 {
+    let beneficiary_bps: u16 = vault
+        .beneficiaries[beneficiary_index].share_bps;
+
+    let total_beneficiary_rewards: u128 = (vault.total_rewards_deposited as u128)
+        .checked_mul(beneficiary_bps as u128)
+        .expect("overflow in total_beneficiary_rewards")
+        .checked_div(10_000u128)
+        .expect("division by zero");
+
+    total_beneficiary_rewards
+        .try_into()
+        .expect("beneficiary rewards exceed u64")
+}

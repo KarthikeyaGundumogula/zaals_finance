@@ -3,8 +3,7 @@
 use crate::setup::{
     accounts,
     constants::{
-        FUND_RAISE_PERIOD, INVESTOR_BPS, MAX_SLASH_BPS, MAX_VAULT_THRESHOLD, MIN_LOCK_AMOUNT,
-        MIN_VAULT_TARGET, ONE_DAY,
+        DISPUTE_WINDOW, EARLY_UNLOCK_FEE, FUND_RAISE_PERIOD, INVESTOR_BPS, MAX_LOCK_DURATION, MAX_SLASH_BPS, MAX_VAULT_THRESHOLD, MIN_LOCK_AMOUNT, MIN_LOCK_DURATION, MIN_VAULT_TARGET, ONE_DAY, SLASH_BPS
     },
     test_config::{TestConfig, Tokens},
     *,
@@ -14,13 +13,9 @@ use litesvm::types::TransactionResult;
 use solana_sdk::{clock::Clock, signature::Signer};
 
 use zaals_finance_client::{
-    capital_program::instructions::{
-        ClaimBeneficiaryRewardsHandlerBuilder, ClaimInvestorRewardsHandlerBuilder,
-        CreateVaultHandlerBuilder, DepositRewardsHandlerBuilder, InitCapitalProgramHandlerBuilder,
-        OpenPositionHandlerBuilder, UpdatePositionHandlerBuilder,
-    },
-    nft_program::instructions::InitNftProgramHandlerBuilder,
-    CAPITAL_PROGRAM_ID, NFT_PROGRAM_ID,
+    CAPITAL_PROGRAM_ID, NFT_PROGRAM_ID, capital_program::instructions::{
+        ClaimBeneficiaryRewardsHandlerBuilder, ClaimInvestorRewardsHandlerBuilder, CreateSlasReqHandlerBuilder, CreateVaultHandlerBuilder, DepositRewardsHandlerBuilder, InitCapitalProgramHandlerBuilder, OpenPositionHandlerBuilder, UpdatePositionHandlerBuilder
+    }, nft_program::instructions::InitNftProgramHandlerBuilder
 };
 
 pub fn init_nft_program(test_config: &mut TestConfig) -> TransactionResult {
@@ -49,10 +44,10 @@ pub fn init_capital_program(test_config: &mut TestConfig) -> TransactionResult {
         .admin(test_config.admin.pubkey())
         .agent(test_config.agent.pubkey())
         .config(authority_config_address)
-        .dispute_window(2 * 86400)
-        .early_unlock_fee(2_000)
-        .max_lock_duration(365 * 86400)
-        .min_lock_duration(31 * 86400)
+        .dispute_window(DISPUTE_WINDOW)
+        .early_unlock_fee(EARLY_UNLOCK_FEE)
+        .max_lock_duration(MAX_LOCK_DURATION)
+        .min_lock_duration(MIN_LOCK_DURATION)
         .nft_program(NFT_PROGRAM_ID)
         .instruction();
     utils::send_transaction(
@@ -260,3 +255,26 @@ pub fn capital_program_claim_beneficiary_rewards(
         ],
     )
 }
+
+pub fn capital_program_create_slash_req(test_config: &mut TestConfig,token_data: &mut Tokens) -> TransactionResult{
+    let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
+    let authority_config = accounts::get_authority_config_pda();
+
+    let inxs = CreateSlasReqHandlerBuilder::new()
+        .agent(test_config.agent.pubkey())
+        .vault(vault_pda)
+        .config(authority_config)
+        .slash_bps(SLASH_BPS)
+        .slash_claimant(test_config.admin.pubkey())
+        .instruction();
+     utils::send_transaction(
+        &mut test_config.svm,
+        &[inxs],
+        &test_config.god.pubkey(),
+        &[
+            &test_config.agent.insecure_clone(),
+            &test_config.god.insecure_clone(),
+        ],
+    )
+}
+

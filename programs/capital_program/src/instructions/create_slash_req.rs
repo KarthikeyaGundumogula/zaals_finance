@@ -48,7 +48,7 @@ impl<'info> CreateSlashReq<'info> {
             .checked_mul(self.vault.total_capital_collected)
             .ok_or(ArithmeticError::ArithmeticOverflow)?
             .checked_div(BASE_BPS as u64)
-            .ok_or(ArithmeticError::ArithmeticOverflow)?;
+            .ok_or(ArithmeticError::DivisionByZero)?;
         self.vault.is_dispute_active = true;
         self.vault.pending_slash_amount = slash_amount;
         self.vault.slash_claimant = slash_claimant;
