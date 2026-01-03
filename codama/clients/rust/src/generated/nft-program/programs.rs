@@ -7,7 +7,5 @@
 
 use solana_pubkey::{pubkey, Pubkey};
 
-
-  /// `nft_program` program ID.
-  pub const NFT_PROGRAM_ID: Pubkey = pubkey!("AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH");
-
+/// `nft_program` program ID.
+pub const NFT_PROGRAM_ID: Pubkey = pubkey!("AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH");

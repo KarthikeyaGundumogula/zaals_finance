@@ -140,6 +140,7 @@ impl<'info> UpdatePosition<'info> {
         // Update state
         self.position.total_value_locked = new_position_value;
         self.vault.total_capital_collected = new_total_capital;
+        self.vault.capital_after_slashing = new_total_capital;
 
         // Transfer tokens
         self.transfer_to_vault(amount)?;
@@ -183,6 +184,7 @@ impl<'info> UpdatePosition<'info> {
         // Update state
         self.position.total_value_locked = new_position_value;
         self.vault.total_capital_collected = new_total_capital;
+        self.vault.capital_after_slashing = new_total_capital;
 
         // Transfer tokens
         self.transfer_from_vault(amount)?;

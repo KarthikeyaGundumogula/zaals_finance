@@ -71,7 +71,6 @@ pub struct CreateVault<'info> {
 }
 
 impl<'info> CreateVault<'info> {
-    
     pub fn validate_config(&self, config: &InitVaultConfig) -> Result<()> {
         // Validate no duplicate beneficiaries and calculate total BPS
         let mut total_beneficiary_bps: u16 = 0;

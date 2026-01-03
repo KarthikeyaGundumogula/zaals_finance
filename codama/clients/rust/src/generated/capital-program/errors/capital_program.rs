@@ -20,4 +20,3 @@ impl From<CapitalProgramError> for solana_program_error::ProgramError {
         solana_program_error::ProgramError::Custom(e as u32)
     }
 }
-

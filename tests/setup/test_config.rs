@@ -18,8 +18,6 @@ use crate::setup::{accounts, constants::DECIMALS, utils};
 
 #[allow(dead_code)]
 pub struct TestConfig {
-    pub nft_program_id: Pubkey,
-    pub capital_program_id: Pubkey,
     pub svm: LiteSVM,
     pub admin: Keypair,
     pub agent: Keypair,
@@ -73,8 +71,6 @@ impl TestConfig {
         utils::deploy_mpl_program(&mut svm).expect("mpl_core deployment failed");
 
         TestConfig {
-            nft_program_id,
-            capital_program_id,
             svm,
             admin,
             agent,
@@ -92,9 +88,8 @@ impl TestConfig {
 pub struct Tokens {
     pub reward_mint: Pubkey,
     pub lock_mint: Pubkey,
-    pub provider_reward_ata: Pubkey,
-    pub provider_lock_ata: Pubkey,
     pub agent_reward_ata: Pubkey,
+    pub provider_lock_ata: Pubkey,
     pub vault_reward_ata: Pubkey,
     pub vault_lock_ata: Pubkey,
     pub collection: Keypair,
@@ -115,11 +110,6 @@ impl Tokens {
             .decimals(DECIMALS)
             .send()
             .unwrap();
-        let provider_reward_ata =
-            CreateAssociatedTokenAccount::new(svm, &test_config.god, &reward_mint)
-                .owner(&test_config.capital_provider.pubkey())
-                .send()
-                .unwrap();
         let provider_lock_ata =
             CreateAssociatedTokenAccount::new(svm, &test_config.god, &lock_mint)
                 .owner(&test_config.capital_provider.pubkey())
@@ -145,9 +135,8 @@ impl Tokens {
         Tokens {
             reward_mint,
             lock_mint,
-            provider_reward_ata,
-            provider_lock_ata,
             agent_reward_ata,
+            provider_lock_ata,
             vault_lock_ata,
             vault_reward_ata,
             collection,

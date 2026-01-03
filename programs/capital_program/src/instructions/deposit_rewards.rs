@@ -85,6 +85,7 @@ impl<'info> DepositRewards<'info> {
 
         // Validate timing - can only deposit rewards after lock phase starts
         let clock = Clock::get()?;
+        msg!("Current time: {}", clock.unix_timestamp);
         require!(
             clock.unix_timestamp >= self.vault.lock_phase_start_at,
             PhaseError::InvalidPhase

@@ -1,14 +1,11 @@
 #![allow(dead_code)]
 
 use crate::setup::test_config::TestConfig;
-use anchor_spl::associated_token;
 use litesvm::LiteSVM;
-use litesvm_token::{
-    get_spl_account, spl_token, spl_token::state::Account as TokenAccount, MintTo,
-};
+use litesvm_token::{get_spl_account, spl_token::state::Account as TokenAccount, MintTo};
 use solana_sdk::pubkey::Pubkey;
 use zaals_finance_client::{
-    capital_program::accounts::{AuthorityConfig, Vault},
+    capital_program::accounts::{AuthorityConfig, Position, Vault},
     CAPITAL_PROGRAM_ID,
 };
 use zaals_finance_client::{nft_program::accounts::NFTConfig, NFT_PROGRAM_ID};
@@ -31,6 +28,7 @@ macro_rules! impl_from_account_bytes {
 impl_from_account_bytes!(AuthorityConfig);
 impl_from_account_bytes!(Vault);
 impl_from_account_bytes!(NFTConfig);
+impl_from_account_bytes!(Position);
 
 pub fn get_nft_config_pda() -> Pubkey {
     let try_find_program_address =

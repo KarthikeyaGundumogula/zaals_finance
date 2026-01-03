@@ -5,494 +5,532 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use solana_pubkey::Pubkey;
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
+use solana_pubkey::Pubkey;
 
-pub const INIT_CAPITAL_PROGRAM_HANDLER_DISCRIMINATOR: [u8; 8] = [248, 187, 57, 89, 38, 219, 66, 222];
+pub const INIT_CAPITAL_PROGRAM_HANDLER_DISCRIMINATOR: [u8; 8] =
+    [248, 187, 57, 89, 38, 219, 66, 222];
 
 /// Accounts.
 #[derive(Debug)]
 pub struct InitCapitalProgramHandler {
-            /// Global authority configuration account
-/// re-initialization is not possible because of the init constraint
+    /// Global authority configuration account
+    /// re-initialization is not possible because of the init constraint
+    pub config: solana_pubkey::Pubkey,
+    /// Program administrator with initialization authority
+    pub admin: solana_pubkey::Pubkey,
+    /// NFT marketplace program
+    pub nft_program: solana_pubkey::Pubkey,
 
-    
-              
-          pub config: solana_pubkey::Pubkey,
-                /// Program administrator with initialization authority
-
-    
-              
-          pub admin: solana_pubkey::Pubkey,
-                /// NFT marketplace program
-
-    
-              
-          pub nft_program: solana_pubkey::Pubkey,
-          
-              
-          pub system_program: solana_pubkey::Pubkey,
-      }
+    pub system_program: solana_pubkey::Pubkey,
+}
 
 impl InitCapitalProgramHandler {
-  pub fn instruction(&self, args: InitCapitalProgramHandlerInstructionArgs) -> solana_instruction::Instruction {
-    self.instruction_with_remaining_accounts(args, &[])
-  }
-  #[allow(clippy::arithmetic_side_effects)]
-  #[allow(clippy::vec_init_then_push)]
-  pub fn instruction_with_remaining_accounts(&self, args: InitCapitalProgramHandlerInstructionArgs, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
-    let mut accounts = Vec::with_capacity(4+ remaining_accounts.len());
-                            accounts.push(solana_instruction::AccountMeta::new(
-            self.config,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new(
-            self.admin,
-            true
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            self.nft_program,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            self.system_program,
-            false
-          ));
-                      accounts.extend_from_slice(remaining_accounts);
-    let mut data = InitCapitalProgramHandlerInstructionData::new().try_to_vec().unwrap();
-          let mut args = args.try_to_vec().unwrap();
-      data.append(&mut args);
-    
-    solana_instruction::Instruction {
-      program_id: crate::CAPITAL_PROGRAM_ID,
-      accounts,
-      data,
+    pub fn instruction(
+        &self,
+        args: InitCapitalProgramHandlerInstructionArgs,
+    ) -> solana_instruction::Instruction {
+        self.instruction_with_remaining_accounts(args, &[])
     }
-  }
+    #[allow(clippy::arithmetic_side_effects)]
+    #[allow(clippy::vec_init_then_push)]
+    pub fn instruction_with_remaining_accounts(
+        &self,
+        args: InitCapitalProgramHandlerInstructionArgs,
+        remaining_accounts: &[solana_instruction::AccountMeta],
+    ) -> solana_instruction::Instruction {
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        accounts.push(solana_instruction::AccountMeta::new(self.config, false));
+        accounts.push(solana_instruction::AccountMeta::new(self.admin, true));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
+            self.nft_program,
+            false,
+        ));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
+            self.system_program,
+            false,
+        ));
+        accounts.extend_from_slice(remaining_accounts);
+        let mut data = InitCapitalProgramHandlerInstructionData::new()
+            .try_to_vec()
+            .unwrap();
+        let mut args = args.try_to_vec().unwrap();
+        data.append(&mut args);
+
+        solana_instruction::Instruction {
+            program_id: crate::CAPITAL_PROGRAM_ID,
+            accounts,
+            data,
+        }
+    }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct InitCapitalProgramHandlerInstructionData {
-            discriminator: [u8; 8],
-                                    }
+pub struct InitCapitalProgramHandlerInstructionData {
+    discriminator: [u8; 8],
+}
 
 impl InitCapitalProgramHandlerInstructionData {
-  pub fn new() -> Self {
-    Self {
-                        discriminator: [248, 187, 57, 89, 38, 219, 66, 222],
-                                                                                        }
-  }
+    pub fn new() -> Self {
+        Self {
+            discriminator: [248, 187, 57, 89, 38, 219, 66, 222],
+        }
+    }
 
     pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
-    borsh::to_vec(self)
-  }
-  }
+        borsh::to_vec(self)
+    }
+}
 
 impl Default for InitCapitalProgramHandlerInstructionData {
-  fn default() -> Self {
-    Self::new()
-  }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct InitCapitalProgramHandlerInstructionArgs {
-                  pub agent: Pubkey,
-                pub early_unlock_fee: u64,
-                pub dispute_window: i64,
-                pub max_lock_duration: i64,
-                pub min_lock_duration: i64,
-      }
-
-impl InitCapitalProgramHandlerInstructionArgs {
-  pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
-    borsh::to_vec(self)
-  }
+pub struct InitCapitalProgramHandlerInstructionArgs {
+    pub agent: Pubkey,
+    pub early_unlock_fee: u64,
+    pub dispute_window: i64,
+    pub max_lock_duration: i64,
+    pub min_lock_duration: i64,
 }
 
+impl InitCapitalProgramHandlerInstructionArgs {
+    pub(crate) fn try_to_vec(&self) -> Result<Vec<u8>, std::io::Error> {
+        borsh::to_vec(self)
+    }
+}
 
 /// Instruction builder for `InitCapitalProgramHandler`.
 ///
 /// ### Accounts:
 ///
-                ///   0. `[writable]` config
-                      ///   1. `[writable, signer]` admin
-                ///   2. `[optional]` nft_program (default to `AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH`)
-                ///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
+///   0. `[writable]` config
+///   1. `[writable, signer]` admin
+///   2. `[optional]` nft_program (default to `AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH`)
+///   3. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct InitCapitalProgramHandlerBuilder {
-            config: Option<solana_pubkey::Pubkey>,
-                admin: Option<solana_pubkey::Pubkey>,
-                nft_program: Option<solana_pubkey::Pubkey>,
-                system_program: Option<solana_pubkey::Pubkey>,
-                        agent: Option<Pubkey>,
-                early_unlock_fee: Option<u64>,
-                dispute_window: Option<i64>,
-                max_lock_duration: Option<i64>,
-                min_lock_duration: Option<i64>,
-        __remaining_accounts: Vec<solana_instruction::AccountMeta>,
+    config: Option<solana_pubkey::Pubkey>,
+    admin: Option<solana_pubkey::Pubkey>,
+    nft_program: Option<solana_pubkey::Pubkey>,
+    system_program: Option<solana_pubkey::Pubkey>,
+    agent: Option<Pubkey>,
+    early_unlock_fee: Option<u64>,
+    dispute_window: Option<i64>,
+    max_lock_duration: Option<i64>,
+    min_lock_duration: Option<i64>,
+    __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
 impl InitCapitalProgramHandlerBuilder {
-  pub fn new() -> Self {
-    Self::default()
-  }
-            /// Global authority configuration account
-/// re-initialization is not possible because of the init constraint
-#[inline(always)]
+    pub fn new() -> Self {
+        Self::default()
+    }
+    /// Global authority configuration account
+    /// re-initialization is not possible because of the init constraint
+    #[inline(always)]
     pub fn config(&mut self, config: solana_pubkey::Pubkey) -> &mut Self {
-                        self.config = Some(config);
-                    self
+        self.config = Some(config);
+        self
     }
-            /// Program administrator with initialization authority
-#[inline(always)]
+    /// Program administrator with initialization authority
+    #[inline(always)]
     pub fn admin(&mut self, admin: solana_pubkey::Pubkey) -> &mut Self {
-                        self.admin = Some(admin);
-                    self
+        self.admin = Some(admin);
+        self
     }
-            /// `[optional account, default to 'AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH']`
-/// NFT marketplace program
-#[inline(always)]
+    /// `[optional account, default to 'AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH']`
+    /// NFT marketplace program
+    #[inline(always)]
     pub fn nft_program(&mut self, nft_program: solana_pubkey::Pubkey) -> &mut Self {
-                        self.nft_program = Some(nft_program);
-                    self
+        self.nft_program = Some(nft_program);
+        self
     }
-            /// `[optional account, default to '11111111111111111111111111111111']`
-#[inline(always)]
+    /// `[optional account, default to '11111111111111111111111111111111']`
+    #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_pubkey::Pubkey) -> &mut Self {
-                        self.system_program = Some(system_program);
-                    self
+        self.system_program = Some(system_program);
+        self
     }
-                    #[inline(always)]
-      pub fn agent(&mut self, agent: Pubkey) -> &mut Self {
+    #[inline(always)]
+    pub fn agent(&mut self, agent: Pubkey) -> &mut Self {
         self.agent = Some(agent);
         self
-      }
-                #[inline(always)]
-      pub fn early_unlock_fee(&mut self, early_unlock_fee: u64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn early_unlock_fee(&mut self, early_unlock_fee: u64) -> &mut Self {
         self.early_unlock_fee = Some(early_unlock_fee);
         self
-      }
-                #[inline(always)]
-      pub fn dispute_window(&mut self, dispute_window: i64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn dispute_window(&mut self, dispute_window: i64) -> &mut Self {
         self.dispute_window = Some(dispute_window);
         self
-      }
-                #[inline(always)]
-      pub fn max_lock_duration(&mut self, max_lock_duration: i64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn max_lock_duration(&mut self, max_lock_duration: i64) -> &mut Self {
         self.max_lock_duration = Some(max_lock_duration);
         self
-      }
-                #[inline(always)]
-      pub fn min_lock_duration(&mut self, min_lock_duration: i64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn min_lock_duration(&mut self, min_lock_duration: i64) -> &mut Self {
         self.min_lock_duration = Some(min_lock_duration);
         self
-      }
-        /// Add an additional account to the instruction.
-  #[inline(always)]
-  pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
-    self.__remaining_accounts.push(account);
-    self
-  }
-  /// Add additional accounts to the instruction.
-  #[inline(always)]
-  pub fn add_remaining_accounts(&mut self, accounts: &[solana_instruction::AccountMeta]) -> &mut Self {
-    self.__remaining_accounts.extend_from_slice(accounts);
-    self
-  }
-  #[allow(clippy::clone_on_copy)]
-  pub fn instruction(&self) -> solana_instruction::Instruction {
-    let accounts = InitCapitalProgramHandler {
-                              config: self.config.expect("config is not set"),
-                                        admin: self.admin.expect("admin is not set"),
-                                        nft_program: self.nft_program.unwrap_or(solana_pubkey::pubkey!("AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH")),
-                                        system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
-                      };
-          let args = InitCapitalProgramHandlerInstructionArgs {
-                                                              agent: self.agent.clone().expect("agent is not set"),
-                                                                  early_unlock_fee: self.early_unlock_fee.clone().expect("early_unlock_fee is not set"),
-                                                                  dispute_window: self.dispute_window.clone().expect("dispute_window is not set"),
-                                                                  max_lock_duration: self.max_lock_duration.clone().expect("max_lock_duration is not set"),
-                                                                  min_lock_duration: self.min_lock_duration.clone().expect("min_lock_duration is not set"),
-                                    };
-    
-    accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
-  }
+    }
+    /// Add an additional account to the instruction.
+    #[inline(always)]
+    pub fn add_remaining_account(&mut self, account: solana_instruction::AccountMeta) -> &mut Self {
+        self.__remaining_accounts.push(account);
+        self
+    }
+    /// Add additional accounts to the instruction.
+    #[inline(always)]
+    pub fn add_remaining_accounts(
+        &mut self,
+        accounts: &[solana_instruction::AccountMeta],
+    ) -> &mut Self {
+        self.__remaining_accounts.extend_from_slice(accounts);
+        self
+    }
+    #[allow(clippy::clone_on_copy)]
+    pub fn instruction(&self) -> solana_instruction::Instruction {
+        let accounts = InitCapitalProgramHandler {
+            config: self.config.expect("config is not set"),
+            admin: self.admin.expect("admin is not set"),
+            nft_program: self.nft_program.unwrap_or(solana_pubkey::pubkey!(
+                "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH"
+            )),
+            system_program: self
+                .system_program
+                .unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
+        };
+        let args = InitCapitalProgramHandlerInstructionArgs {
+            agent: self.agent.clone().expect("agent is not set"),
+            early_unlock_fee: self
+                .early_unlock_fee
+                .clone()
+                .expect("early_unlock_fee is not set"),
+            dispute_window: self
+                .dispute_window
+                .clone()
+                .expect("dispute_window is not set"),
+            max_lock_duration: self
+                .max_lock_duration
+                .clone()
+                .expect("max_lock_duration is not set"),
+            min_lock_duration: self
+                .min_lock_duration
+                .clone()
+                .expect("min_lock_duration is not set"),
+        };
+
+        accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
+    }
 }
 
-  /// `init_capital_program_handler` CPI accounts.
-  pub struct InitCapitalProgramHandlerCpiAccounts<'a, 'b> {
-                  /// Global authority configuration account
-/// re-initialization is not possible because of the init constraint
+/// `init_capital_program_handler` CPI accounts.
+pub struct InitCapitalProgramHandlerCpiAccounts<'a, 'b> {
+    /// Global authority configuration account
+    /// re-initialization is not possible because of the init constraint
+    pub config: &'b solana_account_info::AccountInfo<'a>,
+    /// Program administrator with initialization authority
+    pub admin: &'b solana_account_info::AccountInfo<'a>,
+    /// NFT marketplace program
+    pub nft_program: &'b solana_account_info::AccountInfo<'a>,
 
-      
-                    
-              pub config: &'b solana_account_info::AccountInfo<'a>,
-                        /// Program administrator with initialization authority
-
-      
-                    
-              pub admin: &'b solana_account_info::AccountInfo<'a>,
-                        /// NFT marketplace program
-
-      
-                    
-              pub nft_program: &'b solana_account_info::AccountInfo<'a>,
-                
-                    
-              pub system_program: &'b solana_account_info::AccountInfo<'a>,
-            }
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
+}
 
 /// `init_capital_program_handler` CPI instruction.
 pub struct InitCapitalProgramHandlerCpi<'a, 'b> {
-  /// The program to invoke.
-  pub __program: &'b solana_account_info::AccountInfo<'a>,
-            /// Global authority configuration account
-/// re-initialization is not possible because of the init constraint
+    /// The program to invoke.
+    pub __program: &'b solana_account_info::AccountInfo<'a>,
+    /// Global authority configuration account
+    /// re-initialization is not possible because of the init constraint
+    pub config: &'b solana_account_info::AccountInfo<'a>,
+    /// Program administrator with initialization authority
+    pub admin: &'b solana_account_info::AccountInfo<'a>,
+    /// NFT marketplace program
+    pub nft_program: &'b solana_account_info::AccountInfo<'a>,
 
-    
-              
-          pub config: &'b solana_account_info::AccountInfo<'a>,
-                /// Program administrator with initialization authority
-
-    
-              
-          pub admin: &'b solana_account_info::AccountInfo<'a>,
-                /// NFT marketplace program
-
-    
-              
-          pub nft_program: &'b solana_account_info::AccountInfo<'a>,
-          
-              
-          pub system_program: &'b solana_account_info::AccountInfo<'a>,
-            /// The arguments for the instruction.
+    pub system_program: &'b solana_account_info::AccountInfo<'a>,
+    /// The arguments for the instruction.
     pub __args: InitCapitalProgramHandlerInstructionArgs,
-  }
+}
 
 impl<'a, 'b> InitCapitalProgramHandlerCpi<'a, 'b> {
-  pub fn new(
-    program: &'b solana_account_info::AccountInfo<'a>,
-          accounts: InitCapitalProgramHandlerCpiAccounts<'a, 'b>,
-              args: InitCapitalProgramHandlerInstructionArgs,
-      ) -> Self {
-    Self {
-      __program: program,
-              config: accounts.config,
-              admin: accounts.admin,
-              nft_program: accounts.nft_program,
-              system_program: accounts.system_program,
-                    __args: args,
-          }
-  }
-  #[inline(always)]
-  pub fn invoke(&self) -> solana_program_error::ProgramResult {
-    self.invoke_signed_with_remaining_accounts(&[], &[])
-  }
-  #[inline(always)]
-  pub fn invoke_with_remaining_accounts(&self, remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)]) -> solana_program_error::ProgramResult {
-    self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
-  }
-  #[inline(always)]
-  pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-    self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
-  }
-  #[allow(clippy::arithmetic_side_effects)]
-  #[allow(clippy::clone_on_copy)]
-  #[allow(clippy::vec_init_then_push)]
-  pub fn invoke_signed_with_remaining_accounts(
-    &self,
-    signers_seeds: &[&[&[u8]]],
-    remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)]
-  ) -> solana_program_error::ProgramResult {
-    let mut accounts = Vec::with_capacity(4+ remaining_accounts.len());
-                            accounts.push(solana_instruction::AccountMeta::new(
-            *self.config.key,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new(
-            *self.admin.key,
-            true
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            *self.nft_program.key,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            *self.system_program.key,
-            false
-          ));
-                      remaining_accounts.iter().for_each(|remaining_account| {
-      accounts.push(solana_instruction::AccountMeta {
-          pubkey: *remaining_account.0.key,
-          is_signer: remaining_account.1,
-          is_writable: remaining_account.2,
-      })
-    });
-    let mut data = InitCapitalProgramHandlerInstructionData::new().try_to_vec().unwrap();
-          let mut args = self.__args.try_to_vec().unwrap();
-      data.append(&mut args);
-    
-    let instruction = solana_instruction::Instruction {
-      program_id: crate::CAPITAL_PROGRAM_ID,
-      accounts,
-      data,
-    };
-    let mut account_infos = Vec::with_capacity(5 + remaining_accounts.len());
-    account_infos.push(self.__program.clone());
-                  account_infos.push(self.config.clone());
-                        account_infos.push(self.admin.clone());
-                        account_infos.push(self.nft_program.clone());
-                        account_infos.push(self.system_program.clone());
-              remaining_accounts.iter().for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
-
-    if signers_seeds.is_empty() {
-      solana_cpi::invoke(&instruction, &account_infos)
-    } else {
-      solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
+    pub fn new(
+        program: &'b solana_account_info::AccountInfo<'a>,
+        accounts: InitCapitalProgramHandlerCpiAccounts<'a, 'b>,
+        args: InitCapitalProgramHandlerInstructionArgs,
+    ) -> Self {
+        Self {
+            __program: program,
+            config: accounts.config,
+            admin: accounts.admin,
+            nft_program: accounts.nft_program,
+            system_program: accounts.system_program,
+            __args: args,
+        }
     }
-  }
+    #[inline(always)]
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
+        self.invoke_signed_with_remaining_accounts(&[], &[])
+    }
+    #[inline(always)]
+    pub fn invoke_with_remaining_accounts(
+        &self,
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
+        self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
+    }
+    #[inline(always)]
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
+        self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
+    }
+    #[allow(clippy::arithmetic_side_effects)]
+    #[allow(clippy::clone_on_copy)]
+    #[allow(clippy::vec_init_then_push)]
+    pub fn invoke_signed_with_remaining_accounts(
+        &self,
+        signers_seeds: &[&[&[u8]]],
+        remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> solana_program_error::ProgramResult {
+        let mut accounts = Vec::with_capacity(4 + remaining_accounts.len());
+        accounts.push(solana_instruction::AccountMeta::new(
+            *self.config.key,
+            false,
+        ));
+        accounts.push(solana_instruction::AccountMeta::new(*self.admin.key, true));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
+            *self.nft_program.key,
+            false,
+        ));
+        accounts.push(solana_instruction::AccountMeta::new_readonly(
+            *self.system_program.key,
+            false,
+        ));
+        remaining_accounts.iter().for_each(|remaining_account| {
+            accounts.push(solana_instruction::AccountMeta {
+                pubkey: *remaining_account.0.key,
+                is_signer: remaining_account.1,
+                is_writable: remaining_account.2,
+            })
+        });
+        let mut data = InitCapitalProgramHandlerInstructionData::new()
+            .try_to_vec()
+            .unwrap();
+        let mut args = self.__args.try_to_vec().unwrap();
+        data.append(&mut args);
+
+        let instruction = solana_instruction::Instruction {
+            program_id: crate::CAPITAL_PROGRAM_ID,
+            accounts,
+            data,
+        };
+        let mut account_infos = Vec::with_capacity(5 + remaining_accounts.len());
+        account_infos.push(self.__program.clone());
+        account_infos.push(self.config.clone());
+        account_infos.push(self.admin.clone());
+        account_infos.push(self.nft_program.clone());
+        account_infos.push(self.system_program.clone());
+        remaining_accounts
+            .iter()
+            .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
+
+        if signers_seeds.is_empty() {
+            solana_cpi::invoke(&instruction, &account_infos)
+        } else {
+            solana_cpi::invoke_signed(&instruction, &account_infos, signers_seeds)
+        }
+    }
 }
 
 /// Instruction builder for `InitCapitalProgramHandler` via CPI.
 ///
 /// ### Accounts:
 ///
-                ///   0. `[writable]` config
-                      ///   1. `[writable, signer]` admin
-          ///   2. `[]` nft_program
-          ///   3. `[]` system_program
+///   0. `[writable]` config
+///   1. `[writable, signer]` admin
+///   2. `[]` nft_program
+///   3. `[]` system_program
 #[derive(Clone, Debug)]
 pub struct InitCapitalProgramHandlerCpiBuilder<'a, 'b> {
-  instruction: Box<InitCapitalProgramHandlerCpiBuilderInstruction<'a, 'b>>,
+    instruction: Box<InitCapitalProgramHandlerCpiBuilderInstruction<'a, 'b>>,
 }
 
 impl<'a, 'b> InitCapitalProgramHandlerCpiBuilder<'a, 'b> {
-  pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
-    let instruction = Box::new(InitCapitalProgramHandlerCpiBuilderInstruction {
-      __program: program,
-              config: None,
-              admin: None,
-              nft_program: None,
-              system_program: None,
-                                            agent: None,
-                                early_unlock_fee: None,
-                                dispute_window: None,
-                                max_lock_duration: None,
-                                min_lock_duration: None,
-                    __remaining_accounts: Vec::new(),
-    });
-    Self { instruction }
-  }
-      /// Global authority configuration account
-/// re-initialization is not possible because of the init constraint
-#[inline(always)]
+    pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
+        let instruction = Box::new(InitCapitalProgramHandlerCpiBuilderInstruction {
+            __program: program,
+            config: None,
+            admin: None,
+            nft_program: None,
+            system_program: None,
+            agent: None,
+            early_unlock_fee: None,
+            dispute_window: None,
+            max_lock_duration: None,
+            min_lock_duration: None,
+            __remaining_accounts: Vec::new(),
+        });
+        Self { instruction }
+    }
+    /// Global authority configuration account
+    /// re-initialization is not possible because of the init constraint
+    #[inline(always)]
     pub fn config(&mut self, config: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.config = Some(config);
-                    self
+        self.instruction.config = Some(config);
+        self
     }
-      /// Program administrator with initialization authority
-#[inline(always)]
+    /// Program administrator with initialization authority
+    #[inline(always)]
     pub fn admin(&mut self, admin: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.admin = Some(admin);
-                    self
+        self.instruction.admin = Some(admin);
+        self
     }
-      /// NFT marketplace program
-#[inline(always)]
-    pub fn nft_program(&mut self, nft_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.nft_program = Some(nft_program);
-                    self
+    /// NFT marketplace program
+    #[inline(always)]
+    pub fn nft_program(
+        &mut self,
+        nft_program: &'b solana_account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.nft_program = Some(nft_program);
+        self
     }
-      #[inline(always)]
-    pub fn system_program(&mut self, system_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.system_program = Some(system_program);
-                    self
+    #[inline(always)]
+    pub fn system_program(
+        &mut self,
+        system_program: &'b solana_account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.system_program = Some(system_program);
+        self
     }
-                    #[inline(always)]
-      pub fn agent(&mut self, agent: Pubkey) -> &mut Self {
+    #[inline(always)]
+    pub fn agent(&mut self, agent: Pubkey) -> &mut Self {
         self.instruction.agent = Some(agent);
         self
-      }
-                #[inline(always)]
-      pub fn early_unlock_fee(&mut self, early_unlock_fee: u64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn early_unlock_fee(&mut self, early_unlock_fee: u64) -> &mut Self {
         self.instruction.early_unlock_fee = Some(early_unlock_fee);
         self
-      }
-                #[inline(always)]
-      pub fn dispute_window(&mut self, dispute_window: i64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn dispute_window(&mut self, dispute_window: i64) -> &mut Self {
         self.instruction.dispute_window = Some(dispute_window);
         self
-      }
-                #[inline(always)]
-      pub fn max_lock_duration(&mut self, max_lock_duration: i64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn max_lock_duration(&mut self, max_lock_duration: i64) -> &mut Self {
         self.instruction.max_lock_duration = Some(max_lock_duration);
         self
-      }
-                #[inline(always)]
-      pub fn min_lock_duration(&mut self, min_lock_duration: i64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn min_lock_duration(&mut self, min_lock_duration: i64) -> &mut Self {
         self.instruction.min_lock_duration = Some(min_lock_duration);
         self
-      }
-        /// Add an additional account to the instruction.
-  #[inline(always)]
-  pub fn add_remaining_account(&mut self, account: &'b solana_account_info::AccountInfo<'a>, is_writable: bool, is_signer: bool) -> &mut Self {
-    self.instruction.__remaining_accounts.push((account, is_writable, is_signer));
-    self
-  }
-  /// Add additional accounts to the instruction.
-  ///
-  /// Each account is represented by a tuple of the `AccountInfo`, a `bool` indicating whether the account is writable or not,
-  /// and a `bool` indicating whether the account is a signer or not.
-  #[inline(always)]
-  pub fn add_remaining_accounts(&mut self, accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)]) -> &mut Self {
-    self.instruction.__remaining_accounts.extend_from_slice(accounts);
-    self
-  }
-  #[inline(always)]
-  pub fn invoke(&self) -> solana_program_error::ProgramResult {
-    self.invoke_signed(&[])
-  }
-  #[allow(clippy::clone_on_copy)]
-  #[allow(clippy::vec_init_then_push)]
-  pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-          let args = InitCapitalProgramHandlerInstructionArgs {
-                                                              agent: self.instruction.agent.clone().expect("agent is not set"),
-                                                                  early_unlock_fee: self.instruction.early_unlock_fee.clone().expect("early_unlock_fee is not set"),
-                                                                  dispute_window: self.instruction.dispute_window.clone().expect("dispute_window is not set"),
-                                                                  max_lock_duration: self.instruction.max_lock_duration.clone().expect("max_lock_duration is not set"),
-                                                                  min_lock_duration: self.instruction.min_lock_duration.clone().expect("min_lock_duration is not set"),
-                                    };
+    }
+    /// Add an additional account to the instruction.
+    #[inline(always)]
+    pub fn add_remaining_account(
+        &mut self,
+        account: &'b solana_account_info::AccountInfo<'a>,
+        is_writable: bool,
+        is_signer: bool,
+    ) -> &mut Self {
+        self.instruction
+            .__remaining_accounts
+            .push((account, is_writable, is_signer));
+        self
+    }
+    /// Add additional accounts to the instruction.
+    ///
+    /// Each account is represented by a tuple of the `AccountInfo`, a `bool` indicating whether the account is writable or not,
+    /// and a `bool` indicating whether the account is a signer or not.
+    #[inline(always)]
+    pub fn add_remaining_accounts(
+        &mut self,
+        accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)],
+    ) -> &mut Self {
+        self.instruction
+            .__remaining_accounts
+            .extend_from_slice(accounts);
+        self
+    }
+    #[inline(always)]
+    pub fn invoke(&self) -> solana_program_error::ProgramResult {
+        self.invoke_signed(&[])
+    }
+    #[allow(clippy::clone_on_copy)]
+    #[allow(clippy::vec_init_then_push)]
+    pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
+        let args = InitCapitalProgramHandlerInstructionArgs {
+            agent: self.instruction.agent.clone().expect("agent is not set"),
+            early_unlock_fee: self
+                .instruction
+                .early_unlock_fee
+                .clone()
+                .expect("early_unlock_fee is not set"),
+            dispute_window: self
+                .instruction
+                .dispute_window
+                .clone()
+                .expect("dispute_window is not set"),
+            max_lock_duration: self
+                .instruction
+                .max_lock_duration
+                .clone()
+                .expect("max_lock_duration is not set"),
+            min_lock_duration: self
+                .instruction
+                .min_lock_duration
+                .clone()
+                .expect("min_lock_duration is not set"),
+        };
         let instruction = InitCapitalProgramHandlerCpi {
-        __program: self.instruction.__program,
-                  
-          config: self.instruction.config.expect("config is not set"),
-                  
-          admin: self.instruction.admin.expect("admin is not set"),
-                  
-          nft_program: self.instruction.nft_program.expect("nft_program is not set"),
-                  
-          system_program: self.instruction.system_program.expect("system_program is not set"),
-                          __args: args,
-            };
-    instruction.invoke_signed_with_remaining_accounts(signers_seeds, &self.instruction.__remaining_accounts)
-  }
+            __program: self.instruction.__program,
+
+            config: self.instruction.config.expect("config is not set"),
+
+            admin: self.instruction.admin.expect("admin is not set"),
+
+            nft_program: self
+                .instruction
+                .nft_program
+                .expect("nft_program is not set"),
+
+            system_program: self
+                .instruction
+                .system_program
+                .expect("system_program is not set"),
+            __args: args,
+        };
+        instruction.invoke_signed_with_remaining_accounts(
+            signers_seeds,
+            &self.instruction.__remaining_accounts,
+        )
+    }
 }
 
 #[derive(Clone, Debug)]
 struct InitCapitalProgramHandlerCpiBuilderInstruction<'a, 'b> {
-  __program: &'b solana_account_info::AccountInfo<'a>,
-            config: Option<&'b solana_account_info::AccountInfo<'a>>,
-                admin: Option<&'b solana_account_info::AccountInfo<'a>>,
-                nft_program: Option<&'b solana_account_info::AccountInfo<'a>>,
-                system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
-                        agent: Option<Pubkey>,
-                early_unlock_fee: Option<u64>,
-                dispute_window: Option<i64>,
-                max_lock_duration: Option<i64>,
-                min_lock_duration: Option<i64>,
-        /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-  __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
+    __program: &'b solana_account_info::AccountInfo<'a>,
+    config: Option<&'b solana_account_info::AccountInfo<'a>>,
+    admin: Option<&'b solana_account_info::AccountInfo<'a>>,
+    nft_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+    agent: Option<Pubkey>,
+    early_unlock_fee: Option<u64>,
+    dispute_window: Option<i64>,
+    max_lock_duration: Option<i64>,
+    min_lock_duration: Option<i64>,
+    /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
+    __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,
 }
-

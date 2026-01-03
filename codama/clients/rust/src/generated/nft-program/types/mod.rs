@@ -5,23 +5,22 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-  pub(crate) mod r#asset_burned_event;
-  pub(crate) mod r#asset_minted_event;
-  pub(crate) mod r#collection_created_event;
-  pub(crate) mod r#key;
-  pub(crate) mod r#offer_cancelled_event;
-  pub(crate) mod r#offer_created_event;
-  pub(crate) mod r#offer_purchased_event;
-  pub(crate) mod r#program_initialized_event;
-  pub(crate) mod r#update_authority;
+pub(crate) mod r#asset_burned_event;
+pub(crate) mod r#asset_minted_event;
+pub(crate) mod r#collection_created_event;
+pub(crate) mod r#key;
+pub(crate) mod r#offer_cancelled_event;
+pub(crate) mod r#offer_created_event;
+pub(crate) mod r#offer_purchased_event;
+pub(crate) mod r#program_initialized_event;
+pub(crate) mod r#update_authority;
 
-  pub use self::r#asset_burned_event::*;
-  pub use self::r#asset_minted_event::*;
-  pub use self::r#collection_created_event::*;
-  pub use self::r#key::*;
-  pub use self::r#offer_cancelled_event::*;
-  pub use self::r#offer_created_event::*;
-  pub use self::r#offer_purchased_event::*;
-  pub use self::r#program_initialized_event::*;
-  pub use self::r#update_authority::*;
-
+pub use self::r#asset_burned_event::*;
+pub use self::r#asset_minted_event::*;
+pub use self::r#collection_created_event::*;
+pub use self::r#key::*;
+pub use self::r#offer_cancelled_event::*;
+pub use self::r#offer_created_event::*;
+pub use self::r#offer_purchased_event::*;
+pub use self::r#program_initialized_event::*;
+pub use self::r#update_authority::*;

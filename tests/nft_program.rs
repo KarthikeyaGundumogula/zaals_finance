@@ -4,12 +4,13 @@ use setup::test_config::TestConfig;
 use setup::*;
 use solana_sdk::signature::Signer;
 use zaals_finance_client::nft_program::accounts::NFTConfig;
+use zaals_finance_client::CAPITAL_PROGRAM_ID;
 
 use crate::setup::accounts;
 #[test]
 fn test_init_nft_program() {
     let mut test_config = TestConfig::new();
-    let result = instruction_hadlers::init_nft_program(&mut test_config);
+    let result = instruction_handlers::init_nft_program(&mut test_config);
 
     match result {
         Ok(result) => {
@@ -18,10 +19,7 @@ fn test_init_nft_program() {
             let nft_config_data: NFTConfig =
                 accounts::get_data_from_pda_address(&mut test_config.svm, nft_config);
             assert_eq!(nft_config_data.admin, test_config.admin.pubkey());
-            assert_eq!(
-                nft_config_data.capital_program,
-                test_config.capital_program_id
-            );
+            assert_eq!(nft_config_data.capital_program, CAPITAL_PROGRAM_ID);
         }
         Err(e) => panic!("Transaction failed: {:?}", e),
     }
@@ -30,8 +28,8 @@ fn test_init_nft_program() {
 #[test]
 fn test_init_nft_program_twice_fails() {
     let mut test_config = TestConfig::new();
-    let _ = instruction_hadlers::init_nft_program(&mut test_config);
-    let result = instruction_hadlers::init_nft_program(&mut test_config);
+    let _ = instruction_handlers::init_nft_program(&mut test_config);
+    let result = instruction_handlers::init_nft_program(&mut test_config);
 
     match result {
         Ok(_) => panic!("Transaction should have failed"),

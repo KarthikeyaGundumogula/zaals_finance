@@ -2,7 +2,6 @@
 
 pub(crate) mod generated;
 
-
 pub mod nft_program {
     pub use super::generated::nft_program::*;
 }

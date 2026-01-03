@@ -1,7 +1,8 @@
-use std::str::FromStr;
-
-use crate::constants::{NFT_PROGRAM_KEY_PAIR, NFT_PROGRAM_SO_FILE,MPL_CORE_ID};
-use crate::setup::constants::{CAPITAL_PROGRAM_KEY_PAIR, CAPITAL_PROGRAM_SO_FILE, MPL_CORE_SO_FILE};
+#![allow(dead_code)]
+use crate::constants::{MPL_CORE_ID, NFT_PROGRAM_KEY_PAIR, NFT_PROGRAM_SO_FILE};
+use crate::setup::constants::{
+    CAPITAL_PROGRAM_KEY_PAIR, CAPITAL_PROGRAM_SO_FILE, MPL_CORE_SO_FILE,
+};
 use litesvm::LiteSVM;
 use litesvm::{error::LiteSVMError, types::TransactionResult};
 use solana_sdk::{
@@ -12,9 +13,27 @@ use solana_sdk::{
     signature::{read_keypair_file, Keypair, Signer},
     transaction::Transaction,
 };
+use std::str::FromStr;
 
 use mpl_core::{Asset, Collection};
 
+pub struct MplUtils;
+
+impl MplUtils {
+    pub fn get_collection(svm: &LiteSVM, asset: &Pubkey) -> Collection {
+        let account = svm
+            .get_account(asset)
+            .expect("Collection Asset account not found");
+
+        *Collection::deserialize(&account.data).expect("Failed to deserialize collection account")
+    }
+
+    pub fn get_asset(svm: &LiteSVM, mint: &Pubkey) -> Asset {
+        let account = svm.get_account(mint).expect("Asset account not found");
+
+        *Asset::deserialize(&account.data).expect("Failed to deserialize asset account")
+    }
+}
 
 pub fn deploy_nft_program(svm: &mut LiteSVM) -> Result<(), LiteSVMError> {
     let program_keypair =
@@ -58,20 +77,11 @@ pub fn send_transaction(
 
     result
 }
-pub struct MplUtils;
 
-impl MplUtils {
-    pub fn get_collection(svm: &LiteSVM, mint: &Pubkey) -> Collection {
-        let account = svm
-            .get_account(mint)
-            .expect("Collection Asset account not found");
-
-        *Collection::deserialize(&account.data).expect("Failed to deserialize collection account")
-    }
-
-    pub fn get_asset(svm: &LiteSVM, mint: &Pubkey) -> Asset {
-        let account = svm.get_account(mint).expect("Asset account not found");
-
-        *Asset::deserialize(&account.data).expect("Failed to deserialize asset account")
-    }
+pub fn set_clock(svm: &mut LiteSVM, unix_timestamp: i64) {
+    let mut clock: Clock = svm.get_sysvar();
+    clock.slot = 10;
+    clock.epoch = 1000;
+    clock.unix_timestamp = unix_timestamp;
+    svm.set_sysvar(&clock);
 }

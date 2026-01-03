@@ -7,7 +7,5 @@
 
 use solana_pubkey::{pubkey, Pubkey};
 
-
-  /// `capital_program` program ID.
-  pub const CAPITAL_PROGRAM_ID: Pubkey = pubkey!("8syRdGBunFUWZzkgGigv1KWcTEhxPkc15DMVXEYj9qVn");
-
+/// `capital_program` program ID.
+pub const CAPITAL_PROGRAM_ID: Pubkey = pubkey!("8syRdGBunFUWZzkgGigv1KWcTEhxPkc15DMVXEYj9qVn");

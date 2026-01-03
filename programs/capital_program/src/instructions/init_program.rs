@@ -19,7 +19,6 @@ pub struct InitProgram<'info> {
     )]
     pub config: Account<'info, AuthorityConfig>,
 
-
     /// Program administrator with initialization authority
     #[account(mut)]
     pub admin: Signer<'info>,
@@ -35,7 +34,6 @@ pub struct InitProgram<'info> {
 }
 
 impl<'info> InitProgram<'info> {
-    
     pub fn validate_params(&self, params: &InitProgramConfig) -> Result<()> {
         // Validate agent address
         require_keys_neq!(params.agent, Pubkey::default(), SignerError::InvalidAddress);

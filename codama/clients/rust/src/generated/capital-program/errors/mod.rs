@@ -5,7 +5,6 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-      pub(crate) mod capital_program;
-  
-      pub use self::capital_program::CapitalProgramError;
-  
+pub(crate) mod capital_program;
+
+pub use self::capital_program::CapitalProgramError;
