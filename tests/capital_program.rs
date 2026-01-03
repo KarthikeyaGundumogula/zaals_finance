@@ -6,13 +6,14 @@ use solana_sdk::signer::Signer;
 use zaals_finance_client::capital_program::accounts::{AuthorityConfig, Position, Vault};
 
 use crate::setup::{
-    accounts::{fund_ata, get_ata_balance, get_authority_config_pda, get_vault_pda},
+    accounts::{
+        fund_ata, get_ata_balance, get_authority_config_pda, get_data_from_pda_address,
+        get_vault_pda,
+    },
     constants::{DEPOSIT_AMOUNT, MAX_VAULT_THRESHOLD, MIN_LOCK_AMOUNT, ONE_DAY, REWARDS_DEPOSIT},
     test_config::Tokens,
     utils::set_clock,
 };
-
-use utils::MplUtils;
 
 #[test]
 pub fn test_init_capital_program() {
@@ -58,7 +59,7 @@ pub fn test_create_vault() {
                 test_config.node_operator.pubkey()
             );
             let mpl_collection =
-                MplUtils::get_collection(&test_config.svm, &token_data.collection.pubkey());
+                utils::get_collection(&test_config.svm, &token_data.collection.pubkey());
             println!("MPL Collection: {:?}", mpl_collection);
             assert_eq!(vault_config.nft_collection, token_data.collection.pubkey());
             assert_eq!(vault_config.reward_token_mint, token_data.reward_mint);
@@ -110,9 +111,9 @@ pub fn test_open_position() {
             let vault_pda = get_vault_pda(test_config.node_operator.pubkey());
             let position_pda = accounts::get_position_pda(token_data.asset.pubkey());
             let vault: Vault = accounts::get_data_from_pda_address(&mut test_config.svm, vault_pda);
-            let asset_data = MplUtils::get_asset(&test_config.svm, &token_data.asset.pubkey());
+            let asset_data = utils::get_asset(&test_config.svm, &token_data.asset.pubkey());
             let collection_data =
-                MplUtils::get_collection(&test_config.svm, &token_data.collection.pubkey());
+                utils::get_collection(&test_config.svm, &token_data.collection.pubkey());
             let position: Position =
                 accounts::get_data_from_pda_address(&mut test_config.svm, position_pda);
 
@@ -392,6 +393,17 @@ pub fn test_claim_investor_rewards() {
     )
     .unwrap();
 
+    let vault_pda = get_vault_pda(test_config.node_operator.pubkey());
+    let position_pda = accounts::get_position_pda(token_data.asset.pubkey());
+    let vault_data: Vault = get_data_from_pda_address(&mut test_config.svm, vault_pda);
+    let position_data: Position = get_data_from_pda_address(&mut test_config.svm, position_pda);
+    let holder_reward_ata_balance_before_claim =
+        get_ata_balance(&mut test_config.svm, token_data.provider_reward_ata);
+    let total_rewards_accrued = utils::get_investor_accrued_rewards(vault_data, position_data);
+    println!(
+        "Total rewards accrued before claim: {}",
+        total_rewards_accrued
+    );
     let result = instruction_handlers::capital_program_claim_investor_rewards(
         &mut test_config,
         &mut token_data,
@@ -402,12 +414,14 @@ pub fn test_claim_investor_rewards() {
             // for log in res.logs {
             //     println!("instruction log: {:?}", log);
             // }
-            let holder_reward_ata_balance =
-                get_ata_balance(&mut test_config.svm, token_data.agent_reward_ata);
+            let holder_reward_ata_balance_after_claim =
+                get_ata_balance(&mut test_config.svm, token_data.provider_reward_ata);
+            assert_eq!(
+                holder_reward_ata_balance_after_claim,
+                holder_reward_ata_balance_before_claim + total_rewards_accrued
+            );
 
             // ATA ASSERTIONS
-
-            assert!(holder_reward_ata_balance > 0);
         }
 
         Err(e) => {

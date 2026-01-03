@@ -14,25 +14,22 @@ use solana_sdk::{
     transaction::Transaction,
 };
 use std::str::FromStr;
+use zaals_finance_client::capital_program::accounts::{Position, Vault};
 
 use mpl_core::{Asset, Collection};
 
-pub struct MplUtils;
+pub fn get_collection(svm: &LiteSVM, asset: &Pubkey) -> Collection {
+    let account = svm
+        .get_account(asset)
+        .expect("Collection Asset account not found");
 
-impl MplUtils {
-    pub fn get_collection(svm: &LiteSVM, asset: &Pubkey) -> Collection {
-        let account = svm
-            .get_account(asset)
-            .expect("Collection Asset account not found");
+    *Collection::deserialize(&account.data).expect("Failed to deserialize collection account")
+}
 
-        *Collection::deserialize(&account.data).expect("Failed to deserialize collection account")
-    }
+pub fn get_asset(svm: &LiteSVM, mint: &Pubkey) -> Asset {
+    let account = svm.get_account(mint).expect("Asset account not found");
 
-    pub fn get_asset(svm: &LiteSVM, mint: &Pubkey) -> Asset {
-        let account = svm.get_account(mint).expect("Asset account not found");
-
-        *Asset::deserialize(&account.data).expect("Failed to deserialize asset account")
-    }
+    *Asset::deserialize(&account.data).expect("Failed to deserialize asset account")
 }
 
 pub fn deploy_nft_program(svm: &mut LiteSVM) -> Result<(), LiteSVMError> {
@@ -84,4 +81,30 @@ pub fn set_clock(svm: &mut LiteSVM, unix_timestamp: i64) {
     clock.epoch = 1000;
     clock.unix_timestamp = unix_timestamp;
     svm.set_sysvar(&clock);
+}
+
+pub fn get_investor_accrued_rewards(
+    vault: Vault,
+    position: Position,
+) -> u64 {
+    let total_investor_bps: u16 = vault.investor_bps;
+
+    // ---- step 1: total investor rewards (u128) ----
+    let total_investors_rewards: u128 = (vault.total_rewards_deposited as u128)
+        .checked_mul(total_investor_bps as u128)
+        .expect("overflow in total_investors_rewards")
+        .checked_div(10_000u128)
+        .expect("division by zero");
+
+    // ---- step 2: position share (u128) ----
+    let position_rewards: u128 = total_investors_rewards
+        .checked_mul(position.total_value_locked as u128)
+        .expect("overflow in position reward mul")
+        .checked_div(vault.total_capital_collected as u128)
+        .expect("division by zero");
+
+    // ---- step 3: back to u64 ----
+    position_rewards
+        .try_into()
+        .expect("position rewards exceed u64")
 }

@@ -90,8 +90,10 @@ pub struct Tokens {
     pub lock_mint: Pubkey,
     pub agent_reward_ata: Pubkey,
     pub provider_lock_ata: Pubkey,
+    pub provider_reward_ata: Pubkey,
     pub vault_reward_ata: Pubkey,
     pub vault_lock_ata: Pubkey,
+    pub beneficiary_atas: Vec<Pubkey>,
     pub collection: Keypair,
     pub asset: Keypair,
 }
@@ -130,6 +132,19 @@ impl Tokens {
                 .owner(&position_vault)
                 .send()
                 .unwrap();
+        let provider_reward_ata =
+            CreateAssociatedTokenAccount::new(svm, &test_config.god, &reward_mint)
+                .owner(&test_config.capital_provider.pubkey())
+                .send()
+                .unwrap();
+        let mut beneficiary_atas: Vec<Pubkey> = Vec::new();
+        for beneficiary in &test_config.beneficiaries {
+            let ata = CreateAssociatedTokenAccount::new(svm, &test_config.god, &reward_mint)
+                .owner(&beneficiary.address)
+                .send()
+                .unwrap();
+            beneficiary_atas.push(ata);
+        }
         let collection = Keypair::new();
         let asset = Keypair::new();
         Tokens {
@@ -137,8 +152,10 @@ impl Tokens {
             lock_mint,
             agent_reward_ata,
             provider_lock_ata,
+            provider_reward_ata,
             vault_lock_ata,
             vault_reward_ata,
+            beneficiary_atas,
             collection,
             asset,
         }

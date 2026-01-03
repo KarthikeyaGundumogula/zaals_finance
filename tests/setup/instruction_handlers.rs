@@ -15,9 +15,9 @@ use solana_sdk::{clock::Clock, signature::Signer};
 
 use zaals_finance_client::{
     capital_program::instructions::{
-        ClaimInvestorRewardsHandlerBuilder, CreateVaultHandlerBuilder,
-        DepositRewardsHandlerBuilder, InitCapitalProgramHandlerBuilder, OpenPositionHandlerBuilder,
-        UpdatePositionHandlerBuilder,
+        ClaimBeneficiaryRewardsHandlerBuilder, ClaimInvestorRewardsHandlerBuilder,
+        CreateVaultHandlerBuilder, DepositRewardsHandlerBuilder, InitCapitalProgramHandlerBuilder,
+        OpenPositionHandlerBuilder, UpdatePositionHandlerBuilder,
     },
     nft_program::instructions::InitNftProgramHandlerBuilder,
     CAPITAL_PROGRAM_ID, NFT_PROGRAM_ID,
@@ -219,7 +219,7 @@ pub fn capital_program_claim_investor_rewards(
         .asset(token_data.asset.pubkey())
         .reward_mint(token_data.reward_mint)
         .vault_ata(token_data.vault_reward_ata)
-        .holder_ata(token_data.provider_lock_ata)
+        .holder_ata(token_data.provider_reward_ata)
         .instruction();
     utils::send_transaction(
         &mut test_config.svm,
@@ -227,6 +227,35 @@ pub fn capital_program_claim_investor_rewards(
         &test_config.god.pubkey(),
         &[
             &test_config.capital_provider.insecure_clone(),
+            &test_config.god.insecure_clone(),
+        ],
+    )
+}
+
+pub fn capital_program_claim_beneficiary_rewards(
+    test_config: &mut TestConfig,
+    token_data: &mut Tokens,
+) -> TransactionResult {
+    let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
+    let authority_config = accounts::get_authority_config_pda();
+    let position = accounts::get_position_pda(token_data.asset.pubkey());
+    let beneficiary_1 = test_config.beneficiaries[0].address;
+    let beneficiary_1_ata = token_data.beneficiary_atas[0];
+
+    let inxs = ClaimBeneficiaryRewardsHandlerBuilder::new()
+        .beneficiary(beneficiary_1)
+        .vault(vault_pda)
+        .reward_mint(token_data.reward_mint)
+        .vault_ata(token_data.vault_reward_ata)
+        .beneficiary_ata(beneficiary_1_ata)
+        .beneficiary_index(0)
+        .instruction();
+    utils::send_transaction(
+        &mut test_config.svm,
+        &[inxs],
+        &test_config.god.pubkey(),
+        &[
+            &test_config.beneficiary_signers[0].insecure_clone(),
             &test_config.god.insecure_clone(),
         ],
     )
