@@ -14,16 +14,15 @@ import {
 } from "gill";
 import { NFT_PROGRAM_PROGRAM_ADDRESS } from "../programs";
 
-/** InvalidMPLCoreProgramId: mpl_core_program passed in accounts didn't match */
-export const NFT_PROGRAM_ERROR__INVALID_M_P_L_CORE_PROGRAM_ID = 0x1770; // 6000
+/** InvalidOwner: Vault should be the owner of NFT */
+export const NFT_PROGRAM_ERROR__INVALID_OWNER = 0x1770; // 6000
 
-export type NftProgramError =
-  typeof NFT_PROGRAM_ERROR__INVALID_M_P_L_CORE_PROGRAM_ID;
+export type NftProgramError = typeof NFT_PROGRAM_ERROR__INVALID_OWNER;
 
 let nftProgramErrorMessages: Record<NftProgramError, string> | undefined;
 if (process.env.NODE_ENV !== "production") {
   nftProgramErrorMessages = {
-    [NFT_PROGRAM_ERROR__INVALID_M_P_L_CORE_PROGRAM_ID]: `mpl_core_program passed in accounts didn't match`,
+    [NFT_PROGRAM_ERROR__INVALID_OWNER]: `Vault should be the owner of NFT`,
   };
 }
 

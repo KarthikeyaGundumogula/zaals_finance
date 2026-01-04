@@ -70,6 +70,7 @@ export type Vault = {
   minLockAmount: bigint;
   totalRewardsDeposited: bigint;
   totalCapitalCollected: bigint;
+  operatorRewardsClaimed: bigint;
   capitalAfterSlashing: bigint;
   beneficiaries: Array<Beneficiary>;
   investorBps: number;
@@ -93,6 +94,7 @@ export type VaultArgs = {
   minLockAmount: number | bigint;
   totalRewardsDeposited: number | bigint;
   totalCapitalCollected: number | bigint;
+  operatorRewardsClaimed: number | bigint;
   capitalAfterSlashing: number | bigint;
   beneficiaries: Array<BeneficiaryArgs>;
   investorBps: number;
@@ -120,6 +122,7 @@ export function getVaultEncoder(): Encoder<VaultArgs> {
       ["minLockAmount", getU64Encoder()],
       ["totalRewardsDeposited", getU64Encoder()],
       ["totalCapitalCollected", getU64Encoder()],
+      ["operatorRewardsClaimed", getU64Encoder()],
       ["capitalAfterSlashing", getU64Encoder()],
       ["beneficiaries", getArrayEncoder(getBeneficiaryEncoder())],
       ["investorBps", getU16Encoder()],
@@ -149,6 +152,7 @@ export function getVaultDecoder(): Decoder<Vault> {
     ["minLockAmount", getU64Decoder()],
     ["totalRewardsDeposited", getU64Decoder()],
     ["totalCapitalCollected", getU64Decoder()],
+    ["operatorRewardsClaimed", getU64Decoder()],
     ["capitalAfterSlashing", getU64Decoder()],
     ["beneficiaries", getArrayDecoder(getBeneficiaryDecoder())],
     ["investorBps", getU16Decoder()],

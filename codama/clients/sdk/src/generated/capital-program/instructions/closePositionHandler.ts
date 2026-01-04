@@ -53,7 +53,6 @@ export type ClosePositionHandlerInstruction<
   TProgram extends string = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
   TAccountPositionHolder extends string | AccountMeta<string> = string,
   TAccountVault extends string | AccountMeta<string> = string,
-  TAccountConfig extends string | AccountMeta<string> = string,
   TAccountPosition extends string | AccountMeta<string> = string,
   TAccountAsset extends string | AccountMeta<string> = string,
   TAccountCollection extends string | AccountMeta<string> = string,
@@ -66,8 +65,6 @@ export type ClosePositionHandlerInstruction<
     "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
   TAccountMplCoreProgram extends string | AccountMeta<string> =
     "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d",
-  TAccountNftProgram extends string | AccountMeta<string> =
-    "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH",
   TAccountSystemProgram extends string | AccountMeta<string> =
     "11111111111111111111111111111111",
   TRemainingAccounts extends readonly AccountMeta<string>[] = [],
@@ -82,9 +79,6 @@ export type ClosePositionHandlerInstruction<
       TAccountVault extends string
         ? WritableAccount<TAccountVault>
         : TAccountVault,
-      TAccountConfig extends string
-        ? ReadonlyAccount<TAccountConfig>
-        : TAccountConfig,
       TAccountPosition extends string
         ? WritableAccount<TAccountPosition>
         : TAccountPosition,
@@ -112,9 +106,6 @@ export type ClosePositionHandlerInstruction<
       TAccountMplCoreProgram extends string
         ? ReadonlyAccount<TAccountMplCoreProgram>
         : TAccountMplCoreProgram,
-      TAccountNftProgram extends string
-        ? ReadonlyAccount<TAccountNftProgram>
-        : TAccountNftProgram,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
@@ -157,7 +148,6 @@ export function getClosePositionHandlerInstructionDataCodec(): FixedSizeCodec<
 export type ClosePositionHandlerAsyncInput<
   TAccountPositionHolder extends string = string,
   TAccountVault extends string = string,
-  TAccountConfig extends string = string,
   TAccountPosition extends string = string,
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
@@ -167,15 +157,12 @@ export type ClosePositionHandlerAsyncInput<
   TAccountTokenProgram extends string = string,
   TAccountAssociatedTokenProgram extends string = string,
   TAccountMplCoreProgram extends string = string,
-  TAccountNftProgram extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
   /** The capital provider who owns the position */
   positionHolder: TransactionSigner<TAccountPositionHolder>;
   /** The vault containing this position */
   vault: Address<TAccountVault>;
-  /** Global configuration */
-  config?: Address<TAccountConfig>;
   /** The position being updated */
   position?: Address<TAccountPosition>;
   /** The NFT asset representing the position */
@@ -188,14 +175,12 @@ export type ClosePositionHandlerAsyncInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
-  nftProgram?: Address<TAccountNftProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
 export async function getClosePositionHandlerInstructionAsync<
   TAccountPositionHolder extends string,
   TAccountVault extends string,
-  TAccountConfig extends string,
   TAccountPosition extends string,
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -205,14 +190,12 @@ export async function getClosePositionHandlerInstructionAsync<
   TAccountTokenProgram extends string,
   TAccountAssociatedTokenProgram extends string,
   TAccountMplCoreProgram extends string,
-  TAccountNftProgram extends string,
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: ClosePositionHandlerAsyncInput<
     TAccountPositionHolder,
     TAccountVault,
-    TAccountConfig,
     TAccountPosition,
     TAccountAsset,
     TAccountCollection,
@@ -222,7 +205,6 @@ export async function getClosePositionHandlerInstructionAsync<
     TAccountTokenProgram,
     TAccountAssociatedTokenProgram,
     TAccountMplCoreProgram,
-    TAccountNftProgram,
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
@@ -231,7 +213,6 @@ export async function getClosePositionHandlerInstructionAsync<
     TProgramAddress,
     TAccountPositionHolder,
     TAccountVault,
-    TAccountConfig,
     TAccountPosition,
     TAccountAsset,
     TAccountCollection,
@@ -241,7 +222,6 @@ export async function getClosePositionHandlerInstructionAsync<
     TAccountTokenProgram,
     TAccountAssociatedTokenProgram,
     TAccountMplCoreProgram,
-    TAccountNftProgram,
     TAccountSystemProgram
   >
 > {
@@ -253,7 +233,6 @@ export async function getClosePositionHandlerInstructionAsync<
   const originalAccounts = {
     positionHolder: { value: input.positionHolder ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
-    config: { value: input.config ?? null, isWritable: false },
     position: { value: input.position ?? null, isWritable: true },
     asset: { value: input.asset ?? null, isWritable: false },
     collection: { value: input.collection ?? null, isWritable: false },
@@ -269,7 +248,6 @@ export async function getClosePositionHandlerInstructionAsync<
       isWritable: false,
     },
     mplCoreProgram: { value: input.mplCoreProgram ?? null, isWritable: false },
-    nftProgram: { value: input.nftProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
@@ -278,14 +256,6 @@ export async function getClosePositionHandlerInstructionAsync<
   >;
 
   // Resolve default values.
-  if (!accounts.config.value) {
-    accounts.config.value = await getProgramDerivedAddress({
-      programAddress,
-      seeds: [
-        getBytesEncoder().encode(new Uint8Array([67, 111, 110, 102, 105, 103])),
-      ],
-    });
-  }
   if (!accounts.position.value) {
     accounts.position.value = await getProgramDerivedAddress({
       programAddress,
@@ -333,10 +303,6 @@ export async function getClosePositionHandlerInstructionAsync<
     accounts.mplCoreProgram.value =
       "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d" as Address<"CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d">;
   }
-  if (!accounts.nftProgram.value) {
-    accounts.nftProgram.value =
-      "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH" as Address<"AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH">;
-  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -347,7 +313,6 @@ export async function getClosePositionHandlerInstructionAsync<
     accounts: [
       getAccountMeta(accounts.positionHolder),
       getAccountMeta(accounts.vault),
-      getAccountMeta(accounts.config),
       getAccountMeta(accounts.position),
       getAccountMeta(accounts.asset),
       getAccountMeta(accounts.collection),
@@ -357,7 +322,6 @@ export async function getClosePositionHandlerInstructionAsync<
       getAccountMeta(accounts.tokenProgram),
       getAccountMeta(accounts.associatedTokenProgram),
       getAccountMeta(accounts.mplCoreProgram),
-      getAccountMeta(accounts.nftProgram),
       getAccountMeta(accounts.systemProgram),
     ],
     data: getClosePositionHandlerInstructionDataEncoder().encode({}),
@@ -366,7 +330,6 @@ export async function getClosePositionHandlerInstructionAsync<
     TProgramAddress,
     TAccountPositionHolder,
     TAccountVault,
-    TAccountConfig,
     TAccountPosition,
     TAccountAsset,
     TAccountCollection,
@@ -376,7 +339,6 @@ export async function getClosePositionHandlerInstructionAsync<
     TAccountTokenProgram,
     TAccountAssociatedTokenProgram,
     TAccountMplCoreProgram,
-    TAccountNftProgram,
     TAccountSystemProgram
   >);
 }
@@ -384,7 +346,6 @@ export async function getClosePositionHandlerInstructionAsync<
 export type ClosePositionHandlerInput<
   TAccountPositionHolder extends string = string,
   TAccountVault extends string = string,
-  TAccountConfig extends string = string,
   TAccountPosition extends string = string,
   TAccountAsset extends string = string,
   TAccountCollection extends string = string,
@@ -394,15 +355,12 @@ export type ClosePositionHandlerInput<
   TAccountTokenProgram extends string = string,
   TAccountAssociatedTokenProgram extends string = string,
   TAccountMplCoreProgram extends string = string,
-  TAccountNftProgram extends string = string,
   TAccountSystemProgram extends string = string,
 > = {
   /** The capital provider who owns the position */
   positionHolder: TransactionSigner<TAccountPositionHolder>;
   /** The vault containing this position */
   vault: Address<TAccountVault>;
-  /** Global configuration */
-  config: Address<TAccountConfig>;
   /** The position being updated */
   position: Address<TAccountPosition>;
   /** The NFT asset representing the position */
@@ -415,14 +373,12 @@ export type ClosePositionHandlerInput<
   tokenProgram?: Address<TAccountTokenProgram>;
   associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
-  nftProgram?: Address<TAccountNftProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
 export function getClosePositionHandlerInstruction<
   TAccountPositionHolder extends string,
   TAccountVault extends string,
-  TAccountConfig extends string,
   TAccountPosition extends string,
   TAccountAsset extends string,
   TAccountCollection extends string,
@@ -432,14 +388,12 @@ export function getClosePositionHandlerInstruction<
   TAccountTokenProgram extends string,
   TAccountAssociatedTokenProgram extends string,
   TAccountMplCoreProgram extends string,
-  TAccountNftProgram extends string,
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof CAPITAL_PROGRAM_PROGRAM_ADDRESS,
 >(
   input: ClosePositionHandlerInput<
     TAccountPositionHolder,
     TAccountVault,
-    TAccountConfig,
     TAccountPosition,
     TAccountAsset,
     TAccountCollection,
@@ -449,7 +403,6 @@ export function getClosePositionHandlerInstruction<
     TAccountTokenProgram,
     TAccountAssociatedTokenProgram,
     TAccountMplCoreProgram,
-    TAccountNftProgram,
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
@@ -457,7 +410,6 @@ export function getClosePositionHandlerInstruction<
   TProgramAddress,
   TAccountPositionHolder,
   TAccountVault,
-  TAccountConfig,
   TAccountPosition,
   TAccountAsset,
   TAccountCollection,
@@ -467,7 +419,6 @@ export function getClosePositionHandlerInstruction<
   TAccountTokenProgram,
   TAccountAssociatedTokenProgram,
   TAccountMplCoreProgram,
-  TAccountNftProgram,
   TAccountSystemProgram
 > {
   // Program address.
@@ -478,7 +429,6 @@ export function getClosePositionHandlerInstruction<
   const originalAccounts = {
     positionHolder: { value: input.positionHolder ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
-    config: { value: input.config ?? null, isWritable: false },
     position: { value: input.position ?? null, isWritable: true },
     asset: { value: input.asset ?? null, isWritable: false },
     collection: { value: input.collection ?? null, isWritable: false },
@@ -494,7 +444,6 @@ export function getClosePositionHandlerInstruction<
       isWritable: false,
     },
     mplCoreProgram: { value: input.mplCoreProgram ?? null, isWritable: false },
-    nftProgram: { value: input.nftProgram ?? null, isWritable: false },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<
@@ -515,10 +464,6 @@ export function getClosePositionHandlerInstruction<
     accounts.mplCoreProgram.value =
       "CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d" as Address<"CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d">;
   }
-  if (!accounts.nftProgram.value) {
-    accounts.nftProgram.value =
-      "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH" as Address<"AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH">;
-  }
   if (!accounts.systemProgram.value) {
     accounts.systemProgram.value =
       "11111111111111111111111111111111" as Address<"11111111111111111111111111111111">;
@@ -529,7 +474,6 @@ export function getClosePositionHandlerInstruction<
     accounts: [
       getAccountMeta(accounts.positionHolder),
       getAccountMeta(accounts.vault),
-      getAccountMeta(accounts.config),
       getAccountMeta(accounts.position),
       getAccountMeta(accounts.asset),
       getAccountMeta(accounts.collection),
@@ -539,7 +483,6 @@ export function getClosePositionHandlerInstruction<
       getAccountMeta(accounts.tokenProgram),
       getAccountMeta(accounts.associatedTokenProgram),
       getAccountMeta(accounts.mplCoreProgram),
-      getAccountMeta(accounts.nftProgram),
       getAccountMeta(accounts.systemProgram),
     ],
     data: getClosePositionHandlerInstructionDataEncoder().encode({}),
@@ -548,7 +491,6 @@ export function getClosePositionHandlerInstruction<
     TProgramAddress,
     TAccountPositionHolder,
     TAccountVault,
-    TAccountConfig,
     TAccountPosition,
     TAccountAsset,
     TAccountCollection,
@@ -558,7 +500,6 @@ export function getClosePositionHandlerInstruction<
     TAccountTokenProgram,
     TAccountAssociatedTokenProgram,
     TAccountMplCoreProgram,
-    TAccountNftProgram,
     TAccountSystemProgram
   >);
 }
@@ -573,22 +514,19 @@ export type ParsedClosePositionHandlerInstruction<
     positionHolder: TAccountMetas[0];
     /** The vault containing this position */
     vault: TAccountMetas[1];
-    /** Global configuration */
-    config: TAccountMetas[2];
     /** The position being updated */
-    position: TAccountMetas[3];
+    position: TAccountMetas[2];
     /** The NFT asset representing the position */
-    asset: TAccountMetas[4];
+    asset: TAccountMetas[3];
     /** The NFT asset representing the position */
-    collection: TAccountMetas[5];
-    lockMint: TAccountMetas[6];
-    vaultLockAta: TAccountMetas[7];
-    capitalProviderLockAta: TAccountMetas[8];
-    tokenProgram: TAccountMetas[9];
-    associatedTokenProgram: TAccountMetas[10];
-    mplCoreProgram: TAccountMetas[11];
-    nftProgram: TAccountMetas[12];
-    systemProgram: TAccountMetas[13];
+    collection: TAccountMetas[4];
+    lockMint: TAccountMetas[5];
+    vaultLockAta: TAccountMetas[6];
+    capitalProviderLockAta: TAccountMetas[7];
+    tokenProgram: TAccountMetas[8];
+    associatedTokenProgram: TAccountMetas[9];
+    mplCoreProgram: TAccountMetas[10];
+    systemProgram: TAccountMetas[11];
   };
   data: ClosePositionHandlerInstructionData;
 };
@@ -601,7 +539,7 @@ export function parseClosePositionHandlerInstruction<
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
 ): ParsedClosePositionHandlerInstruction<TProgram, TAccountMetas> {
-  if (instruction.accounts.length < 14) {
+  if (instruction.accounts.length < 12) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
   }
@@ -616,7 +554,6 @@ export function parseClosePositionHandlerInstruction<
     accounts: {
       positionHolder: getNextAccount(),
       vault: getNextAccount(),
-      config: getNextAccount(),
       position: getNextAccount(),
       asset: getNextAccount(),
       collection: getNextAccount(),
@@ -626,7 +563,6 @@ export function parseClosePositionHandlerInstruction<
       tokenProgram: getNextAccount(),
       associatedTokenProgram: getNextAccount(),
       mplCoreProgram: getNextAccount(),
-      nftProgram: getNextAccount(),
       systemProgram: getNextAccount(),
     },
     data: getClosePositionHandlerInstructionDataDecoder().decode(

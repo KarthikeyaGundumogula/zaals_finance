@@ -432,6 +432,92 @@ pub fn test_claim_investor_rewards() {
 }
 
 #[test]
+pub fn test_claim_operator_rewards() {
+    let mut test_config = TestConfig::new();
+    let mut token_data = Tokens::create(&mut test_config);
+
+    instruction_handlers::init_nft_program(&mut test_config).unwrap();
+    instruction_handlers::init_capital_program(&mut test_config).unwrap();
+    instruction_handlers::capital_program_create_vault(&mut test_config, &mut token_data).unwrap();
+
+    let capital_provider = token_data.provider_lock_ata;
+    let lock_mint = token_data.lock_mint;
+    let reward_mint = token_data.reward_mint;
+    let agent_reward_ata = token_data.agent_reward_ata;
+
+    fund_ata(
+        &mut test_config,
+        &capital_provider,
+        lock_mint,
+        DEPOSIT_AMOUNT,
+    );
+    instruction_handlers::capital_program_open_position(
+        &mut test_config,
+        &mut token_data,
+        DEPOSIT_AMOUNT,
+    )
+    .unwrap();
+
+    fund_ata(
+        &mut test_config,
+        &agent_reward_ata,
+        reward_mint,
+        REWARDS_DEPOSIT,
+    );
+
+    let vault: Vault = accounts::get_data_from_pda_address(
+        &mut test_config.svm,
+        accounts::get_vault_pda(test_config.node_operator.pubkey()),
+    );
+
+    // TIME TRAVEL TO FUND RAISE PERIOD - GOO DORAEMON
+    set_clock(&mut test_config.svm, vault.lock_phase_start_at + ONE_DAY);
+
+    instruction_handlers::capital_program_deposit_rewards(
+        &mut test_config,
+        &mut token_data,
+        REWARDS_DEPOSIT,
+    )
+    .unwrap();
+
+    let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
+    let vault_data: Vault = accounts::get_data_from_pda_address(&mut test_config.svm, vault_pda);
+    let operator_reward_ata_balance_before_claim =
+        accounts::get_ata_balance(&mut test_config.svm, token_data.node_operator_reward_ata);
+    let total_rewards_accrued = utils::get_operator_accrued_rewards(vault_data);
+    println!(
+        "Total rewards accrued before claim: {}",
+        total_rewards_accrued
+    );
+    let result = instruction_handlers::capital_program_claim_operator_rewards(
+        &mut test_config,
+        &mut token_data,
+    );
+
+    match result {
+        Ok(res) => {
+            for log in res.logs {
+                println!("instruction log: {:?}", log);
+            }
+            let operator_reward_ata_balance_after_claim = accounts::get_ata_balance(
+                &mut test_config.svm,
+                token_data.node_operator_reward_ata,
+            );
+            assert_eq!(
+                operator_reward_ata_balance_after_claim,
+                operator_reward_ata_balance_before_claim + total_rewards_accrued
+            );
+
+            // ATA ASSERTIONS
+        }
+
+        Err(e) => {
+            panic!("instruction failed with {:?}", e);
+        }
+    }
+}
+
+#[test]
 pub fn test_claim_beneficiary_rewards() {
     let mut test_config = TestConfig::new();
     let mut token_data = Tokens::create(&mut test_config);
@@ -663,6 +749,173 @@ pub fn test_accept_slash_req() {
                 admin_bal_after_slash_req,
                 admin_bal_before_slash_req + slash_amount
             );
+        }
+
+        Err(e) => {
+            panic!("instruction failed with {:?}", e);
+        }
+    }
+}
+#[test]
+pub fn test_reject_slash_req() {
+    let mut test_config = TestConfig::new();
+    let mut token_data = Tokens::create(&mut test_config);
+
+    instruction_handlers::init_nft_program(&mut test_config).unwrap();
+    instruction_handlers::init_capital_program(&mut test_config).unwrap();
+    instruction_handlers::capital_program_create_vault(&mut test_config, &mut token_data).unwrap();
+
+    let capital_provider = token_data.provider_lock_ata;
+    let lock_mint = token_data.lock_mint;
+
+    fund_ata(
+        &mut test_config,
+        &capital_provider,
+        lock_mint,
+        DEPOSIT_AMOUNT,
+    );
+    instruction_handlers::capital_program_open_position(
+        &mut test_config,
+        &mut token_data,
+        DEPOSIT_AMOUNT,
+    )
+    .unwrap();
+    fund_ata(
+        &mut test_config,
+        &token_data.agent_reward_ata,
+        token_data.reward_mint,
+        REWARDS_DEPOSIT,
+    );
+
+    let vault: Vault = accounts::get_data_from_pda_address(
+        &mut test_config.svm,
+        accounts::get_vault_pda(test_config.node_operator.pubkey()),
+    );
+    // TIME TRAVEL TO FUND RAISE PERIOD - GOO DORAEMON
+    set_clock(&mut test_config.svm, vault.lock_phase_start_at + ONE_DAY);
+
+    instruction_handlers::capital_program_deposit_rewards(
+        &mut test_config,
+        &mut token_data,
+        REWARDS_DEPOSIT,
+    )
+    .unwrap();
+
+    instruction_handlers::capital_program_create_slash_req(&mut test_config).unwrap();
+    let clock: Clock = test_config.svm.get_sysvar();
+    set_clock(&mut test_config.svm, clock.unix_timestamp + ONE_DAY);
+    let vault_bal_before_slash_req =
+        accounts::get_ata_balance(&mut test_config.svm, token_data.vault_lock_ata);
+    let result = instruction_handlers::capital_program_finalize_slash_request(
+        &mut test_config,
+        &mut token_data,
+        0,
+        false,
+    );
+    match result {
+        Ok(res) => {
+            for log in res.logs {
+                println!("instruction log: {:?}", log);
+            }
+            let vault: Vault = accounts::get_data_from_pda_address(
+                &mut test_config.svm,
+                accounts::get_vault_pda(test_config.node_operator.pubkey()),
+            );
+            assert_eq!(vault.pending_slash_amount, 0);
+            let vault_bal_after_slash_req =
+                accounts::get_ata_balance(&mut test_config.svm, token_data.vault_lock_ata);
+            assert_eq!(vault_bal_after_slash_req, vault_bal_before_slash_req);
+        }
+
+        Err(e) => {
+            panic!("instruction failed with {:?}", e);
+        }
+    }
+}
+
+#[test]
+pub fn test_close_position() {
+    let mut test_config = TestConfig::new();
+    let mut token_data = Tokens::create(&mut test_config);
+
+    instruction_handlers::init_nft_program(&mut test_config).unwrap();
+    instruction_handlers::init_capital_program(&mut test_config).unwrap();
+    instruction_handlers::capital_program_create_vault(&mut test_config, &mut token_data).unwrap();
+
+    let capital_provider = token_data.provider_lock_ata;
+    let lock_mint = token_data.lock_mint;
+    let reward_mint = token_data.reward_mint;
+    let agent_reward_ata = token_data.agent_reward_ata;
+
+    fund_ata(
+        &mut test_config,
+        &capital_provider,
+        lock_mint,
+        DEPOSIT_AMOUNT,
+    );
+    instruction_handlers::capital_program_open_position(
+        &mut test_config,
+        &mut token_data,
+        DEPOSIT_AMOUNT,
+    )
+    .unwrap();
+
+    fund_ata(
+        &mut test_config,
+        &agent_reward_ata,
+        reward_mint,
+        REWARDS_DEPOSIT,
+    );
+
+    let vault: Vault = accounts::get_data_from_pda_address(
+        &mut test_config.svm,
+        accounts::get_vault_pda(test_config.node_operator.pubkey()),
+    );
+
+    // TIME TRAVEL TO FUND RAISE PERIOD - GOO DORAEMON
+    set_clock(&mut test_config.svm, vault.lock_phase_start_at + ONE_DAY);
+
+    instruction_handlers::capital_program_deposit_rewards(
+        &mut test_config,
+        &mut token_data,
+        REWARDS_DEPOSIT,
+    )
+    .unwrap();
+
+    let positon_data: Position = accounts::get_data_from_pda_address(
+        &mut test_config.svm,
+        accounts::get_position_pda(token_data.asset.pubkey()),
+    );
+    let vault_data: Vault = accounts::get_data_from_pda_address(
+        &mut test_config.svm,
+        accounts::get_vault_pda(test_config.node_operator.pubkey()),
+    );
+    let provider_lock_ata_balance_before_closing =
+        accounts::get_ata_balance(&mut test_config.svm, token_data.provider_lock_ata);
+    instruction_handlers::capital_program_claim_investor_rewards(&mut test_config, &mut token_data)
+        .unwrap();
+
+    set_clock(
+        &mut test_config.svm,
+        vault_data.lock_phase_start_at + vault.lock_phase_duration + 2 * ONE_DAY,
+    );
+
+    let result =
+        instruction_handlers::capital_program_close_position(&mut test_config, &mut token_data);
+
+    match result {
+        Ok(res) => {
+            for log in res.logs {
+                println!("instruction log: {:?}", log);
+            }
+            let provider_lock_ata_balance_after_closing =
+                accounts::get_ata_balance(&mut test_config.svm, token_data.provider_lock_ata);
+            assert_eq!(
+                provider_lock_ata_balance_after_closing,
+                provider_lock_ata_balance_before_closing + positon_data.total_value_locked
+            );
+
+            // ATA ASSERTIONS
         }
 
         Err(e) => {

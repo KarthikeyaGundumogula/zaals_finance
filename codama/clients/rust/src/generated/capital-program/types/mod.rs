@@ -8,6 +8,7 @@
   pub(crate) mod r#beneficiary;
   pub(crate) mod r#beneficiary_rewards_claimed_event;
   pub(crate) mod r#key;
+  pub(crate) mod r#operator_rewards_claimed_event;
   pub(crate) mod r#position_closed_event;
   pub(crate) mod r#position_opened_event;
   pub(crate) mod r#position_updated_event;
@@ -23,6 +24,7 @@
   pub use self::r#beneficiary::*;
   pub use self::r#beneficiary_rewards_claimed_event::*;
   pub use self::r#key::*;
+  pub use self::r#operator_rewards_claimed_event::*;
   pub use self::r#position_closed_event::*;
   pub use self::r#position_opened_event::*;
   pub use self::r#position_updated_event::*;

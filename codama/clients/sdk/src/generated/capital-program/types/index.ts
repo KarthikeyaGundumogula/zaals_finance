@@ -9,6 +9,7 @@
 export * from "./beneficiary";
 export * from "./beneficiaryRewardsClaimedEvent";
 export * from "./key";
+export * from "./operatorRewardsClaimedEvent";
 export * from "./positionClosedEvent";
 export * from "./positionOpenedEvent";
 export * from "./positionUpdatedEvent";

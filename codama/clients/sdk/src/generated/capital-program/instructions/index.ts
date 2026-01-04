@@ -8,6 +8,7 @@
 
 export * from "./claimBeneficiaryRewardsHandler";
 export * from "./claimInvestorRewardsHandler";
+export * from "./claimOperatorRewardsHandler";
 export * from "./closePositionHandler";
 export * from "./closeVaultHandler";
 export * from "./createSlasReqHandler";

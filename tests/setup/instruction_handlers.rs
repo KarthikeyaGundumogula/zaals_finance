@@ -15,6 +15,7 @@ use solana_sdk::{clock::Clock, signature::Signer};
 use zaals_finance_client::{
     capital_program::instructions::{
         ClaimBeneficiaryRewardsHandlerBuilder, ClaimInvestorRewardsHandlerBuilder,
+        ClaimOperatorRewardsHandlerBuilder, ClosePositionHandlerBuilder,
         CreateSlasReqHandlerBuilder, CreateVaultHandlerBuilder, DepositRewardsHandlerBuilder,
         FinalizeSlashReqHandlerBuilder, InitCapitalProgramHandlerBuilder,
         OpenPositionHandlerBuilder, UpdatePositionHandlerBuilder,
@@ -259,6 +260,30 @@ pub fn capital_program_claim_beneficiary_rewards(
     )
 }
 
+pub fn capital_program_claim_operator_rewards(
+    test_config: &mut TestConfig,
+    token_data: &mut Tokens,
+) -> TransactionResult {
+    let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
+
+    let inxs = ClaimOperatorRewardsHandlerBuilder::new()
+        .node_operator(test_config.node_operator.pubkey())
+        .vault(vault_pda)
+        .reward_mint(token_data.reward_mint)
+        .vault_ata(token_data.vault_reward_ata)
+        .operator_ata(token_data.node_operator_reward_ata)
+        .instruction();
+    utils::send_transaction(
+        &mut test_config.svm,
+        &[inxs],
+        &test_config.god.pubkey(),
+        &[
+            &test_config.node_operator.insecure_clone(),
+            &test_config.god.insecure_clone(),
+        ],
+    )
+}
+
 pub fn capital_program_create_slash_req(test_config: &mut TestConfig) -> TransactionResult {
     let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
     let authority_config = accounts::get_authority_config_pda();
@@ -285,7 +310,7 @@ pub fn capital_program_finalize_slash_request(
     test_config: &mut TestConfig,
     token_data: &mut Tokens,
     amount: u64,
-    decision:bool
+    decision: bool,
 ) -> TransactionResult {
     let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
     let authority_config = accounts::get_authority_config_pda();
@@ -306,6 +331,35 @@ pub fn capital_program_finalize_slash_request(
         &test_config.god.pubkey(),
         &[
             &test_config.agent.insecure_clone(),
+            &test_config.god.insecure_clone(),
+        ],
+    )
+}
+
+pub fn capital_program_close_position(
+    test_config: &mut TestConfig,
+    token_data: &mut Tokens,
+) -> TransactionResult {
+    let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
+    let position_pda = accounts::get_position_pda(token_data.asset.pubkey());
+
+    let inxs = ClosePositionHandlerBuilder::new()
+        .position_holder(test_config.capital_provider.pubkey())
+        .vault(vault_pda)
+        .position(position_pda)
+        .asset(token_data.asset.pubkey())
+        .collection(token_data.collection.pubkey())
+        .lock_mint(token_data.lock_mint)
+        .vault_lock_ata(token_data.vault_lock_ata)
+        .capital_provider_lock_ata(token_data.provider_lock_ata)
+        .instruction();
+    
+    utils::send_transaction(
+        &mut test_config.svm,
+        &[inxs],
+        &test_config.god.pubkey(),
+        &[
+            &test_config.capital_provider.insecure_clone(),
             &test_config.god.insecure_clone(),
         ],
     )

@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 use crate::constants::{MPL_CORE_ID, NFT_PROGRAM_KEY_PAIR, NFT_PROGRAM_SO_FILE};
 use crate::setup::constants::{
-    CAPITAL_PROGRAM_KEY_PAIR, CAPITAL_PROGRAM_SO_FILE, MPL_CORE_SO_FILE,
+    BASE_BPS, CAPITAL_PROGRAM_KEY_PAIR, CAPITAL_PROGRAM_SO_FILE, MPL_CORE_SO_FILE,
 };
 use litesvm::LiteSVM;
 use litesvm::{error::LiteSVMError, types::TransactionResult};
@@ -83,17 +83,14 @@ pub fn set_clock(svm: &mut LiteSVM, unix_timestamp: i64) {
     svm.set_sysvar(&clock);
 }
 
-pub fn get_investor_accrued_rewards(
-    vault: Vault,
-    position: Position,
-) -> u64 {
+pub fn get_investor_accrued_rewards(vault: Vault, position: Position) -> u64 {
     let total_investor_bps: u16 = vault.investor_bps;
 
     // ---- step 1: total investor rewards (u128) ----
     let total_investors_rewards: u128 = (vault.total_rewards_deposited as u128)
         .checked_mul(total_investor_bps as u128)
         .expect("overflow in total_investors_rewards")
-        .checked_div(10_000u128)
+        .checked_div(BASE_BPS as u128)
         .expect("division by zero");
 
     // ---- step 2: position share (u128) ----
@@ -105,24 +102,39 @@ pub fn get_investor_accrued_rewards(
 
     // ---- step 3: back to u64 ----
     position_rewards
+        .checked_sub(position.total_rewards_claimed as u128)
+        .expect("undefow in position rewards ")
         .try_into()
         .expect("position rewards exceed u64")
 }
 
-pub fn get_beneficiary_accrued_rewards(
-    vault: Vault,
-    beneficiary_index: usize,
-) -> u64 {
-    let beneficiary_bps: u16 = vault
-        .beneficiaries[beneficiary_index].share_bps;
+pub fn get_beneficiary_accrued_rewards(vault: Vault, beneficiary_index: usize) -> u64 {
+    let beneficiary_bps: u16 = vault.beneficiaries[beneficiary_index].share_bps;
 
     let total_beneficiary_rewards: u128 = (vault.total_rewards_deposited as u128)
         .checked_mul(beneficiary_bps as u128)
         .expect("overflow in total_beneficiary_rewards")
-        .checked_div(10_000u128)
+        .checked_div(BASE_BPS as u128)
         .expect("division by zero");
 
     total_beneficiary_rewards
+        .checked_sub(vault.beneficiaries[beneficiary_index].total_claimed as u128)
+        .expect("underfow in beneficiary rewards")
         .try_into()
         .expect("beneficiary rewards exceed u64")
+}
+
+pub fn get_operator_accrued_rewards(vault: Vault) -> u64 {
+    let beneficiaries_sum: u16 = vault.beneficiaries.iter().map(|b| b.share_bps).sum();
+    let operator_bps = BASE_BPS - (beneficiaries_sum + vault.investor_bps);
+    let total_operator_rewards = (vault.total_rewards_deposited as u128)
+        .checked_mul(operator_bps as u128)
+        .expect("overflow in total_beneficiary_rewards")
+        .checked_div(BASE_BPS as u128)
+        .expect("division by zero");
+    total_operator_rewards
+        .checked_sub(vault.operator_rewards_claimed as u128)
+        .expect("underlow in operator rewards")
+        .try_into()
+        .expect("operator rewards exceeded u64")
 }

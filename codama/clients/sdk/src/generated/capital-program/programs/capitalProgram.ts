@@ -16,6 +16,7 @@ import {
 import {
   type ParsedClaimBeneficiaryRewardsHandlerInstruction,
   type ParsedClaimInvestorRewardsHandlerInstruction,
+  type ParsedClaimOperatorRewardsHandlerInstruction,
   type ParsedClosePositionHandlerInstruction,
   type ParsedCloseVaultHandlerInstruction,
   type ParsedCreateSlasReqHandlerInstruction,
@@ -103,6 +104,7 @@ export function identifyCapitalProgramAccount(
 export enum CapitalProgramInstruction {
   ClaimBeneficiaryRewardsHandler,
   ClaimInvestorRewardsHandler,
+  ClaimOperatorRewardsHandler,
   ClosePositionHandler,
   CloseVaultHandler,
   CreateSlasReqHandler,
@@ -139,6 +141,17 @@ export function identifyCapitalProgramInstruction(
     )
   ) {
     return CapitalProgramInstruction.ClaimInvestorRewardsHandler;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([24, 220, 159, 215, 117, 173, 196, 253]),
+      ),
+      0,
+    )
+  ) {
+    return CapitalProgramInstruction.ClaimOperatorRewardsHandler;
   }
   if (
     containsBytes(
@@ -253,6 +266,9 @@ export type ParsedCapitalProgramInstruction<
   | ({
       instructionType: CapitalProgramInstruction.ClaimInvestorRewardsHandler;
     } & ParsedClaimInvestorRewardsHandlerInstruction<TProgram>)
+  | ({
+      instructionType: CapitalProgramInstruction.ClaimOperatorRewardsHandler;
+    } & ParsedClaimOperatorRewardsHandlerInstruction<TProgram>)
   | ({
       instructionType: CapitalProgramInstruction.ClosePositionHandler;
     } & ParsedClosePositionHandlerInstruction<TProgram>)

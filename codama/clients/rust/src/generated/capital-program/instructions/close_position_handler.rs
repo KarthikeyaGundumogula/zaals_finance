@@ -23,11 +23,6 @@ pub struct ClosePositionHandler {
     
               
           pub vault: solana_pubkey::Pubkey,
-                /// Global configuration
-
-    
-              
-          pub config: solana_pubkey::Pubkey,
                 /// The position being updated
 
     
@@ -63,9 +58,6 @@ pub struct ClosePositionHandler {
           pub mpl_core_program: solana_pubkey::Pubkey,
           
               
-          pub nft_program: solana_pubkey::Pubkey,
-          
-              
           pub system_program: solana_pubkey::Pubkey,
       }
 
@@ -76,17 +68,13 @@ impl ClosePositionHandler {
   #[allow(clippy::arithmetic_side_effects)]
   #[allow(clippy::vec_init_then_push)]
   pub fn instruction_with_remaining_accounts(&self, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
-    let mut accounts = Vec::with_capacity(14+ remaining_accounts.len());
+    let mut accounts = Vec::with_capacity(12+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
             self.position_holder,
             true
           ));
                                           accounts.push(solana_instruction::AccountMeta::new(
             self.vault,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            self.config,
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new(
@@ -123,10 +111,6 @@ impl ClosePositionHandler {
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.mpl_core_program,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            self.nft_program,
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
@@ -176,23 +160,20 @@ impl Default for ClosePositionHandlerInstructionData {
 ///
                       ///   0. `[writable, signer]` position_holder
                 ///   1. `[writable]` vault
-          ///   2. `[]` config
-                ///   3. `[writable]` position
-          ///   4. `[]` asset
-          ///   5. `[]` collection
-          ///   6. `[]` lock_mint
-                ///   7. `[writable]` vault_lock_ata
-                ///   8. `[writable]` capital_provider_lock_ata
-                ///   9. `[optional]` token_program (default to `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`)
-                ///   10. `[optional]` associated_token_program (default to `ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL`)
-                ///   11. `[optional]` mpl_core_program (default to `CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d`)
-                ///   12. `[optional]` nft_program (default to `AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH`)
-                ///   13. `[optional]` system_program (default to `11111111111111111111111111111111`)
+                ///   2. `[writable]` position
+          ///   3. `[]` asset
+          ///   4. `[]` collection
+          ///   5. `[]` lock_mint
+                ///   6. `[writable]` vault_lock_ata
+                ///   7. `[writable]` capital_provider_lock_ata
+                ///   8. `[optional]` token_program (default to `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`)
+                ///   9. `[optional]` associated_token_program (default to `ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL`)
+                ///   10. `[optional]` mpl_core_program (default to `CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d`)
+                ///   11. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
 pub struct ClosePositionHandlerBuilder {
             position_holder: Option<solana_pubkey::Pubkey>,
                 vault: Option<solana_pubkey::Pubkey>,
-                config: Option<solana_pubkey::Pubkey>,
                 position: Option<solana_pubkey::Pubkey>,
                 asset: Option<solana_pubkey::Pubkey>,
                 collection: Option<solana_pubkey::Pubkey>,
@@ -202,7 +183,6 @@ pub struct ClosePositionHandlerBuilder {
                 token_program: Option<solana_pubkey::Pubkey>,
                 associated_token_program: Option<solana_pubkey::Pubkey>,
                 mpl_core_program: Option<solana_pubkey::Pubkey>,
-                nft_program: Option<solana_pubkey::Pubkey>,
                 system_program: Option<solana_pubkey::Pubkey>,
                 __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
@@ -221,12 +201,6 @@ impl ClosePositionHandlerBuilder {
 #[inline(always)]
     pub fn vault(&mut self, vault: solana_pubkey::Pubkey) -> &mut Self {
                         self.vault = Some(vault);
-                    self
-    }
-            /// Global configuration
-#[inline(always)]
-    pub fn config(&mut self, config: solana_pubkey::Pubkey) -> &mut Self {
-                        self.config = Some(config);
                     self
     }
             /// The position being updated
@@ -280,12 +254,6 @@ impl ClosePositionHandlerBuilder {
                         self.mpl_core_program = Some(mpl_core_program);
                     self
     }
-            /// `[optional account, default to 'AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH']`
-#[inline(always)]
-    pub fn nft_program(&mut self, nft_program: solana_pubkey::Pubkey) -> &mut Self {
-                        self.nft_program = Some(nft_program);
-                    self
-    }
             /// `[optional account, default to '11111111111111111111111111111111']`
 #[inline(always)]
     pub fn system_program(&mut self, system_program: solana_pubkey::Pubkey) -> &mut Self {
@@ -309,7 +277,6 @@ impl ClosePositionHandlerBuilder {
     let accounts = ClosePositionHandler {
                               position_holder: self.position_holder.expect("position_holder is not set"),
                                         vault: self.vault.expect("vault is not set"),
-                                        config: self.config.expect("config is not set"),
                                         position: self.position.expect("position is not set"),
                                         asset: self.asset.expect("asset is not set"),
                                         collection: self.collection.expect("collection is not set"),
@@ -319,7 +286,6 @@ impl ClosePositionHandlerBuilder {
                                         token_program: self.token_program.unwrap_or(solana_pubkey::pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")),
                                         associated_token_program: self.associated_token_program.unwrap_or(solana_pubkey::pubkey!("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")),
                                         mpl_core_program: self.mpl_core_program.unwrap_or(solana_pubkey::pubkey!("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")),
-                                        nft_program: self.nft_program.unwrap_or(solana_pubkey::pubkey!("AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH")),
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
                       };
     
@@ -339,11 +305,6 @@ impl ClosePositionHandlerBuilder {
       
                     
               pub vault: &'b solana_account_info::AccountInfo<'a>,
-                        /// Global configuration
-
-      
-                    
-              pub config: &'b solana_account_info::AccountInfo<'a>,
                         /// The position being updated
 
       
@@ -379,9 +340,6 @@ impl ClosePositionHandlerBuilder {
               pub mpl_core_program: &'b solana_account_info::AccountInfo<'a>,
                 
                     
-              pub nft_program: &'b solana_account_info::AccountInfo<'a>,
-                
-                    
               pub system_program: &'b solana_account_info::AccountInfo<'a>,
             }
 
@@ -399,11 +357,6 @@ pub struct ClosePositionHandlerCpi<'a, 'b> {
     
               
           pub vault: &'b solana_account_info::AccountInfo<'a>,
-                /// Global configuration
-
-    
-              
-          pub config: &'b solana_account_info::AccountInfo<'a>,
                 /// The position being updated
 
     
@@ -439,9 +392,6 @@ pub struct ClosePositionHandlerCpi<'a, 'b> {
           pub mpl_core_program: &'b solana_account_info::AccountInfo<'a>,
           
               
-          pub nft_program: &'b solana_account_info::AccountInfo<'a>,
-          
-              
           pub system_program: &'b solana_account_info::AccountInfo<'a>,
         }
 
@@ -454,7 +404,6 @@ impl<'a, 'b> ClosePositionHandlerCpi<'a, 'b> {
       __program: program,
               position_holder: accounts.position_holder,
               vault: accounts.vault,
-              config: accounts.config,
               position: accounts.position,
               asset: accounts.asset,
               collection: accounts.collection,
@@ -464,7 +413,6 @@ impl<'a, 'b> ClosePositionHandlerCpi<'a, 'b> {
               token_program: accounts.token_program,
               associated_token_program: accounts.associated_token_program,
               mpl_core_program: accounts.mpl_core_program,
-              nft_program: accounts.nft_program,
               system_program: accounts.system_program,
                 }
   }
@@ -488,17 +436,13 @@ impl<'a, 'b> ClosePositionHandlerCpi<'a, 'b> {
     signers_seeds: &[&[&[u8]]],
     remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)]
   ) -> solana_program_error::ProgramResult {
-    let mut accounts = Vec::with_capacity(14+ remaining_accounts.len());
+    let mut accounts = Vec::with_capacity(12+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
             *self.position_holder.key,
             true
           ));
                                           accounts.push(solana_instruction::AccountMeta::new(
             *self.vault.key,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
-            *self.config.key,
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new(
@@ -538,10 +482,6 @@ impl<'a, 'b> ClosePositionHandlerCpi<'a, 'b> {
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
-            *self.nft_program.key,
-            false
-          ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.system_program.key,
             false
           ));
@@ -559,11 +499,10 @@ impl<'a, 'b> ClosePositionHandlerCpi<'a, 'b> {
       accounts,
       data,
     };
-    let mut account_infos = Vec::with_capacity(15 + remaining_accounts.len());
+    let mut account_infos = Vec::with_capacity(13 + remaining_accounts.len());
     account_infos.push(self.__program.clone());
                   account_infos.push(self.position_holder.clone());
                         account_infos.push(self.vault.clone());
-                        account_infos.push(self.config.clone());
                         account_infos.push(self.position.clone());
                         account_infos.push(self.asset.clone());
                         account_infos.push(self.collection.clone());
@@ -573,7 +512,6 @@ impl<'a, 'b> ClosePositionHandlerCpi<'a, 'b> {
                         account_infos.push(self.token_program.clone());
                         account_infos.push(self.associated_token_program.clone());
                         account_infos.push(self.mpl_core_program.clone());
-                        account_infos.push(self.nft_program.clone());
                         account_infos.push(self.system_program.clone());
               remaining_accounts.iter().for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
@@ -591,18 +529,16 @@ impl<'a, 'b> ClosePositionHandlerCpi<'a, 'b> {
 ///
                       ///   0. `[writable, signer]` position_holder
                 ///   1. `[writable]` vault
-          ///   2. `[]` config
-                ///   3. `[writable]` position
-          ///   4. `[]` asset
-          ///   5. `[]` collection
-          ///   6. `[]` lock_mint
-                ///   7. `[writable]` vault_lock_ata
-                ///   8. `[writable]` capital_provider_lock_ata
-          ///   9. `[]` token_program
-          ///   10. `[]` associated_token_program
-          ///   11. `[]` mpl_core_program
-          ///   12. `[]` nft_program
-          ///   13. `[]` system_program
+                ///   2. `[writable]` position
+          ///   3. `[]` asset
+          ///   4. `[]` collection
+          ///   5. `[]` lock_mint
+                ///   6. `[writable]` vault_lock_ata
+                ///   7. `[writable]` capital_provider_lock_ata
+          ///   8. `[]` token_program
+          ///   9. `[]` associated_token_program
+          ///   10. `[]` mpl_core_program
+          ///   11. `[]` system_program
 #[derive(Clone, Debug)]
 pub struct ClosePositionHandlerCpiBuilder<'a, 'b> {
   instruction: Box<ClosePositionHandlerCpiBuilderInstruction<'a, 'b>>,
@@ -614,7 +550,6 @@ impl<'a, 'b> ClosePositionHandlerCpiBuilder<'a, 'b> {
       __program: program,
               position_holder: None,
               vault: None,
-              config: None,
               position: None,
               asset: None,
               collection: None,
@@ -624,7 +559,6 @@ impl<'a, 'b> ClosePositionHandlerCpiBuilder<'a, 'b> {
               token_program: None,
               associated_token_program: None,
               mpl_core_program: None,
-              nft_program: None,
               system_program: None,
                                 __remaining_accounts: Vec::new(),
     });
@@ -640,12 +574,6 @@ impl<'a, 'b> ClosePositionHandlerCpiBuilder<'a, 'b> {
 #[inline(always)]
     pub fn vault(&mut self, vault: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
                         self.instruction.vault = Some(vault);
-                    self
-    }
-      /// Global configuration
-#[inline(always)]
-    pub fn config(&mut self, config: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.config = Some(config);
                     self
     }
       /// The position being updated
@@ -697,11 +625,6 @@ impl<'a, 'b> ClosePositionHandlerCpiBuilder<'a, 'b> {
                     self
     }
       #[inline(always)]
-    pub fn nft_program(&mut self, nft_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.nft_program = Some(nft_program);
-                    self
-    }
-      #[inline(always)]
     pub fn system_program(&mut self, system_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
                         self.instruction.system_program = Some(system_program);
                     self
@@ -735,8 +658,6 @@ impl<'a, 'b> ClosePositionHandlerCpiBuilder<'a, 'b> {
                   
           vault: self.instruction.vault.expect("vault is not set"),
                   
-          config: self.instruction.config.expect("config is not set"),
-                  
           position: self.instruction.position.expect("position is not set"),
                   
           asset: self.instruction.asset.expect("asset is not set"),
@@ -755,8 +676,6 @@ impl<'a, 'b> ClosePositionHandlerCpiBuilder<'a, 'b> {
                   
           mpl_core_program: self.instruction.mpl_core_program.expect("mpl_core_program is not set"),
                   
-          nft_program: self.instruction.nft_program.expect("nft_program is not set"),
-                  
           system_program: self.instruction.system_program.expect("system_program is not set"),
                     };
     instruction.invoke_signed_with_remaining_accounts(signers_seeds, &self.instruction.__remaining_accounts)
@@ -768,7 +687,6 @@ struct ClosePositionHandlerCpiBuilderInstruction<'a, 'b> {
   __program: &'b solana_account_info::AccountInfo<'a>,
             position_holder: Option<&'b solana_account_info::AccountInfo<'a>>,
                 vault: Option<&'b solana_account_info::AccountInfo<'a>>,
-                config: Option<&'b solana_account_info::AccountInfo<'a>>,
                 position: Option<&'b solana_account_info::AccountInfo<'a>>,
                 asset: Option<&'b solana_account_info::AccountInfo<'a>>,
                 collection: Option<&'b solana_account_info::AccountInfo<'a>>,
@@ -778,7 +696,6 @@ struct ClosePositionHandlerCpiBuilderInstruction<'a, 'b> {
                 token_program: Option<&'b solana_account_info::AccountInfo<'a>>,
                 associated_token_program: Option<&'b solana_account_info::AccountInfo<'a>>,
                 mpl_core_program: Option<&'b solana_account_info::AccountInfo<'a>>,
-                nft_program: Option<&'b solana_account_info::AccountInfo<'a>>,
                 system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
                 /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
   __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,

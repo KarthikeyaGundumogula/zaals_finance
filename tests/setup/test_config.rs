@@ -88,6 +88,7 @@ impl TestConfig {
 pub struct Tokens {
     pub reward_mint: Pubkey,
     pub lock_mint: Pubkey,
+    pub node_operator_reward_ata: Pubkey,
     pub agent_reward_ata: Pubkey,
     pub provider_lock_ata: Pubkey,
     pub provider_reward_ata: Pubkey,
@@ -118,14 +119,18 @@ impl Tokens {
                 .owner(&test_config.capital_provider.pubkey())
                 .send()
                 .unwrap();
-        let admin_lock_ata =
-            CreateAssociatedTokenAccount::new(svm, &test_config.god, &lock_mint)
-                .owner(&test_config.admin.pubkey())
-                .send()
-                .unwrap();
+        let admin_lock_ata = CreateAssociatedTokenAccount::new(svm, &test_config.god, &lock_mint)
+            .owner(&test_config.admin.pubkey())
+            .send()
+            .unwrap();
         let agent_reward_ata =
             CreateAssociatedTokenAccount::new(svm, &test_config.god, &reward_mint)
                 .owner(&test_config.agent.pubkey())
+                .send()
+                .unwrap();
+        let node_operator_ata =
+            CreateAssociatedTokenAccount::new(svm, &test_config.god, &reward_mint)
+                .owner(&test_config.node_operator.pubkey())
                 .send()
                 .unwrap();
         let position_vault = accounts::get_vault_pda(test_config.node_operator.pubkey());
@@ -156,6 +161,7 @@ impl Tokens {
         Tokens {
             reward_mint,
             lock_mint,
+            node_operator_reward_ata: node_operator_ata,
             agent_reward_ata,
             provider_lock_ata,
             admin_lock_ata,

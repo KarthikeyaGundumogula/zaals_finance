@@ -7,6 +7,7 @@
 
   pub(crate) mod r#claim_beneficiary_rewards_handler;
   pub(crate) mod r#claim_investor_rewards_handler;
+  pub(crate) mod r#claim_operator_rewards_handler;
   pub(crate) mod r#close_position_handler;
   pub(crate) mod r#close_vault_handler;
   pub(crate) mod r#create_slas_req_handler;
@@ -19,6 +20,7 @@
 
   pub use self::r#claim_beneficiary_rewards_handler::*;
   pub use self::r#claim_investor_rewards_handler::*;
+  pub use self::r#claim_operator_rewards_handler::*;
   pub use self::r#close_position_handler::*;
   pub use self::r#close_vault_handler::*;
   pub use self::r#create_slas_req_handler::*;
