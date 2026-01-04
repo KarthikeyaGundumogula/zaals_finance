@@ -191,8 +191,6 @@ pub mod capital_program {
         // Calculate claimable amount
         let claimable = ctx.accounts.calculate_claimable(beneficiary_index)?;
 
-        require_gt!(claimable, 0, PositionError::NoRewardsToClaim);
-
         // Process claim
         ctx.accounts.process_claim(beneficiary_index, claimable)?;
 
@@ -206,6 +204,20 @@ pub mod capital_program {
             timestamp: Clock::get()?.unix_timestamp,
         });
 
+        Ok(())
+    }
+
+    pub fn claim_operator_rewards_handler(ctx: Context<ClaimOperatorRewards>) -> Result<()> {
+        let claimable = ctx.accounts.calculate_claimable_rewards()?;
+        ctx.accounts.process_claim(claimable)?;
+        ctx.accounts.transfer_rewards(claimable)?;
+
+        emit!(OperatorRewardsClaimedEvent {
+            operator: ctx.accounts.node_operator.key(),
+            vault: ctx.accounts.vault.key(),
+            amount: claimable,
+            timestamp: Clock::get()?.unix_timestamp
+        });
         Ok(())
     }
 

@@ -160,6 +160,7 @@ impl<'info> CreateVault<'info> {
             total_capital_collected: 0,
             total_rewards_deposited: 0,
             capital_after_slashing: 0,
+            operator_rewards_claimed: 0,
             node_operator: *self.node_operator.key,
 
             // Beneficiary configuration

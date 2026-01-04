@@ -23,6 +23,7 @@ pub struct Vault {
     pub min_lock_amount: u64,
     pub total_rewards_deposited: u64,
     pub total_capital_collected: u64,
+    pub operator_rewards_claimed: u64,
     pub capital_after_slashing: u64,
 
     #[max_len(5)]

@@ -19,6 +19,7 @@ impl<'info> BurnAsset<'info> {
     pub fn burn(&mut self) -> Result<()> {
         BurnV1CpiBuilder::new(&self.mpl_core_program.to_account_info())
             .asset(&self.asset.to_account_info())
+            .payer(&self.holder.to_account_info())
             .authority(Some(&self.holder.to_account_info()))
             .collection(Some(&self.collection.as_ref()))
             .invoke()?;

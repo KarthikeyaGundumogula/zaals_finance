@@ -7,8 +7,8 @@ use anchor_spl::{
     token_interface::{transfer_checked, Mint, TokenAccount, TokenInterface, TransferChecked},
 };
 use mpl_core::accounts::BaseAssetV1;
-use nft_program::cpi::accounts::BurnAsset;
-use nft_program::program::NftProgram;
+
+use mpl_core::{instructions::BurnV1CpiBuilder, ID as MPL_CORE_ID};
 
 #[derive(Accounts)]
 pub struct ClosePosition<'info> {
@@ -28,13 +28,6 @@ pub struct ClosePosition<'info> {
         constraint = !vault.is_dispute_active @ VaultError::VaultUnderDispute
     )]
     pub vault: Account<'info, Vault>,
-
-    /// Global configuration
-    #[account(
-        seeds = [b"Config"],
-        bump = config.bump
-    )]
-    pub config: Account<'info, AuthorityConfig>,
 
     /// The position being updated
     #[account(
@@ -82,39 +75,41 @@ pub struct ClosePosition<'info> {
     pub token_program: Interface<'info, TokenInterface>,
     pub associated_token_program: Program<'info, AssociatedToken>,
     /// CHECK: this will be cheked at marketplace
+    #[account(address = MPL_CORE_ID)]
     pub mpl_core_program: UncheckedAccount<'info>,
-    pub nft_program: Program<'info, NftProgram>,
     pub system_program: Program<'info, System>,
 }
 
 impl<'info> ClosePosition<'info> {
-    fn calculate_claimable_rewards(&self) -> Result<u64> {
+    pub fn calculate_claimable_rewards(&self) -> Result<u64> {
         let total_vault_capital = self.vault.total_capital_collected;
         let position_locked_capital = self.position.total_value_locked;
         let total_rewards_deposited = self.vault.total_rewards_deposited;
         let investors_share_bps = self.vault.investor_bps as u64;
 
-        // Validate preconditions
-        require_gt!(total_vault_capital, 0, TokenError::NoRewardsInVault);
-
-        // Calculate total rewards allocated to investors
-        let rewards_for_investors = total_rewards_deposited
-            .checked_mul(investors_share_bps)
+        // ---- STEP 1: investor rewards (u128 math) ----
+        let rewards_for_investors = (total_rewards_deposited as u128)
+            .checked_mul(investors_share_bps as u128)
             .ok_or(ArithmeticError::ArithmeticOverflow)?
-            .checked_div(BASE_BPS as u64)
-            .ok_or(ArithmeticError::ArithmeticOverflow)?;
+            .checked_div(BASE_BPS as u128)
+            .ok_or(ArithmeticError::DivisionByZero)?;
 
-        // Calculate this position's share of investor rewards
+        // ---- STEP 2: position share (u128 math) ----
         let position_total_rewards = rewards_for_investors
-            .checked_mul(position_locked_capital)
+            .checked_mul(position_locked_capital as u128)
             .ok_or(ArithmeticError::ArithmeticOverflow)?
-            .checked_div(total_vault_capital)
-            .ok_or(ArithmeticError::ArithmeticOverflow)?;
+            .checked_div(total_vault_capital as u128)
+            .ok_or(ArithmeticError::DivisionByZero)?;
 
-        // Calculate claimable amount (total earned - already claimed)
+        // ---- STEP 3: subtract claimed ----
         let claimable = position_total_rewards
-            .checked_sub(self.position.total_rewards_claimed)
+            .checked_sub(self.position.total_rewards_claimed as u128)
             .ok_or(ArithmeticError::ArithmeticUnderflow)?;
+
+        // ---- STEP 4: back to u64 ----
+        let claimable: u64 = claimable
+            .try_into()
+            .map_err(|_| ArithmeticError::ArithmeticOverflow)?;
 
         Ok(claimable)
     }
@@ -158,15 +153,12 @@ impl<'info> ClosePosition<'info> {
     }
 
     pub fn burn_nft(&mut self) -> Result<()> {
-        let burn_asset_accounts = BurnAsset {
-            asset: self.asset.to_account_info(),
-            holder: self.position_holder.to_account_info(),
-            system_program: self.system_program.to_account_info(),
-            mpl_core_program: self.mpl_core_program.to_account_info(),
-            collection: self.collection.to_account_info(),
-        };
-        let burn_cpi = CpiContext::new(self.nft_program.to_account_info(), burn_asset_accounts);
-        nft_program::cpi::burn_asset_handler(burn_cpi)?;
+        BurnV1CpiBuilder::new(&self.mpl_core_program.to_account_info())
+            .asset(&self.asset.to_account_info())
+            .payer(&self.position_holder.to_account_info())
+            .authority(Some(&self.position_holder.to_account_info()))
+            .collection(Some(&self.collection.as_ref()))
+            .invoke()?;
         Ok(())
     }
 }

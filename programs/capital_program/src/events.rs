@@ -67,6 +67,14 @@ pub struct RewardsClaimedEvent {
 }
 
 #[event]
+pub struct OperatorRewardsClaimedEvent {
+    pub operator: Pubkey,
+    pub vault: Pubkey,
+    pub amount: u64,
+    pub timestamp: i64,
+}
+
+#[event]
 pub struct BeneficiaryRewardsClaimedEvent {
     pub beneficiary: Pubkey,
     pub vault: Pubkey,
