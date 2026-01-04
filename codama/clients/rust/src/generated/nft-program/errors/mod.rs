@@ -5,6 +5,7 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-pub(crate) mod nft_program;
-
-pub use self::nft_program::NftProgramError;
+      pub(crate) mod nft_program;
+  
+      pub use self::nft_program::NftProgramError;
+  

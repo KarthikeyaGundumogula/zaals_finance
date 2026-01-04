@@ -249,7 +249,7 @@ export async function getClaimInvestorRewardsHandlerInstructionAsync<
     accounts.config.value = await getProgramDerivedAddress({
       programAddress,
       seeds: [
-        getBytesEncoder().encode(new Uint8Array([99, 111, 110, 102, 105, 103])),
+        getBytesEncoder().encode(new Uint8Array([67, 111, 110, 102, 105, 103])),
       ],
     });
   }

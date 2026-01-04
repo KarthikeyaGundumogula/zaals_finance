@@ -1,21 +1,26 @@
 #![allow(dead_code)]
-#![allow(unused)]
+// #![allow(unused)]
 use crate::setup::{
     accounts,
     constants::{
-        DISPUTE_WINDOW, EARLY_UNLOCK_FEE, FUND_RAISE_PERIOD, INVESTOR_BPS, MAX_LOCK_DURATION, MAX_SLASH_BPS, MAX_VAULT_THRESHOLD, MIN_LOCK_AMOUNT, MIN_LOCK_DURATION, MIN_VAULT_TARGET, ONE_DAY, SLASH_BPS
+        DISPUTE_WINDOW, EARLY_UNLOCK_FEE, FUND_RAISE_PERIOD, INVESTOR_BPS, MAX_LOCK_DURATION,
+        MAX_SLASH_BPS, MAX_VAULT_THRESHOLD, MIN_LOCK_AMOUNT, MIN_LOCK_DURATION, ONE_DAY, SLASH_BPS,
     },
     test_config::{TestConfig, Tokens},
     *,
 };
-use anchor_lang::solana_program::example_mocks::solana_transaction::Transaction;
 use litesvm::types::TransactionResult;
 use solana_sdk::{clock::Clock, signature::Signer};
 
 use zaals_finance_client::{
-    CAPITAL_PROGRAM_ID, NFT_PROGRAM_ID, capital_program::instructions::{
-        ClaimBeneficiaryRewardsHandlerBuilder, ClaimInvestorRewardsHandlerBuilder, CreateSlasReqHandlerBuilder, CreateVaultHandlerBuilder, DepositRewardsHandlerBuilder, InitCapitalProgramHandlerBuilder, OpenPositionHandlerBuilder, UpdatePositionHandlerBuilder
-    }, nft_program::instructions::InitNftProgramHandlerBuilder
+    capital_program::instructions::{
+        ClaimBeneficiaryRewardsHandlerBuilder, ClaimInvestorRewardsHandlerBuilder,
+        CreateSlasReqHandlerBuilder, CreateVaultHandlerBuilder, DepositRewardsHandlerBuilder,
+        FinalizeSlashReqHandlerBuilder, InitCapitalProgramHandlerBuilder,
+        OpenPositionHandlerBuilder, UpdatePositionHandlerBuilder,
+    },
+    nft_program::instructions::InitNftProgramHandlerBuilder,
+    CAPITAL_PROGRAM_ID, NFT_PROGRAM_ID,
 };
 
 pub fn init_nft_program(test_config: &mut TestConfig) -> TransactionResult {
@@ -232,8 +237,6 @@ pub fn capital_program_claim_beneficiary_rewards(
     token_data: &mut Tokens,
 ) -> TransactionResult {
     let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
-    let authority_config = accounts::get_authority_config_pda();
-    let position = accounts::get_position_pda(token_data.asset.pubkey());
     let beneficiary_1 = test_config.beneficiaries[0].address;
     let beneficiary_1_ata = token_data.beneficiary_atas[0];
 
@@ -256,7 +259,7 @@ pub fn capital_program_claim_beneficiary_rewards(
     )
 }
 
-pub fn capital_program_create_slash_req(test_config: &mut TestConfig,token_data: &mut Tokens) -> TransactionResult{
+pub fn capital_program_create_slash_req(test_config: &mut TestConfig) -> TransactionResult {
     let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
     let authority_config = accounts::get_authority_config_pda();
 
@@ -267,7 +270,7 @@ pub fn capital_program_create_slash_req(test_config: &mut TestConfig,token_data:
         .slash_bps(SLASH_BPS)
         .slash_claimant(test_config.admin.pubkey())
         .instruction();
-     utils::send_transaction(
+    utils::send_transaction(
         &mut test_config.svm,
         &[inxs],
         &test_config.god.pubkey(),
@@ -278,3 +281,32 @@ pub fn capital_program_create_slash_req(test_config: &mut TestConfig,token_data:
     )
 }
 
+pub fn capital_program_finalize_slash_request(
+    test_config: &mut TestConfig,
+    token_data: &mut Tokens,
+    amount: u64,
+    decision:bool
+) -> TransactionResult {
+    let vault_pda = accounts::get_vault_pda(test_config.node_operator.pubkey());
+    let authority_config = accounts::get_authority_config_pda();
+
+    let inxs = FinalizeSlashReqHandlerBuilder::new()
+        .agent(test_config.agent.pubkey())
+        .vault(vault_pda)
+        .config(authority_config)
+        .locking_token_mint(token_data.lock_mint)
+        .vault_token_ata(token_data.vault_lock_ata)
+        .slash_claimant_ata(token_data.admin_lock_ata)
+        .amount(amount)
+        .decision(decision)
+        .instruction();
+    utils::send_transaction(
+        &mut test_config.svm,
+        &[inxs],
+        &test_config.god.pubkey(),
+        &[
+            &test_config.agent.insecure_clone(),
+            &test_config.god.insecure_clone(),
+        ],
+    )
+}

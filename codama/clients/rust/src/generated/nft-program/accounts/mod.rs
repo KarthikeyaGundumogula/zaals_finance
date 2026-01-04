@@ -5,10 +5,11 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-pub(crate) mod r#base_asset_v1;
-pub(crate) mod r#n_f_t_config;
-pub(crate) mod r#offer;
+  pub(crate) mod r#base_asset_v1;
+  pub(crate) mod r#n_f_t_config;
+  pub(crate) mod r#offer;
 
-pub use self::r#base_asset_v1::*;
-pub use self::r#n_f_t_config::*;
-pub use self::r#offer::*;
+  pub use self::r#base_asset_v1::*;
+  pub use self::r#n_f_t_config::*;
+  pub use self::r#offer::*;
+

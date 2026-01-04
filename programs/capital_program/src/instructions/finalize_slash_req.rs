@@ -19,7 +19,7 @@ pub struct FinalizeSlashReq<'info> {
         mut,
         seeds = [b"Vault", vault.node_operator.key().as_ref()],
         bump = vault.bump,
-        constraint = !vault.is_dispute_active @ VaultError::VaultUnderDispute
+        constraint = vault.is_dispute_active @ VaultError::VaultNotUnderDispute
     )]
     pub vault: Account<'info, Vault>,
     #[account(
@@ -43,11 +43,11 @@ pub struct FinalizeSlashReq<'info> {
     )]
     pub vault_token_ata: InterfaceAccount<'info, TokenAccount>,
 
-    /// Capital provider's token account
+    /// Slash claimant's token account
     #[account(
         mut,
         associated_token::mint = locking_token_mint,
-        associated_token::authority = agent,
+        associated_token::authority = vault.slash_claimant,
         associated_token::token_program = token_program
     )]
     pub slash_claimant_ata: InterfaceAccount<'info, TokenAccount>,
@@ -64,6 +64,7 @@ impl<'info> FinalizeSlashReq<'info> {
             && amount > 0
             && clock.unix_timestamp < self.vault.dispute_start_time + DISPUTE_WINDOW
         {
+            msg!("Processing withdrawl");
             self.process_withdrawal(amount)?;
         }
         self.vault.pending_slash_amount = 0;

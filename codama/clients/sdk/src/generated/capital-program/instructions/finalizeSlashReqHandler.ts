@@ -165,8 +165,8 @@ export type FinalizeSlashReqHandlerAsyncInput<
   lockingTokenMint: Address<TAccountLockingTokenMint>;
   /** Vault's token account */
   vaultTokenAta?: Address<TAccountVaultTokenAta>;
-  /** Capital provider's token account */
-  slashClaimantAta?: Address<TAccountSlashClaimantAta>;
+  /** Slash claimant's token account */
+  slashClaimantAta: Address<TAccountSlashClaimantAta>;
   tokenProgram?: Address<TAccountTokenProgram>;
   associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
@@ -271,19 +271,6 @@ export async function getFinalizeSlashReqHandlerInstructionAsync<
       ],
     });
   }
-  if (!accounts.slashClaimantAta.value) {
-    accounts.slashClaimantAta.value = await getProgramDerivedAddress({
-      programAddress:
-        "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">,
-      seeds: [
-        getAddressEncoder().encode(expectAddress(accounts.agent.value)),
-        getAddressEncoder().encode(expectAddress(accounts.tokenProgram.value)),
-        getAddressEncoder().encode(
-          expectAddress(accounts.lockingTokenMint.value),
-        ),
-      ],
-    });
-  }
   if (!accounts.associatedTokenProgram.value) {
     accounts.associatedTokenProgram.value =
       "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL" as Address<"ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL">;
@@ -342,7 +329,7 @@ export type FinalizeSlashReqHandlerInput<
   lockingTokenMint: Address<TAccountLockingTokenMint>;
   /** Vault's token account */
   vaultTokenAta: Address<TAccountVaultTokenAta>;
-  /** Capital provider's token account */
+  /** Slash claimant's token account */
   slashClaimantAta: Address<TAccountSlashClaimantAta>;
   tokenProgram?: Address<TAccountTokenProgram>;
   associatedTokenProgram?: Address<TAccountAssociatedTokenProgram>;
@@ -478,7 +465,7 @@ export type ParsedFinalizeSlashReqHandlerInstruction<
     lockingTokenMint: TAccountMetas[3];
     /** Vault's token account */
     vaultTokenAta: TAccountMetas[4];
-    /** Capital provider's token account */
+    /** Slash claimant's token account */
     slashClaimantAta: TAccountMetas[5];
     tokenProgram: TAccountMetas[6];
     associatedTokenProgram: TAccountMetas[7];

@@ -14,20 +14,16 @@ import {
 } from "gill";
 import { NFT_PROGRAM_PROGRAM_ADDRESS } from "../programs";
 
-/** InvalidMint: Mint does not match seller listed token mint */
-export const NFT_PROGRAM_ERROR__INVALID_MINT = 0x1770; // 6000
-/** InvalidSeller: Seller must be the one in the offer */
-export const NFT_PROGRAM_ERROR__INVALID_SELLER = 0x1771; // 6001
+/** InvalidMPLCoreProgramId: mpl_core_program passed in accounts didn't match */
+export const NFT_PROGRAM_ERROR__INVALID_M_P_L_CORE_PROGRAM_ID = 0x1770; // 6000
 
 export type NftProgramError =
-  | typeof NFT_PROGRAM_ERROR__INVALID_MINT
-  | typeof NFT_PROGRAM_ERROR__INVALID_SELLER;
+  typeof NFT_PROGRAM_ERROR__INVALID_M_P_L_CORE_PROGRAM_ID;
 
 let nftProgramErrorMessages: Record<NftProgramError, string> | undefined;
 if (process.env.NODE_ENV !== "production") {
   nftProgramErrorMessages = {
-    [NFT_PROGRAM_ERROR__INVALID_MINT]: `Mint does not match seller listed token mint`,
-    [NFT_PROGRAM_ERROR__INVALID_SELLER]: `Seller must be the one in the offer`,
+    [NFT_PROGRAM_ERROR__INVALID_M_P_L_CORE_PROGRAM_ID]: `mpl_core_program passed in accounts didn't match`,
   };
 }
 

@@ -59,6 +59,9 @@ pub enum VaultError {
     #[msg("Vault still has some locked tokens in it")]
     VaultNotEmpty,
 
+    #[msg("Vault is not under dispute or claim_request is expired")]
+    VaultNotUnderDispute,
+
     #[msg("Vault doesn't reach the min cap")]
     BelowMinCap,
 
