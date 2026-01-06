@@ -42,17 +42,17 @@ import {
   type ResolvedAccount,
 } from "../shared";
 
-export const LIST_ASSET_HANDLER_DISCRIMINATOR = new Uint8Array([
-  78, 90, 204, 78, 80, 232, 145, 204,
+export const LIST_POSITION_HANDLER_DISCRIMINATOR = new Uint8Array([
+  48, 162, 222, 196, 85, 18, 204, 107,
 ]);
 
-export function getListAssetHandlerDiscriminatorBytes() {
+export function getListPositionHandlerDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    LIST_ASSET_HANDLER_DISCRIMINATOR,
+    LIST_POSITION_HANDLER_DISCRIMINATOR,
   );
 }
 
-export type ListAssetHandlerInstruction<
+export type ListPositionHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountSeller extends string | AccountMeta<string> = string,
   TAccountAsset extends string | AccountMeta<string> = string,
@@ -72,7 +72,7 @@ export type ListAssetHandlerInstruction<
             AccountSignerMeta<TAccountSeller>
         : TAccountSeller,
       TAccountAsset extends string
-        ? ReadonlyAccount<TAccountAsset>
+        ? WritableAccount<TAccountAsset>
         : TAccountAsset,
       TAccountOffer extends string
         ? WritableAccount<TAccountOffer>
@@ -90,29 +90,32 @@ export type ListAssetHandlerInstruction<
     ]
   >;
 
-export type ListAssetHandlerInstructionData = {
+export type ListPositionHandlerInstructionData = {
   discriminator: ReadonlyUint8Array;
   price: bigint;
   payingTokenMint: Address;
 };
 
-export type ListAssetHandlerInstructionDataArgs = {
+export type ListPositionHandlerInstructionDataArgs = {
   price: number | bigint;
   payingTokenMint: Address;
 };
 
-export function getListAssetHandlerInstructionDataEncoder(): FixedSizeEncoder<ListAssetHandlerInstructionDataArgs> {
+export function getListPositionHandlerInstructionDataEncoder(): FixedSizeEncoder<ListPositionHandlerInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([
       ["discriminator", fixEncoderSize(getBytesEncoder(), 8)],
       ["price", getU64Encoder()],
       ["payingTokenMint", getAddressEncoder()],
     ]),
-    (value) => ({ ...value, discriminator: LIST_ASSET_HANDLER_DISCRIMINATOR }),
+    (value) => ({
+      ...value,
+      discriminator: LIST_POSITION_HANDLER_DISCRIMINATOR,
+    }),
   );
 }
 
-export function getListAssetHandlerInstructionDataDecoder(): FixedSizeDecoder<ListAssetHandlerInstructionData> {
+export function getListPositionHandlerInstructionDataDecoder(): FixedSizeDecoder<ListPositionHandlerInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
     ["price", getU64Decoder()],
@@ -120,17 +123,17 @@ export function getListAssetHandlerInstructionDataDecoder(): FixedSizeDecoder<Li
   ]);
 }
 
-export function getListAssetHandlerInstructionDataCodec(): FixedSizeCodec<
-  ListAssetHandlerInstructionDataArgs,
-  ListAssetHandlerInstructionData
+export function getListPositionHandlerInstructionDataCodec(): FixedSizeCodec<
+  ListPositionHandlerInstructionDataArgs,
+  ListPositionHandlerInstructionData
 > {
   return combineCodec(
-    getListAssetHandlerInstructionDataEncoder(),
-    getListAssetHandlerInstructionDataDecoder(),
+    getListPositionHandlerInstructionDataEncoder(),
+    getListPositionHandlerInstructionDataDecoder(),
   );
 }
 
-export type ListAssetHandlerAsyncInput<
+export type ListPositionHandlerAsyncInput<
   TAccountSeller extends string = string,
   TAccountAsset extends string = string,
   TAccountOffer extends string = string,
@@ -145,11 +148,11 @@ export type ListAssetHandlerAsyncInput<
   collection: Address<TAccountCollection>;
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
-  price: ListAssetHandlerInstructionDataArgs["price"];
-  payingTokenMint: ListAssetHandlerInstructionDataArgs["payingTokenMint"];
+  price: ListPositionHandlerInstructionDataArgs["price"];
+  payingTokenMint: ListPositionHandlerInstructionDataArgs["payingTokenMint"];
 };
 
-export async function getListAssetHandlerInstructionAsync<
+export async function getListPositionHandlerInstructionAsync<
   TAccountSeller extends string,
   TAccountAsset extends string,
   TAccountOffer extends string,
@@ -158,7 +161,7 @@ export async function getListAssetHandlerInstructionAsync<
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: ListAssetHandlerAsyncInput<
+  input: ListPositionHandlerAsyncInput<
     TAccountSeller,
     TAccountAsset,
     TAccountOffer,
@@ -168,7 +171,7 @@ export async function getListAssetHandlerInstructionAsync<
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
-  ListAssetHandlerInstruction<
+  ListPositionHandlerInstruction<
     TProgramAddress,
     TAccountSeller,
     TAccountAsset,
@@ -184,7 +187,7 @@ export async function getListAssetHandlerInstructionAsync<
   // Original accounts.
   const originalAccounts = {
     seller: { value: input.seller ?? null, isWritable: true },
-    asset: { value: input.asset ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isWritable: true },
     offer: { value: input.offer ?? null, isWritable: true },
     collection: { value: input.collection ?? null, isWritable: true },
     mplCoreProgram: { value: input.mplCoreProgram ?? null, isWritable: false },
@@ -227,11 +230,11 @@ export async function getListAssetHandlerInstructionAsync<
       getAccountMeta(accounts.mplCoreProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getListAssetHandlerInstructionDataEncoder().encode(
-      args as ListAssetHandlerInstructionDataArgs,
+    data: getListPositionHandlerInstructionDataEncoder().encode(
+      args as ListPositionHandlerInstructionDataArgs,
     ),
     programAddress,
-  } as ListAssetHandlerInstruction<
+  } as ListPositionHandlerInstruction<
     TProgramAddress,
     TAccountSeller,
     TAccountAsset,
@@ -242,7 +245,7 @@ export async function getListAssetHandlerInstructionAsync<
   >);
 }
 
-export type ListAssetHandlerInput<
+export type ListPositionHandlerInput<
   TAccountSeller extends string = string,
   TAccountAsset extends string = string,
   TAccountOffer extends string = string,
@@ -257,11 +260,11 @@ export type ListAssetHandlerInput<
   collection: Address<TAccountCollection>;
   mplCoreProgram?: Address<TAccountMplCoreProgram>;
   systemProgram?: Address<TAccountSystemProgram>;
-  price: ListAssetHandlerInstructionDataArgs["price"];
-  payingTokenMint: ListAssetHandlerInstructionDataArgs["payingTokenMint"];
+  price: ListPositionHandlerInstructionDataArgs["price"];
+  payingTokenMint: ListPositionHandlerInstructionDataArgs["payingTokenMint"];
 };
 
-export function getListAssetHandlerInstruction<
+export function getListPositionHandlerInstruction<
   TAccountSeller extends string,
   TAccountAsset extends string,
   TAccountOffer extends string,
@@ -270,7 +273,7 @@ export function getListAssetHandlerInstruction<
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: ListAssetHandlerInput<
+  input: ListPositionHandlerInput<
     TAccountSeller,
     TAccountAsset,
     TAccountOffer,
@@ -279,7 +282,7 @@ export function getListAssetHandlerInstruction<
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
-): ListAssetHandlerInstruction<
+): ListPositionHandlerInstruction<
   TProgramAddress,
   TAccountSeller,
   TAccountAsset,
@@ -294,7 +297,7 @@ export function getListAssetHandlerInstruction<
   // Original accounts.
   const originalAccounts = {
     seller: { value: input.seller ?? null, isWritable: true },
-    asset: { value: input.asset ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isWritable: true },
     offer: { value: input.offer ?? null, isWritable: true },
     collection: { value: input.collection ?? null, isWritable: true },
     mplCoreProgram: { value: input.mplCoreProgram ?? null, isWritable: false },
@@ -328,11 +331,11 @@ export function getListAssetHandlerInstruction<
       getAccountMeta(accounts.mplCoreProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getListAssetHandlerInstructionDataEncoder().encode(
-      args as ListAssetHandlerInstructionDataArgs,
+    data: getListPositionHandlerInstructionDataEncoder().encode(
+      args as ListPositionHandlerInstructionDataArgs,
     ),
     programAddress,
-  } as ListAssetHandlerInstruction<
+  } as ListPositionHandlerInstruction<
     TProgramAddress,
     TAccountSeller,
     TAccountAsset,
@@ -343,7 +346,7 @@ export function getListAssetHandlerInstruction<
   >);
 }
 
-export type ParsedListAssetHandlerInstruction<
+export type ParsedListPositionHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -357,17 +360,17 @@ export type ParsedListAssetHandlerInstruction<
     mplCoreProgram: TAccountMetas[4];
     systemProgram: TAccountMetas[5];
   };
-  data: ListAssetHandlerInstructionData;
+  data: ListPositionHandlerInstructionData;
 };
 
-export function parseListAssetHandlerInstruction<
+export function parseListPositionHandlerInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedListAssetHandlerInstruction<TProgram, TAccountMetas> {
+): ParsedListPositionHandlerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
@@ -388,6 +391,8 @@ export function parseListAssetHandlerInstruction<
       mplCoreProgram: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getListAssetHandlerInstructionDataDecoder().decode(instruction.data),
+    data: getListPositionHandlerInstructionDataDecoder().decode(
+      instruction.data,
+    ),
   };
 }

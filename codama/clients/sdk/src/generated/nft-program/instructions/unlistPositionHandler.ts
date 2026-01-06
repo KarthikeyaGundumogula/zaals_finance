@@ -39,17 +39,17 @@ import {
   type ResolvedAccount,
 } from "../shared";
 
-export const UNLIST_ASSET_HANDLER_DISCRIMINATOR = new Uint8Array([
-  97, 27, 195, 138, 135, 193, 217, 48,
+export const UNLIST_POSITION_HANDLER_DISCRIMINATOR = new Uint8Array([
+  106, 108, 53, 121, 133, 159, 118, 182,
 ]);
 
-export function getUnlistAssetHandlerDiscriminatorBytes() {
+export function getUnlistPositionHandlerDiscriminatorBytes() {
   return fixEncoderSize(getBytesEncoder(), 8).encode(
-    UNLIST_ASSET_HANDLER_DISCRIMINATOR,
+    UNLIST_POSITION_HANDLER_DISCRIMINATOR,
   );
 }
 
-export type UnlistAssetHandlerInstruction<
+export type UnlistPositionHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountSeller extends string | AccountMeta<string> = string,
   TAccountAsset extends string | AccountMeta<string> = string,
@@ -69,7 +69,7 @@ export type UnlistAssetHandlerInstruction<
             AccountSignerMeta<TAccountSeller>
         : TAccountSeller,
       TAccountAsset extends string
-        ? ReadonlyAccount<TAccountAsset>
+        ? WritableAccount<TAccountAsset>
         : TAccountAsset,
       TAccountOffer extends string
         ? WritableAccount<TAccountOffer>
@@ -87,39 +87,39 @@ export type UnlistAssetHandlerInstruction<
     ]
   >;
 
-export type UnlistAssetHandlerInstructionData = {
+export type UnlistPositionHandlerInstructionData = {
   discriminator: ReadonlyUint8Array;
 };
 
-export type UnlistAssetHandlerInstructionDataArgs = {};
+export type UnlistPositionHandlerInstructionDataArgs = {};
 
-export function getUnlistAssetHandlerInstructionDataEncoder(): FixedSizeEncoder<UnlistAssetHandlerInstructionDataArgs> {
+export function getUnlistPositionHandlerInstructionDataEncoder(): FixedSizeEncoder<UnlistPositionHandlerInstructionDataArgs> {
   return transformEncoder(
     getStructEncoder([["discriminator", fixEncoderSize(getBytesEncoder(), 8)]]),
     (value) => ({
       ...value,
-      discriminator: UNLIST_ASSET_HANDLER_DISCRIMINATOR,
+      discriminator: UNLIST_POSITION_HANDLER_DISCRIMINATOR,
     }),
   );
 }
 
-export function getUnlistAssetHandlerInstructionDataDecoder(): FixedSizeDecoder<UnlistAssetHandlerInstructionData> {
+export function getUnlistPositionHandlerInstructionDataDecoder(): FixedSizeDecoder<UnlistPositionHandlerInstructionData> {
   return getStructDecoder([
     ["discriminator", fixDecoderSize(getBytesDecoder(), 8)],
   ]);
 }
 
-export function getUnlistAssetHandlerInstructionDataCodec(): FixedSizeCodec<
-  UnlistAssetHandlerInstructionDataArgs,
-  UnlistAssetHandlerInstructionData
+export function getUnlistPositionHandlerInstructionDataCodec(): FixedSizeCodec<
+  UnlistPositionHandlerInstructionDataArgs,
+  UnlistPositionHandlerInstructionData
 > {
   return combineCodec(
-    getUnlistAssetHandlerInstructionDataEncoder(),
-    getUnlistAssetHandlerInstructionDataDecoder(),
+    getUnlistPositionHandlerInstructionDataEncoder(),
+    getUnlistPositionHandlerInstructionDataDecoder(),
   );
 }
 
-export type UnlistAssetHandlerAsyncInput<
+export type UnlistPositionHandlerAsyncInput<
   TAccountSeller extends string = string,
   TAccountAsset extends string = string,
   TAccountOffer extends string = string,
@@ -136,7 +136,7 @@ export type UnlistAssetHandlerAsyncInput<
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
-export async function getUnlistAssetHandlerInstructionAsync<
+export async function getUnlistPositionHandlerInstructionAsync<
   TAccountSeller extends string,
   TAccountAsset extends string,
   TAccountOffer extends string,
@@ -145,7 +145,7 @@ export async function getUnlistAssetHandlerInstructionAsync<
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: UnlistAssetHandlerAsyncInput<
+  input: UnlistPositionHandlerAsyncInput<
     TAccountSeller,
     TAccountAsset,
     TAccountOffer,
@@ -155,7 +155,7 @@ export async function getUnlistAssetHandlerInstructionAsync<
   >,
   config?: { programAddress?: TProgramAddress },
 ): Promise<
-  UnlistAssetHandlerInstruction<
+  UnlistPositionHandlerInstruction<
     TProgramAddress,
     TAccountSeller,
     TAccountAsset,
@@ -171,7 +171,7 @@ export async function getUnlistAssetHandlerInstructionAsync<
   // Original accounts.
   const originalAccounts = {
     seller: { value: input.seller ?? null, isWritable: true },
-    asset: { value: input.asset ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isWritable: true },
     offer: { value: input.offer ?? null, isWritable: true },
     collection: { value: input.collection ?? null, isWritable: true },
     mplCoreProgram: { value: input.mplCoreProgram ?? null, isWritable: false },
@@ -211,9 +211,9 @@ export async function getUnlistAssetHandlerInstructionAsync<
       getAccountMeta(accounts.mplCoreProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getUnlistAssetHandlerInstructionDataEncoder().encode({}),
+    data: getUnlistPositionHandlerInstructionDataEncoder().encode({}),
     programAddress,
-  } as UnlistAssetHandlerInstruction<
+  } as UnlistPositionHandlerInstruction<
     TProgramAddress,
     TAccountSeller,
     TAccountAsset,
@@ -224,7 +224,7 @@ export async function getUnlistAssetHandlerInstructionAsync<
   >);
 }
 
-export type UnlistAssetHandlerInput<
+export type UnlistPositionHandlerInput<
   TAccountSeller extends string = string,
   TAccountAsset extends string = string,
   TAccountOffer extends string = string,
@@ -241,7 +241,7 @@ export type UnlistAssetHandlerInput<
   systemProgram?: Address<TAccountSystemProgram>;
 };
 
-export function getUnlistAssetHandlerInstruction<
+export function getUnlistPositionHandlerInstruction<
   TAccountSeller extends string,
   TAccountAsset extends string,
   TAccountOffer extends string,
@@ -250,7 +250,7 @@ export function getUnlistAssetHandlerInstruction<
   TAccountSystemProgram extends string,
   TProgramAddress extends Address = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
 >(
-  input: UnlistAssetHandlerInput<
+  input: UnlistPositionHandlerInput<
     TAccountSeller,
     TAccountAsset,
     TAccountOffer,
@@ -259,7 +259,7 @@ export function getUnlistAssetHandlerInstruction<
     TAccountSystemProgram
   >,
   config?: { programAddress?: TProgramAddress },
-): UnlistAssetHandlerInstruction<
+): UnlistPositionHandlerInstruction<
   TProgramAddress,
   TAccountSeller,
   TAccountAsset,
@@ -274,7 +274,7 @@ export function getUnlistAssetHandlerInstruction<
   // Original accounts.
   const originalAccounts = {
     seller: { value: input.seller ?? null, isWritable: true },
-    asset: { value: input.asset ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isWritable: true },
     offer: { value: input.offer ?? null, isWritable: true },
     collection: { value: input.collection ?? null, isWritable: true },
     mplCoreProgram: { value: input.mplCoreProgram ?? null, isWritable: false },
@@ -305,9 +305,9 @@ export function getUnlistAssetHandlerInstruction<
       getAccountMeta(accounts.mplCoreProgram),
       getAccountMeta(accounts.systemProgram),
     ],
-    data: getUnlistAssetHandlerInstructionDataEncoder().encode({}),
+    data: getUnlistPositionHandlerInstructionDataEncoder().encode({}),
     programAddress,
-  } as UnlistAssetHandlerInstruction<
+  } as UnlistPositionHandlerInstruction<
     TProgramAddress,
     TAccountSeller,
     TAccountAsset,
@@ -318,7 +318,7 @@ export function getUnlistAssetHandlerInstruction<
   >);
 }
 
-export type ParsedUnlistAssetHandlerInstruction<
+export type ParsedUnlistPositionHandlerInstruction<
   TProgram extends string = typeof NFT_PROGRAM_PROGRAM_ADDRESS,
   TAccountMetas extends readonly AccountMeta[] = readonly AccountMeta[],
 > = {
@@ -332,17 +332,17 @@ export type ParsedUnlistAssetHandlerInstruction<
     mplCoreProgram: TAccountMetas[4];
     systemProgram: TAccountMetas[5];
   };
-  data: UnlistAssetHandlerInstructionData;
+  data: UnlistPositionHandlerInstructionData;
 };
 
-export function parseUnlistAssetHandlerInstruction<
+export function parseUnlistPositionHandlerInstruction<
   TProgram extends string,
   TAccountMetas extends readonly AccountMeta[],
 >(
   instruction: Instruction<TProgram> &
     InstructionWithAccounts<TAccountMetas> &
     InstructionWithData<ReadonlyUint8Array>,
-): ParsedUnlistAssetHandlerInstruction<TProgram, TAccountMetas> {
+): ParsedUnlistPositionHandlerInstruction<TProgram, TAccountMetas> {
   if (instruction.accounts.length < 6) {
     // TODO: Coded error.
     throw new Error("Not enough accounts");
@@ -363,7 +363,7 @@ export function parseUnlistAssetHandlerInstruction<
       mplCoreProgram: getNextAccount(),
       systemProgram: getNextAccount(),
     },
-    data: getUnlistAssetHandlerInstructionDataDecoder().decode(
+    data: getUnlistPositionHandlerInstructionDataDecoder().decode(
       instruction.data,
     ),
   };

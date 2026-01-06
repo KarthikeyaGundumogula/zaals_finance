@@ -83,10 +83,10 @@ export type ClosePositionHandlerInstruction<
         ? WritableAccount<TAccountPosition>
         : TAccountPosition,
       TAccountAsset extends string
-        ? ReadonlyAccount<TAccountAsset>
+        ? WritableAccount<TAccountAsset>
         : TAccountAsset,
       TAccountCollection extends string
-        ? ReadonlyAccount<TAccountCollection>
+        ? WritableAccount<TAccountCollection>
         : TAccountCollection,
       TAccountLockMint extends string
         ? ReadonlyAccount<TAccountLockMint>
@@ -234,8 +234,8 @@ export async function getClosePositionHandlerInstructionAsync<
     positionHolder: { value: input.positionHolder ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     position: { value: input.position ?? null, isWritable: true },
-    asset: { value: input.asset ?? null, isWritable: false },
-    collection: { value: input.collection ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isWritable: true },
+    collection: { value: input.collection ?? null, isWritable: true },
     lockMint: { value: input.lockMint ?? null, isWritable: false },
     vaultLockAta: { value: input.vaultLockAta ?? null, isWritable: true },
     capitalProviderLockAta: {
@@ -430,8 +430,8 @@ export function getClosePositionHandlerInstruction<
     positionHolder: { value: input.positionHolder ?? null, isWritable: true },
     vault: { value: input.vault ?? null, isWritable: true },
     position: { value: input.position ?? null, isWritable: true },
-    asset: { value: input.asset ?? null, isWritable: false },
-    collection: { value: input.collection ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isWritable: true },
+    collection: { value: input.collection ?? null, isWritable: true },
     lockMint: { value: input.lockMint ?? null, isWritable: false },
     vaultLockAta: { value: input.vaultLockAta ?? null, isWritable: true },
     capitalProviderLockAta: {

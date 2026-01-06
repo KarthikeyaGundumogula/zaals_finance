@@ -88,13 +88,16 @@ impl TestConfig {
 pub struct Tokens {
     pub reward_mint: Pubkey,
     pub lock_mint: Pubkey,
+    pub general_mint: Pubkey,
     pub node_operator_reward_ata: Pubkey,
     pub agent_reward_ata: Pubkey,
     pub provider_lock_ata: Pubkey,
     pub provider_reward_ata: Pubkey,
+    pub provider_general_ata: Pubkey,
     pub vault_reward_ata: Pubkey,
     pub vault_lock_ata: Pubkey,
     pub admin_lock_ata: Pubkey,
+    pub admin_general_ata: Pubkey,
     pub beneficiary_atas: Vec<Pubkey>,
     pub collection: Keypair,
     pub asset: Keypair,
@@ -105,6 +108,11 @@ impl Tokens {
         let svm = &mut test_config.svm;
         // Create a new SPL token mint with alice as the mint authority
         let reward_mint = CreateMint::new(svm, &test_config.god)
+            .authority(&test_config.god.pubkey())
+            .decimals(DECIMALS)
+            .send()
+            .unwrap();
+        let general_mint = CreateMint::new(svm, &test_config.god)
             .authority(&test_config.god.pubkey())
             .decimals(DECIMALS)
             .send()
@@ -123,12 +131,22 @@ impl Tokens {
             .owner(&test_config.admin.pubkey())
             .send()
             .unwrap();
+        let admin_general_ata =
+            CreateAssociatedTokenAccount::new(svm, &test_config.god, &general_mint)
+                .owner(&test_config.admin.pubkey())
+                .send()
+                .unwrap();
+        let provider_general_ata =
+            CreateAssociatedTokenAccount::new(svm, &test_config.god, &general_mint)
+                .owner(&test_config.capital_provider.pubkey())
+                .send()
+                .unwrap();
         let agent_reward_ata =
             CreateAssociatedTokenAccount::new(svm, &test_config.god, &reward_mint)
                 .owner(&test_config.agent.pubkey())
                 .send()
                 .unwrap();
-        let node_operator_ata =
+        let node_operator_reward_ata =
             CreateAssociatedTokenAccount::new(svm, &test_config.god, &reward_mint)
                 .owner(&test_config.node_operator.pubkey())
                 .send()
@@ -161,16 +179,19 @@ impl Tokens {
         Tokens {
             reward_mint,
             lock_mint,
-            node_operator_reward_ata: node_operator_ata,
+            node_operator_reward_ata,
             agent_reward_ata,
             provider_lock_ata,
             admin_lock_ata,
             provider_reward_ata,
+            provider_general_ata,
             vault_lock_ata,
             vault_reward_ata,
             beneficiary_atas,
             collection,
             asset,
+            general_mint,
+            admin_general_ata,
         }
     }
 }

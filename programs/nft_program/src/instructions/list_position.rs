@@ -6,11 +6,12 @@ use mpl_core::{accounts::BaseAssetV1, instructions::TransferV1CpiBuilder, ID as 
 pub struct ListPosition<'info> {
     #[account(mut,address = asset.owner @SignerError::InvalidAssetOwner)]
     pub seller: Signer<'info>,
+    #[account(mut)]
     pub asset: Account<'info, BaseAssetV1>,
     #[account(
         init,
         payer = seller,
-        space = Offer::INIT_SPACE,
+        space = Offer::INIT_SPACE + 8,
         seeds = [b"Offer",asset.key().as_ref()],
         bump
     )]

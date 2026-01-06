@@ -1,10 +1,10 @@
 #![allow(dead_code)]
-// #![allow(unused)]
 use crate::setup::{
     accounts,
     constants::{
         DISPUTE_WINDOW, EARLY_UNLOCK_FEE, FUND_RAISE_PERIOD, INVESTOR_BPS, MAX_LOCK_DURATION,
-        MAX_SLASH_BPS, MAX_VAULT_THRESHOLD, MIN_LOCK_AMOUNT, MIN_LOCK_DURATION, ONE_DAY, SLASH_BPS,
+        MAX_SLASH_BPS, MAX_VAULT_THRESHOLD, MIN_LOCK_AMOUNT, MIN_LOCK_DURATION, ONE_DAY,
+        SALE_PRICE, SLASH_BPS,
     },
     test_config::{TestConfig, Tokens},
     *,
@@ -20,7 +20,10 @@ use zaals_finance_client::{
         FinalizeSlashReqHandlerBuilder, InitCapitalProgramHandlerBuilder,
         OpenPositionHandlerBuilder, UpdatePositionHandlerBuilder,
     },
-    nft_program::instructions::InitNftProgramHandlerBuilder,
+    nft_program::instructions::{
+        BuyPositionHandlerBuilder, InitNftProgramHandlerBuilder, ListPositionHandlerBuilder,
+        UnlistPositionHandlerBuilder,
+    },
     CAPITAL_PROGRAM_ID, NFT_PROGRAM_ID,
 };
 
@@ -353,14 +356,92 @@ pub fn capital_program_close_position(
         .vault_lock_ata(token_data.vault_lock_ata)
         .capital_provider_lock_ata(token_data.provider_lock_ata)
         .instruction();
-    
+
+    println!("asset {:?}", token_data.asset.pubkey());
+
     utils::send_transaction(
         &mut test_config.svm,
         &[inxs],
-        &test_config.god.pubkey(),
-        &[
-            &test_config.capital_provider.insecure_clone(),
-            &test_config.god.insecure_clone(),
-        ],
+        &test_config.capital_provider.pubkey(),
+        &[&test_config.capital_provider.insecure_clone()],
+    )
+}
+
+pub fn nft_program_list_positon(
+    test_config: &mut TestConfig,
+    token_data: &mut Tokens,
+) -> TransactionResult {
+    let offer_pda = accounts::get_offer_pda(token_data.asset.pubkey());
+
+    let inxs = ListPositionHandlerBuilder::new()
+        .seller(test_config.capital_provider.pubkey())
+        .asset(token_data.asset.pubkey())
+        .offer(offer_pda)
+        .collection(token_data.collection.pubkey())
+        .paying_token_mint(token_data.general_mint)
+        .price(SALE_PRICE)
+        .instruction();
+    utils::send_transaction(
+        &mut test_config.svm,
+        &[inxs],
+        &test_config.capital_provider.pubkey(),
+        &[&test_config.capital_provider.insecure_clone()],
+    )
+}
+
+pub fn nft_program_unlist_positon(
+    test_config: &mut TestConfig,
+    token_data: &mut Tokens,
+) -> TransactionResult {
+    let offer_pda = accounts::get_offer_pda(token_data.asset.pubkey());
+
+    let inxs = UnlistPositionHandlerBuilder::new()
+        .seller(test_config.capital_provider.pubkey())
+        .asset(token_data.asset.pubkey())
+        .offer(offer_pda)
+        .collection(token_data.collection.pubkey())
+        .instruction();
+    utils::send_transaction(
+        &mut test_config.svm,
+        &[inxs],
+        &test_config.capital_provider.pubkey(),
+        &[&test_config.capital_provider.insecure_clone()],
+    )
+}
+
+pub fn nft_program_buy_position(
+    test_config: &mut TestConfig,
+    token_data: &mut Tokens,
+) -> TransactionResult {
+    let offer_pda = accounts::get_offer_pda(token_data.asset.pubkey());
+    let asset = utils::get_asset(&test_config.svm, &token_data.asset.pubkey());
+    println!("asset owner is {:?} ", asset.base.owner);
+    let inxs = BuyPositionHandlerBuilder::new()
+        .buyer(test_config.admin.pubkey())
+        .seller(test_config.capital_provider.pubkey())
+        .asset(token_data.asset.pubkey())
+        .offer(offer_pda)
+        .collection(token_data.collection.pubkey())
+        .token_mint(token_data.general_mint)
+        .seller_ata(token_data.provider_general_ata)
+        .buyer_ata(token_data.admin_general_ata)
+        .instruction();
+
+    // logs of passed accounts
+
+    println!("{:?}", token_data.asset.pubkey());
+    println!("{}", offer_pda);
+    println!("{}", token_data.admin_general_ata);
+    println!("{}", token_data.provider_general_ata);
+    println!("{}", token_data.collection.pubkey());
+    println!("{}", token_data.general_mint);
+    println!("{}",test_config.capital_provider.pubkey());
+    println!("{}",test_config.admin.pubkey());
+
+    utils::send_transaction(
+        &mut test_config.svm,
+        &[inxs],
+        &test_config.admin.pubkey(),
+        &[&test_config.admin.insecure_clone()],
     )
 }

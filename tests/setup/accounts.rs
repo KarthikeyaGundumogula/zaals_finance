@@ -6,6 +6,7 @@ use litesvm_token::{get_spl_account, spl_token::state::Account as TokenAccount, 
 use solana_sdk::pubkey::Pubkey;
 use zaals_finance_client::{
     capital_program::accounts::{AuthorityConfig, Position, Vault},
+    nft_program::accounts::Offer,
     CAPITAL_PROGRAM_ID,
 };
 use zaals_finance_client::{nft_program::accounts::NFTConfig, NFT_PROGRAM_ID};
@@ -13,6 +14,7 @@ use zaals_finance_client::{nft_program::accounts::NFTConfig, NFT_PROGRAM_ID};
 pub trait FromAccountBytes: Sized {
     fn from_bytes(data: &[u8]) -> Result<Self, std::io::Error>;
 }
+
 #[macro_export]
 macro_rules! impl_from_account_bytes {
     ($t:ty) => {
@@ -29,6 +31,7 @@ impl_from_account_bytes!(AuthorityConfig);
 impl_from_account_bytes!(Vault);
 impl_from_account_bytes!(NFTConfig);
 impl_from_account_bytes!(Position);
+impl_from_account_bytes!(Offer);
 
 pub fn get_nft_config_pda() -> Pubkey {
     let try_find_program_address =
@@ -52,6 +55,11 @@ pub fn get_position_pda(asset: Pubkey) -> Pubkey {
     let position_pda =
         Pubkey::try_find_program_address(&[b"Position", asset.as_ref()], &CAPITAL_PROGRAM_ID);
     position_pda.unwrap().0
+}
+
+pub fn get_offer_pda(asset: Pubkey) -> Pubkey {
+    let offer_pda = Pubkey::try_find_program_address(&[b"Offer", asset.as_ref()], &NFT_PROGRAM_ID);
+    offer_pda.unwrap().0
 }
 
 pub fn get_data_from_pda_address<T>(svm: &mut LiteSVM, pda_address: Pubkey) -> T

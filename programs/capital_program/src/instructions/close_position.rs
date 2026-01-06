@@ -39,8 +39,8 @@ pub struct ClosePosition<'info> {
     pub position: Account<'info, Position>,
 
     /// The NFT asset representing the position
-    /// CHECK: Validated by position.asset and capital_provider ownership
     #[account(
+        mut,
         address = position.asset @ PositionError::InvalidAsset
     )]
     pub asset: Account<'info, BaseAssetV1>,
@@ -48,6 +48,7 @@ pub struct ClosePosition<'info> {
     /// The NFT asset representing the position
     /// CHECK: Validated by vault.collection and capital_provider ownership
     #[account(
+        mut,
         address = vault.nft_collection @ PositionError::InvalidCollection
     )]
     pub collection: UncheckedAccount<'info>,
@@ -161,10 +162,4 @@ impl<'info> ClosePosition<'info> {
             .invoke()?;
         Ok(())
     }
-}
-
-#[error_code]
-pub enum UnstakeError {
-    #[msg("Only owner of the NFT can Unstake")]
-    OnlyNFTOwner,
 }

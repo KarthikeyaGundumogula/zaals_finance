@@ -40,7 +40,7 @@ pub mod nft_program {
         Ok(())
     }
 
-    pub fn list_asset_handler(
+    pub fn list_position_handler(
         ctx: Context<ListPosition>,
         price: u64,
         paying_token_mint: Pubkey,
@@ -58,11 +58,25 @@ pub mod nft_program {
         Ok(())
     }
 
-    pub fn unlist_asset_handler(ctx: Context<UnlistPosition>) -> Result<()> {
+    pub fn unlist_position_handler(ctx: Context<UnlistPosition>) -> Result<()> {
         ctx.accounts.unlock_asset()?;
         msg!("Asset unlisted from sale");
         emit!(OfferCancelledEvent {
             seller: *ctx.accounts.seller.key,
+            time_stamp: Clock::get()?.unix_timestamp,
+        });
+        Ok(())
+    }
+
+    pub fn buy_position_handler(ctx: Context<BuyPosition>) -> Result<()> {
+        ctx.accounts.transfer_tokens()?;
+        ctx.accounts.transfer_asset()?;
+        msg!(" Asset Sale Completed ");
+        emit!(OfferPurchasedEvent {
+            buyer: ctx.accounts.buyer.key(),
+            seller: ctx.accounts.seller.key(),
+            price: ctx.accounts.offer.price,
+            token_mint: ctx.accounts.token_mint.key(),
             time_stamp: Clock::get()?.unix_timestamp,
         });
         Ok(())

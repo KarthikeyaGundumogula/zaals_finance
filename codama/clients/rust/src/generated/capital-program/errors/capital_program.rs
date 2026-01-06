@@ -10,9 +10,72 @@ use thiserror::Error;
 
 #[derive(Clone, Debug, Eq, Error, FromPrimitive, PartialEq)]
 pub enum CapitalProgramError {
-    /// 6000 - Only owner of the NFT can Unstake
-    #[error("Only owner of the NFT can Unstake")]
-    OnlyNFTOwner = 0x1770,
+    /// 6000 - Total basis points allocation exceeds maximum (10000 BPS = 100%)
+    #[error("Total basis points allocation exceeds maximum (10000 BPS = 100%)")]
+    BPSExceedsMaximum = 0x1770,
+    /// 6001 - Slash basis points exceeds maximum allowed
+    #[error("Slash basis points exceeds maximum allowed")]
+    SlashBPSExceedsMaximum = 0x1771,
+    /// 6002 - Number of beneficiaries does not match number of share allocations
+    #[error("Number of beneficiaries does not match number of share allocations")]
+    BeneficiaryMismatch = 0x1772,
+    /// 6003 - Too many beneficiaries specified (exceeds maximum limit)
+    #[error("Too many beneficiaries specified (exceeds maximum limit)")]
+    TooManyBeneficiaries = 0x1773,
+    /// 6004 - Duplicate beneficiary address detected
+    #[error("Duplicate beneficiary address detected")]
+    DuplicateBeneficiary = 0x1774,
+    /// 6005 - Invalid basis points configuration
+    #[error("Invalid basis points configuration")]
+    InvalidBasisPoints = 0x1775,
+    /// 6006 - Beneficiary shares must sum to allocated BPS
+    #[error("Beneficiary shares must sum to allocated BPS")]
+    BeneficiarySharesMismatch = 0x1776,
+    /// 6007 - Maximum cap must be greater than minimum cap
+    #[error("Maximum cap must be greater than minimum cap")]
+    InvalidCapitalRange = 0x1777,
+    /// 6008 - Minimum cap must be greater than zero
+    #[error("Minimum cap must be greater than zero")]
+    MinCapMustBePositive = 0x1778,
+    /// 6009 - Minimum lock amount must be greater than zero
+    #[error("Minimum lock amount must be greater than zero")]
+    MinLockAmountMustBePositive = 0x1779,
+    /// 6010 - Amount Must be greater than the Min Lock Amount
+    #[error("Amount Must be greater than the Min Lock Amount")]
+    BelowMinLockCap = 0x177A,
+    /// 6011 - Lock Duration must be above MIN_LOCK_DURATION
+    #[error("Lock Duration must be above MIN_LOCK_DURATION")]
+    LockDurationRangeTooNarrow = 0x177B,
+    /// 6012 - Beneficiary shares must greater than zero
+    #[error("Beneficiary shares must greater than zero")]
+    BeneficiaryShareMustBePositive = 0x177C,
+    /// 6013 - The vault is currently under dispute and claims are disabled
+    #[error("The vault is currently under dispute and claims are disabled")]
+    VaultUnderDispute = 0x177D,
+    /// 6014 - Slash req is more than vault configured slash req limit
+    #[error("Slash req is more than vault configured slash req limit")]
+    SlashReqExceedsMaxBps = 0x177E,
+    /// 6015 - Vault has reached maximum capacity
+    #[error("Vault has reached maximum capacity")]
+    VaultMaxCapReached = 0x177F,
+    /// 6016 - Vault has no capital collected
+    #[error("Vault has no capital collected")]
+    NoCapitalInVault = 0x1780,
+    /// 6017 - Given Index is out of Beneficiary
+    #[error("Given Index is out of Beneficiary")]
+    InvalidBeneficiaryIndex = 0x1781,
+    /// 6018 - Vault still has some locked tokens in it
+    #[error("Vault still has some locked tokens in it")]
+    VaultNotEmpty = 0x1782,
+    /// 6019 - Vault is not under dispute or claim_request is expired
+    #[error("Vault is not under dispute or claim_request is expired")]
+    VaultNotUnderDispute = 0x1783,
+    /// 6020 - Vault doesn't reach the min cap
+    #[error("Vault doesn't reach the min cap")]
+    BelowMinCap = 0x1784,
+    /// 6021 - After this operation vault reaches less than MIN_CAP
+    #[error("After this operation vault reaches less than MIN_CAP")]
+    VaultReachedMinCap = 0x1785,
 }
 
 impl From<CapitalProgramError> for solana_program_error::ProgramError {

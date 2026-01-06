@@ -15,10 +15,11 @@ import {
 } from "gill";
 import {
   type ParsedBurnAssetHandlerInstruction,
+  type ParsedBuyPositionHandlerInstruction,
   type ParsedCreateVaultCollectionHandlerInstruction,
   type ParsedInitNftProgramHandlerInstruction,
-  type ParsedListAssetHandlerInstruction,
-  type ParsedUnlistAssetHandlerInstruction,
+  type ParsedListPositionHandlerInstruction,
+  type ParsedUnlistPositionHandlerInstruction,
 } from "../instructions";
 
 export const NFT_PROGRAM_PROGRAM_ADDRESS =
@@ -72,10 +73,11 @@ export function identifyNftProgramAccount(
 
 export enum NftProgramInstruction {
   BurnAssetHandler,
+  BuyPositionHandler,
   CreateVaultCollectionHandler,
   InitNftProgramHandler,
-  ListAssetHandler,
-  UnlistAssetHandler,
+  ListPositionHandler,
+  UnlistPositionHandler,
 }
 
 export function identifyNftProgramInstruction(
@@ -92,6 +94,17 @@ export function identifyNftProgramInstruction(
     )
   ) {
     return NftProgramInstruction.BurnAssetHandler;
+  }
+  if (
+    containsBytes(
+      data,
+      fixEncoderSize(getBytesEncoder(), 8).encode(
+        new Uint8Array([55, 94, 88, 138, 201, 222, 80, 165]),
+      ),
+      0,
+    )
+  ) {
+    return NftProgramInstruction.BuyPositionHandler;
   }
   if (
     containsBytes(
@@ -119,23 +132,23 @@ export function identifyNftProgramInstruction(
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([78, 90, 204, 78, 80, 232, 145, 204]),
+        new Uint8Array([48, 162, 222, 196, 85, 18, 204, 107]),
       ),
       0,
     )
   ) {
-    return NftProgramInstruction.ListAssetHandler;
+    return NftProgramInstruction.ListPositionHandler;
   }
   if (
     containsBytes(
       data,
       fixEncoderSize(getBytesEncoder(), 8).encode(
-        new Uint8Array([97, 27, 195, 138, 135, 193, 217, 48]),
+        new Uint8Array([106, 108, 53, 121, 133, 159, 118, 182]),
       ),
       0,
     )
   ) {
-    return NftProgramInstruction.UnlistAssetHandler;
+    return NftProgramInstruction.UnlistPositionHandler;
   }
   throw new Error(
     "The provided instruction could not be identified as a nftProgram instruction.",
@@ -149,14 +162,17 @@ export type ParsedNftProgramInstruction<
       instructionType: NftProgramInstruction.BurnAssetHandler;
     } & ParsedBurnAssetHandlerInstruction<TProgram>)
   | ({
+      instructionType: NftProgramInstruction.BuyPositionHandler;
+    } & ParsedBuyPositionHandlerInstruction<TProgram>)
+  | ({
       instructionType: NftProgramInstruction.CreateVaultCollectionHandler;
     } & ParsedCreateVaultCollectionHandlerInstruction<TProgram>)
   | ({
       instructionType: NftProgramInstruction.InitNftProgramHandler;
     } & ParsedInitNftProgramHandlerInstruction<TProgram>)
   | ({
-      instructionType: NftProgramInstruction.ListAssetHandler;
-    } & ParsedListAssetHandlerInstruction<TProgram>)
+      instructionType: NftProgramInstruction.ListPositionHandler;
+    } & ParsedListPositionHandlerInstruction<TProgram>)
   | ({
-      instructionType: NftProgramInstruction.UnlistAssetHandler;
-    } & ParsedUnlistAssetHandlerInstruction<TProgram>);
+      instructionType: NftProgramInstruction.UnlistPositionHandler;
+    } & ParsedUnlistPositionHandlerInstruction<TProgram>);

@@ -6,6 +6,7 @@ use mpl_core::{accounts::BaseAssetV1, instructions::TransferV1CpiBuilder, ID as 
 pub struct UnlistPosition<'info> {
     #[account(mut,address = offer.seller @SignerError::InvalidAssetOwner)]
     pub seller: Signer<'info>,
+    #[account(mut)]
     pub asset: Account<'info, BaseAssetV1>,
     #[account(
       mut,

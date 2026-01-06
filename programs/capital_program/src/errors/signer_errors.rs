@@ -10,7 +10,7 @@ pub enum SignerError {
 
     #[msg("The signer is not the node operator")]
     InvalidNodeOperator,
-    
+
     #[msg("Address cannot be default or system program")]
     InvalidAddress,
 

@@ -2,6 +2,7 @@
 name = "zaals-finance-client"
 version = "0.1.0"
 edition = "2021"
+manifest = ""
 
 [lib]
 crate-type = ["cdylib", "lib"]

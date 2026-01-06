@@ -1,5 +1,6 @@
 pub mod claim_beneficiary_rewards;
 pub mod claim_investor_rewards;
+pub mod claim_operator_rewards;
 pub mod close_position;
 pub mod close_vault;
 pub mod create_slash_req;
@@ -9,10 +10,10 @@ pub mod finalize_slash_req;
 pub mod init_program;
 pub mod open_position;
 pub mod update_position;
-pub mod claim_operator_rewards;
 
 pub use claim_beneficiary_rewards::*;
 pub use claim_investor_rewards::*;
+pub use claim_operator_rewards::*;
 pub use close_position::*;
 pub use close_vault::*;
 pub use create_slash_req::*;
@@ -22,4 +23,3 @@ pub use finalize_slash_req::*;
 pub use init_program::*;
 pub use open_position::*;
 pub use update_position::*;
-pub use claim_operator_rewards::*;

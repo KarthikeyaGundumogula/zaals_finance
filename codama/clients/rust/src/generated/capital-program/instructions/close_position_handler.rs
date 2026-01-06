@@ -81,11 +81,11 @@ impl ClosePositionHandler {
             self.position,
             false
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
             self.asset,
             false
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
             self.collection,
             false
           ));
@@ -161,8 +161,8 @@ impl Default for ClosePositionHandlerInstructionData {
                       ///   0. `[writable, signer]` position_holder
                 ///   1. `[writable]` vault
                 ///   2. `[writable]` position
-          ///   3. `[]` asset
-          ///   4. `[]` collection
+                ///   3. `[writable]` asset
+                ///   4. `[writable]` collection
           ///   5. `[]` lock_mint
                 ///   6. `[writable]` vault_lock_ata
                 ///   7. `[writable]` capital_provider_lock_ata
@@ -449,11 +449,11 @@ impl<'a, 'b> ClosePositionHandlerCpi<'a, 'b> {
             *self.position.key,
             false
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
             *self.asset.key,
             false
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
             *self.collection.key,
             false
           ));
@@ -530,8 +530,8 @@ impl<'a, 'b> ClosePositionHandlerCpi<'a, 'b> {
                       ///   0. `[writable, signer]` position_holder
                 ///   1. `[writable]` vault
                 ///   2. `[writable]` position
-          ///   3. `[]` asset
-          ///   4. `[]` collection
+                ///   3. `[writable]` asset
+                ///   4. `[writable]` collection
           ///   5. `[]` lock_mint
                 ///   6. `[writable]` vault_lock_ata
                 ///   7. `[writable]` capital_provider_lock_ata

@@ -15,6 +15,7 @@ pub struct BuyPosition<'info> {
         address = offer.seller @ OfferError::InvalidSeller
     )]
     pub seller: UncheckedAccount<'info>,
+    #[account(mut)]
     pub asset: Account<'info, BaseAssetV1>,
     #[account(
       mut,
@@ -66,7 +67,7 @@ impl<'info> BuyPosition<'info> {
             from: self.buyer_ata.to_account_info(),
             to: self.seller_ata.to_account_info(),
             mint: self.token_mint.to_account_info(),
-            authority: self.seller.to_account_info(),
+            authority: self.buyer.to_account_info(),
         };
         let cpi_ctx = CpiContext::new(self.token_program.to_account_info(), transfer_accounts);
         transfer_checked(cpi_ctx, self.offer.price, self.token_mint.decimals)?;

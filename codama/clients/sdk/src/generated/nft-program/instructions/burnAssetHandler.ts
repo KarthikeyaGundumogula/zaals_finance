@@ -27,6 +27,7 @@ import {
   type ReadonlyAccount,
   type ReadonlyUint8Array,
   type TransactionSigner,
+  type WritableAccount,
   type WritableSignerAccount,
 } from "gill";
 import { NFT_PROGRAM_PROGRAM_ADDRESS } from "../programs";
@@ -61,13 +62,13 @@ export type BurnAssetHandlerInstruction<
             AccountSignerMeta<TAccountHolder>
         : TAccountHolder,
       TAccountAsset extends string
-        ? ReadonlyAccount<TAccountAsset>
+        ? WritableAccount<TAccountAsset>
         : TAccountAsset,
       TAccountSystemProgram extends string
         ? ReadonlyAccount<TAccountSystemProgram>
         : TAccountSystemProgram,
       TAccountCollection extends string
-        ? ReadonlyAccount<TAccountCollection>
+        ? WritableAccount<TAccountCollection>
         : TAccountCollection,
       TAccountMplCoreProgram extends string
         ? ReadonlyAccount<TAccountMplCoreProgram>
@@ -149,9 +150,9 @@ export function getBurnAssetHandlerInstruction<
   // Original accounts.
   const originalAccounts = {
     holder: { value: input.holder ?? null, isWritable: true },
-    asset: { value: input.asset ?? null, isWritable: false },
+    asset: { value: input.asset ?? null, isWritable: true },
     systemProgram: { value: input.systemProgram ?? null, isWritable: false },
-    collection: { value: input.collection ?? null, isWritable: false },
+    collection: { value: input.collection ?? null, isWritable: true },
     mplCoreProgram: { value: input.mplCoreProgram ?? null, isWritable: false },
   };
   const accounts = originalAccounts as Record<

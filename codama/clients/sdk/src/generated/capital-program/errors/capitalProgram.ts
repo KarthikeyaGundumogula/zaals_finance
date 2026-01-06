@@ -14,18 +14,102 @@ import {
 } from "gill";
 import { CAPITAL_PROGRAM_PROGRAM_ADDRESS } from "../programs";
 
-/** OnlyNFTOwner: Only owner of the NFT can Unstake */
-export const CAPITAL_PROGRAM_ERROR__ONLY_N_F_T_OWNER = 0x1770; // 6000
+/** BPSExceedsMaximum: Total basis points allocation exceeds maximum (10000 BPS = 100%) */
+export const CAPITAL_PROGRAM_ERROR__B_P_S_EXCEEDS_MAXIMUM = 0x1770; // 6000
+/** SlashBPSExceedsMaximum: Slash basis points exceeds maximum allowed */
+export const CAPITAL_PROGRAM_ERROR__SLASH_B_P_S_EXCEEDS_MAXIMUM = 0x1771; // 6001
+/** BeneficiaryMismatch: Number of beneficiaries does not match number of share allocations */
+export const CAPITAL_PROGRAM_ERROR__BENEFICIARY_MISMATCH = 0x1772; // 6002
+/** TooManyBeneficiaries: Too many beneficiaries specified (exceeds maximum limit) */
+export const CAPITAL_PROGRAM_ERROR__TOO_MANY_BENEFICIARIES = 0x1773; // 6003
+/** DuplicateBeneficiary: Duplicate beneficiary address detected */
+export const CAPITAL_PROGRAM_ERROR__DUPLICATE_BENEFICIARY = 0x1774; // 6004
+/** InvalidBasisPoints: Invalid basis points configuration */
+export const CAPITAL_PROGRAM_ERROR__INVALID_BASIS_POINTS = 0x1775; // 6005
+/** BeneficiarySharesMismatch: Beneficiary shares must sum to allocated BPS */
+export const CAPITAL_PROGRAM_ERROR__BENEFICIARY_SHARES_MISMATCH = 0x1776; // 6006
+/** InvalidCapitalRange: Maximum cap must be greater than minimum cap */
+export const CAPITAL_PROGRAM_ERROR__INVALID_CAPITAL_RANGE = 0x1777; // 6007
+/** MinCapMustBePositive: Minimum cap must be greater than zero */
+export const CAPITAL_PROGRAM_ERROR__MIN_CAP_MUST_BE_POSITIVE = 0x1778; // 6008
+/** MinLockAmountMustBePositive: Minimum lock amount must be greater than zero */
+export const CAPITAL_PROGRAM_ERROR__MIN_LOCK_AMOUNT_MUST_BE_POSITIVE = 0x1779; // 6009
+/** BelowMinLockCap: Amount Must be greater than the Min Lock Amount */
+export const CAPITAL_PROGRAM_ERROR__BELOW_MIN_LOCK_CAP = 0x177a; // 6010
+/** LockDurationRangeTooNarrow: Lock Duration must be above MIN_LOCK_DURATION */
+export const CAPITAL_PROGRAM_ERROR__LOCK_DURATION_RANGE_TOO_NARROW = 0x177b; // 6011
+/** BeneficiaryShareMustBePositive: Beneficiary shares must greater than zero */
+export const CAPITAL_PROGRAM_ERROR__BENEFICIARY_SHARE_MUST_BE_POSITIVE = 0x177c; // 6012
+/** VaultUnderDispute: The vault is currently under dispute and claims are disabled */
+export const CAPITAL_PROGRAM_ERROR__VAULT_UNDER_DISPUTE = 0x177d; // 6013
+/** SlashReqExceedsMaxBps: Slash req is more than vault configured slash req limit */
+export const CAPITAL_PROGRAM_ERROR__SLASH_REQ_EXCEEDS_MAX_BPS = 0x177e; // 6014
+/** VaultMaxCapReached: Vault has reached maximum capacity */
+export const CAPITAL_PROGRAM_ERROR__VAULT_MAX_CAP_REACHED = 0x177f; // 6015
+/** NoCapitalInVault: Vault has no capital collected */
+export const CAPITAL_PROGRAM_ERROR__NO_CAPITAL_IN_VAULT = 0x1780; // 6016
+/** InvalidBeneficiaryIndex: Given Index is out of Beneficiary */
+export const CAPITAL_PROGRAM_ERROR__INVALID_BENEFICIARY_INDEX = 0x1781; // 6017
+/** VaultNotEmpty: Vault still has some locked tokens in it */
+export const CAPITAL_PROGRAM_ERROR__VAULT_NOT_EMPTY = 0x1782; // 6018
+/** VaultNotUnderDispute: Vault is not under dispute or claim_request is expired */
+export const CAPITAL_PROGRAM_ERROR__VAULT_NOT_UNDER_DISPUTE = 0x1783; // 6019
+/** BelowMinCap: Vault doesn't reach the min cap */
+export const CAPITAL_PROGRAM_ERROR__BELOW_MIN_CAP = 0x1784; // 6020
+/** VaultReachedMinCap: After this operation vault reaches less than MIN_CAP */
+export const CAPITAL_PROGRAM_ERROR__VAULT_REACHED_MIN_CAP = 0x1785; // 6021
 
 export type CapitalProgramError =
-  typeof CAPITAL_PROGRAM_ERROR__ONLY_N_F_T_OWNER;
+  | typeof CAPITAL_PROGRAM_ERROR__BELOW_MIN_CAP
+  | typeof CAPITAL_PROGRAM_ERROR__BELOW_MIN_LOCK_CAP
+  | typeof CAPITAL_PROGRAM_ERROR__BENEFICIARY_MISMATCH
+  | typeof CAPITAL_PROGRAM_ERROR__BENEFICIARY_SHARE_MUST_BE_POSITIVE
+  | typeof CAPITAL_PROGRAM_ERROR__BENEFICIARY_SHARES_MISMATCH
+  | typeof CAPITAL_PROGRAM_ERROR__B_P_S_EXCEEDS_MAXIMUM
+  | typeof CAPITAL_PROGRAM_ERROR__DUPLICATE_BENEFICIARY
+  | typeof CAPITAL_PROGRAM_ERROR__INVALID_BASIS_POINTS
+  | typeof CAPITAL_PROGRAM_ERROR__INVALID_BENEFICIARY_INDEX
+  | typeof CAPITAL_PROGRAM_ERROR__INVALID_CAPITAL_RANGE
+  | typeof CAPITAL_PROGRAM_ERROR__LOCK_DURATION_RANGE_TOO_NARROW
+  | typeof CAPITAL_PROGRAM_ERROR__MIN_CAP_MUST_BE_POSITIVE
+  | typeof CAPITAL_PROGRAM_ERROR__MIN_LOCK_AMOUNT_MUST_BE_POSITIVE
+  | typeof CAPITAL_PROGRAM_ERROR__NO_CAPITAL_IN_VAULT
+  | typeof CAPITAL_PROGRAM_ERROR__SLASH_B_P_S_EXCEEDS_MAXIMUM
+  | typeof CAPITAL_PROGRAM_ERROR__SLASH_REQ_EXCEEDS_MAX_BPS
+  | typeof CAPITAL_PROGRAM_ERROR__TOO_MANY_BENEFICIARIES
+  | typeof CAPITAL_PROGRAM_ERROR__VAULT_MAX_CAP_REACHED
+  | typeof CAPITAL_PROGRAM_ERROR__VAULT_NOT_EMPTY
+  | typeof CAPITAL_PROGRAM_ERROR__VAULT_NOT_UNDER_DISPUTE
+  | typeof CAPITAL_PROGRAM_ERROR__VAULT_REACHED_MIN_CAP
+  | typeof CAPITAL_PROGRAM_ERROR__VAULT_UNDER_DISPUTE;
 
 let capitalProgramErrorMessages:
   | Record<CapitalProgramError, string>
   | undefined;
 if (process.env.NODE_ENV !== "production") {
   capitalProgramErrorMessages = {
-    [CAPITAL_PROGRAM_ERROR__ONLY_N_F_T_OWNER]: `Only owner of the NFT can Unstake`,
+    [CAPITAL_PROGRAM_ERROR__BELOW_MIN_CAP]: `Vault doesn't reach the min cap`,
+    [CAPITAL_PROGRAM_ERROR__BELOW_MIN_LOCK_CAP]: `Amount Must be greater than the Min Lock Amount`,
+    [CAPITAL_PROGRAM_ERROR__BENEFICIARY_MISMATCH]: `Number of beneficiaries does not match number of share allocations`,
+    [CAPITAL_PROGRAM_ERROR__BENEFICIARY_SHARE_MUST_BE_POSITIVE]: `Beneficiary shares must greater than zero`,
+    [CAPITAL_PROGRAM_ERROR__BENEFICIARY_SHARES_MISMATCH]: `Beneficiary shares must sum to allocated BPS`,
+    [CAPITAL_PROGRAM_ERROR__B_P_S_EXCEEDS_MAXIMUM]: `Total basis points allocation exceeds maximum (10000 BPS = 100%)`,
+    [CAPITAL_PROGRAM_ERROR__DUPLICATE_BENEFICIARY]: `Duplicate beneficiary address detected`,
+    [CAPITAL_PROGRAM_ERROR__INVALID_BASIS_POINTS]: `Invalid basis points configuration`,
+    [CAPITAL_PROGRAM_ERROR__INVALID_BENEFICIARY_INDEX]: `Given Index is out of Beneficiary`,
+    [CAPITAL_PROGRAM_ERROR__INVALID_CAPITAL_RANGE]: `Maximum cap must be greater than minimum cap`,
+    [CAPITAL_PROGRAM_ERROR__LOCK_DURATION_RANGE_TOO_NARROW]: `Lock Duration must be above MIN_LOCK_DURATION`,
+    [CAPITAL_PROGRAM_ERROR__MIN_CAP_MUST_BE_POSITIVE]: `Minimum cap must be greater than zero`,
+    [CAPITAL_PROGRAM_ERROR__MIN_LOCK_AMOUNT_MUST_BE_POSITIVE]: `Minimum lock amount must be greater than zero`,
+    [CAPITAL_PROGRAM_ERROR__NO_CAPITAL_IN_VAULT]: `Vault has no capital collected`,
+    [CAPITAL_PROGRAM_ERROR__SLASH_B_P_S_EXCEEDS_MAXIMUM]: `Slash basis points exceeds maximum allowed`,
+    [CAPITAL_PROGRAM_ERROR__SLASH_REQ_EXCEEDS_MAX_BPS]: `Slash req is more than vault configured slash req limit`,
+    [CAPITAL_PROGRAM_ERROR__TOO_MANY_BENEFICIARIES]: `Too many beneficiaries specified (exceeds maximum limit)`,
+    [CAPITAL_PROGRAM_ERROR__VAULT_MAX_CAP_REACHED]: `Vault has reached maximum capacity`,
+    [CAPITAL_PROGRAM_ERROR__VAULT_NOT_EMPTY]: `Vault still has some locked tokens in it`,
+    [CAPITAL_PROGRAM_ERROR__VAULT_NOT_UNDER_DISPUTE]: `Vault is not under dispute or claim_request is expired`,
+    [CAPITAL_PROGRAM_ERROR__VAULT_REACHED_MIN_CAP]: `After this operation vault reaches less than MIN_CAP`,
+    [CAPITAL_PROGRAM_ERROR__VAULT_UNDER_DISPUTE]: `The vault is currently under dispute and claims are disabled`,
   };
 }
 

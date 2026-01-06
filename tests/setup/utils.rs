@@ -26,8 +26,8 @@ pub fn get_collection(svm: &LiteSVM, asset: &Pubkey) -> Collection {
     *Collection::deserialize(&account.data).expect("Failed to deserialize collection account")
 }
 
-pub fn get_asset(svm: &LiteSVM, mint: &Pubkey) -> Asset {
-    let account = svm.get_account(mint).expect("Asset account not found");
+pub fn get_asset(svm: &LiteSVM, asset: &Pubkey) -> Asset {
+    let account = svm.get_account(asset).expect("Asset account not found");
 
     *Asset::deserialize(&account.data).expect("Failed to deserialize asset account")
 }

@@ -8,12 +8,15 @@
 use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
 
-pub const UNLIST_ASSET_HANDLER_DISCRIMINATOR: [u8; 8] = [97, 27, 195, 138, 135, 193, 217, 48];
+pub const BUY_POSITION_HANDLER_DISCRIMINATOR: [u8; 8] = [55, 94, 88, 138, 201, 222, 80, 165];
 
 /// Accounts.
 #[derive(Debug)]
-pub struct UnlistAssetHandler {
+pub struct BuyPositionHandler {
       
+              
+          pub buyer: solana_pubkey::Pubkey,
+          
               
           pub seller: solana_pubkey::Pubkey,
           
@@ -27,27 +30,48 @@ pub struct UnlistAssetHandler {
     
               
           pub collection: solana_pubkey::Pubkey,
+                /// Reward token mint
+
+    
+              
+          pub token_mint: solana_pubkey::Pubkey,
+          
+              
+          pub seller_ata: solana_pubkey::Pubkey,
+          
+              
+          pub buyer_ata: solana_pubkey::Pubkey,
           
               
           pub mpl_core_program: solana_pubkey::Pubkey,
           
               
+          pub token_program: solana_pubkey::Pubkey,
+          
+              
+          pub associated_token_program: solana_pubkey::Pubkey,
+          
+              
           pub system_program: solana_pubkey::Pubkey,
       }
 
-impl UnlistAssetHandler {
+impl BuyPositionHandler {
   pub fn instruction(&self) -> solana_instruction::Instruction {
     self.instruction_with_remaining_accounts(&[])
   }
   #[allow(clippy::arithmetic_side_effects)]
   #[allow(clippy::vec_init_then_push)]
   pub fn instruction_with_remaining_accounts(&self, remaining_accounts: &[solana_instruction::AccountMeta]) -> solana_instruction::Instruction {
-    let mut accounts = Vec::with_capacity(6+ remaining_accounts.len());
+    let mut accounts = Vec::with_capacity(12+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
-            self.seller,
+            self.buyer,
             true
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
+            self.seller,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new(
             self.asset,
             false
           ));
@@ -60,7 +84,27 @@ impl UnlistAssetHandler {
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
+            self.token_mint,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new(
+            self.seller_ata,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new(
+            self.buyer_ata,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
             self.mpl_core_program,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+            self.token_program,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+            self.associated_token_program,
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
@@ -68,7 +112,7 @@ impl UnlistAssetHandler {
             false
           ));
                       accounts.extend_from_slice(remaining_accounts);
-    let data = UnlistAssetHandlerInstructionData::new().try_to_vec().unwrap();
+    let data = BuyPositionHandlerInstructionData::new().try_to_vec().unwrap();
     
     solana_instruction::Instruction {
       program_id: crate::NFT_PROGRAM_ID,
@@ -80,14 +124,14 @@ impl UnlistAssetHandler {
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, Eq, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct UnlistAssetHandlerInstructionData {
+ pub struct BuyPositionHandlerInstructionData {
             discriminator: [u8; 8],
       }
 
-impl UnlistAssetHandlerInstructionData {
+impl BuyPositionHandlerInstructionData {
   pub fn new() -> Self {
     Self {
-                        discriminator: [97, 27, 195, 138, 135, 193, 217, 48],
+                        discriminator: [55, 94, 88, 138, 201, 222, 80, 165],
                   }
   }
 
@@ -96,7 +140,7 @@ impl UnlistAssetHandlerInstructionData {
   }
   }
 
-impl Default for UnlistAssetHandlerInstructionData {
+impl Default for BuyPositionHandlerInstructionData {
   fn default() -> Self {
     Self::new()
   }
@@ -104,31 +148,48 @@ impl Default for UnlistAssetHandlerInstructionData {
 
 
 
-/// Instruction builder for `UnlistAssetHandler`.
+/// Instruction builder for `BuyPositionHandler`.
 ///
 /// ### Accounts:
 ///
-                      ///   0. `[writable, signer]` seller
-          ///   1. `[]` asset
-                ///   2. `[writable]` offer
-                ///   3. `[writable]` collection
-                ///   4. `[optional]` mpl_core_program (default to `CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d`)
-                ///   5. `[optional]` system_program (default to `11111111111111111111111111111111`)
+                      ///   0. `[writable, signer]` buyer
+                ///   1. `[writable]` seller
+                ///   2. `[writable]` asset
+                ///   3. `[writable]` offer
+                ///   4. `[writable]` collection
+          ///   5. `[]` token_mint
+                ///   6. `[writable]` seller_ata
+                ///   7. `[writable]` buyer_ata
+                ///   8. `[optional]` mpl_core_program (default to `CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d`)
+                ///   9. `[optional]` token_program (default to `TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA`)
+                ///   10. `[optional]` associated_token_program (default to `ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL`)
+                ///   11. `[optional]` system_program (default to `11111111111111111111111111111111`)
 #[derive(Clone, Debug, Default)]
-pub struct UnlistAssetHandlerBuilder {
-            seller: Option<solana_pubkey::Pubkey>,
+pub struct BuyPositionHandlerBuilder {
+            buyer: Option<solana_pubkey::Pubkey>,
+                seller: Option<solana_pubkey::Pubkey>,
                 asset: Option<solana_pubkey::Pubkey>,
                 offer: Option<solana_pubkey::Pubkey>,
                 collection: Option<solana_pubkey::Pubkey>,
+                token_mint: Option<solana_pubkey::Pubkey>,
+                seller_ata: Option<solana_pubkey::Pubkey>,
+                buyer_ata: Option<solana_pubkey::Pubkey>,
                 mpl_core_program: Option<solana_pubkey::Pubkey>,
+                token_program: Option<solana_pubkey::Pubkey>,
+                associated_token_program: Option<solana_pubkey::Pubkey>,
                 system_program: Option<solana_pubkey::Pubkey>,
                 __remaining_accounts: Vec<solana_instruction::AccountMeta>,
 }
 
-impl UnlistAssetHandlerBuilder {
+impl BuyPositionHandlerBuilder {
   pub fn new() -> Self {
     Self::default()
   }
+            #[inline(always)]
+    pub fn buyer(&mut self, buyer: solana_pubkey::Pubkey) -> &mut Self {
+                        self.buyer = Some(buyer);
+                    self
+    }
             #[inline(always)]
     pub fn seller(&mut self, seller: solana_pubkey::Pubkey) -> &mut Self {
                         self.seller = Some(seller);
@@ -150,10 +211,38 @@ impl UnlistAssetHandlerBuilder {
                         self.collection = Some(collection);
                     self
     }
+            /// Reward token mint
+#[inline(always)]
+    pub fn token_mint(&mut self, token_mint: solana_pubkey::Pubkey) -> &mut Self {
+                        self.token_mint = Some(token_mint);
+                    self
+    }
+            #[inline(always)]
+    pub fn seller_ata(&mut self, seller_ata: solana_pubkey::Pubkey) -> &mut Self {
+                        self.seller_ata = Some(seller_ata);
+                    self
+    }
+            #[inline(always)]
+    pub fn buyer_ata(&mut self, buyer_ata: solana_pubkey::Pubkey) -> &mut Self {
+                        self.buyer_ata = Some(buyer_ata);
+                    self
+    }
             /// `[optional account, default to 'CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d']`
 #[inline(always)]
     pub fn mpl_core_program(&mut self, mpl_core_program: solana_pubkey::Pubkey) -> &mut Self {
                         self.mpl_core_program = Some(mpl_core_program);
+                    self
+    }
+            /// `[optional account, default to 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA']`
+#[inline(always)]
+    pub fn token_program(&mut self, token_program: solana_pubkey::Pubkey) -> &mut Self {
+                        self.token_program = Some(token_program);
+                    self
+    }
+            /// `[optional account, default to 'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL']`
+#[inline(always)]
+    pub fn associated_token_program(&mut self, associated_token_program: solana_pubkey::Pubkey) -> &mut Self {
+                        self.associated_token_program = Some(associated_token_program);
                     self
     }
             /// `[optional account, default to '11111111111111111111111111111111']`
@@ -176,12 +265,18 @@ impl UnlistAssetHandlerBuilder {
   }
   #[allow(clippy::clone_on_copy)]
   pub fn instruction(&self) -> solana_instruction::Instruction {
-    let accounts = UnlistAssetHandler {
-                              seller: self.seller.expect("seller is not set"),
+    let accounts = BuyPositionHandler {
+                              buyer: self.buyer.expect("buyer is not set"),
+                                        seller: self.seller.expect("seller is not set"),
                                         asset: self.asset.expect("asset is not set"),
                                         offer: self.offer.expect("offer is not set"),
                                         collection: self.collection.expect("collection is not set"),
+                                        token_mint: self.token_mint.expect("token_mint is not set"),
+                                        seller_ata: self.seller_ata.expect("seller_ata is not set"),
+                                        buyer_ata: self.buyer_ata.expect("buyer_ata is not set"),
                                         mpl_core_program: self.mpl_core_program.unwrap_or(solana_pubkey::pubkey!("CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d")),
+                                        token_program: self.token_program.unwrap_or(solana_pubkey::pubkey!("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")),
+                                        associated_token_program: self.associated_token_program.unwrap_or(solana_pubkey::pubkey!("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL")),
                                         system_program: self.system_program.unwrap_or(solana_pubkey::pubkey!("11111111111111111111111111111111")),
                       };
     
@@ -189,9 +284,12 @@ impl UnlistAssetHandlerBuilder {
   }
 }
 
-  /// `unlist_asset_handler` CPI accounts.
-  pub struct UnlistAssetHandlerCpiAccounts<'a, 'b> {
+  /// `buy_position_handler` CPI accounts.
+  pub struct BuyPositionHandlerCpiAccounts<'a, 'b> {
           
+                    
+              pub buyer: &'b solana_account_info::AccountInfo<'a>,
+                
                     
               pub seller: &'b solana_account_info::AccountInfo<'a>,
                 
@@ -205,19 +303,39 @@ impl UnlistAssetHandlerBuilder {
       
                     
               pub collection: &'b solana_account_info::AccountInfo<'a>,
+                        /// Reward token mint
+
+      
+                    
+              pub token_mint: &'b solana_account_info::AccountInfo<'a>,
+                
+                    
+              pub seller_ata: &'b solana_account_info::AccountInfo<'a>,
+                
+                    
+              pub buyer_ata: &'b solana_account_info::AccountInfo<'a>,
                 
                     
               pub mpl_core_program: &'b solana_account_info::AccountInfo<'a>,
                 
                     
+              pub token_program: &'b solana_account_info::AccountInfo<'a>,
+                
+                    
+              pub associated_token_program: &'b solana_account_info::AccountInfo<'a>,
+                
+                    
               pub system_program: &'b solana_account_info::AccountInfo<'a>,
             }
 
-/// `unlist_asset_handler` CPI instruction.
-pub struct UnlistAssetHandlerCpi<'a, 'b> {
+/// `buy_position_handler` CPI instruction.
+pub struct BuyPositionHandlerCpi<'a, 'b> {
   /// The program to invoke.
   pub __program: &'b solana_account_info::AccountInfo<'a>,
       
+              
+          pub buyer: &'b solana_account_info::AccountInfo<'a>,
+          
               
           pub seller: &'b solana_account_info::AccountInfo<'a>,
           
@@ -231,26 +349,49 @@ pub struct UnlistAssetHandlerCpi<'a, 'b> {
     
               
           pub collection: &'b solana_account_info::AccountInfo<'a>,
+                /// Reward token mint
+
+    
+              
+          pub token_mint: &'b solana_account_info::AccountInfo<'a>,
+          
+              
+          pub seller_ata: &'b solana_account_info::AccountInfo<'a>,
+          
+              
+          pub buyer_ata: &'b solana_account_info::AccountInfo<'a>,
           
               
           pub mpl_core_program: &'b solana_account_info::AccountInfo<'a>,
           
               
+          pub token_program: &'b solana_account_info::AccountInfo<'a>,
+          
+              
+          pub associated_token_program: &'b solana_account_info::AccountInfo<'a>,
+          
+              
           pub system_program: &'b solana_account_info::AccountInfo<'a>,
         }
 
-impl<'a, 'b> UnlistAssetHandlerCpi<'a, 'b> {
+impl<'a, 'b> BuyPositionHandlerCpi<'a, 'b> {
   pub fn new(
     program: &'b solana_account_info::AccountInfo<'a>,
-          accounts: UnlistAssetHandlerCpiAccounts<'a, 'b>,
+          accounts: BuyPositionHandlerCpiAccounts<'a, 'b>,
           ) -> Self {
     Self {
       __program: program,
+              buyer: accounts.buyer,
               seller: accounts.seller,
               asset: accounts.asset,
               offer: accounts.offer,
               collection: accounts.collection,
+              token_mint: accounts.token_mint,
+              seller_ata: accounts.seller_ata,
+              buyer_ata: accounts.buyer_ata,
               mpl_core_program: accounts.mpl_core_program,
+              token_program: accounts.token_program,
+              associated_token_program: accounts.associated_token_program,
               system_program: accounts.system_program,
                 }
   }
@@ -274,12 +415,16 @@ impl<'a, 'b> UnlistAssetHandlerCpi<'a, 'b> {
     signers_seeds: &[&[&[u8]]],
     remaining_accounts: &[(&'b solana_account_info::AccountInfo<'a>, bool, bool)]
   ) -> solana_program_error::ProgramResult {
-    let mut accounts = Vec::with_capacity(6+ remaining_accounts.len());
+    let mut accounts = Vec::with_capacity(12+ remaining_accounts.len());
                             accounts.push(solana_instruction::AccountMeta::new(
-            *self.seller.key,
+            *self.buyer.key,
             true
           ));
-                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+                                          accounts.push(solana_instruction::AccountMeta::new(
+            *self.seller.key,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new(
             *self.asset.key,
             false
           ));
@@ -292,7 +437,27 @@ impl<'a, 'b> UnlistAssetHandlerCpi<'a, 'b> {
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
+            *self.token_mint.key,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new(
+            *self.seller_ata.key,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new(
+            *self.buyer_ata.key,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
             *self.mpl_core_program.key,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+            *self.token_program.key,
+            false
+          ));
+                                          accounts.push(solana_instruction::AccountMeta::new_readonly(
+            *self.associated_token_program.key,
             false
           ));
                                           accounts.push(solana_instruction::AccountMeta::new_readonly(
@@ -306,20 +471,26 @@ impl<'a, 'b> UnlistAssetHandlerCpi<'a, 'b> {
           is_writable: remaining_account.2,
       })
     });
-    let data = UnlistAssetHandlerInstructionData::new().try_to_vec().unwrap();
+    let data = BuyPositionHandlerInstructionData::new().try_to_vec().unwrap();
     
     let instruction = solana_instruction::Instruction {
       program_id: crate::NFT_PROGRAM_ID,
       accounts,
       data,
     };
-    let mut account_infos = Vec::with_capacity(7 + remaining_accounts.len());
+    let mut account_infos = Vec::with_capacity(13 + remaining_accounts.len());
     account_infos.push(self.__program.clone());
-                  account_infos.push(self.seller.clone());
+                  account_infos.push(self.buyer.clone());
+                        account_infos.push(self.seller.clone());
                         account_infos.push(self.asset.clone());
                         account_infos.push(self.offer.clone());
                         account_infos.push(self.collection.clone());
+                        account_infos.push(self.token_mint.clone());
+                        account_infos.push(self.seller_ata.clone());
+                        account_infos.push(self.buyer_ata.clone());
                         account_infos.push(self.mpl_core_program.clone());
+                        account_infos.push(self.token_program.clone());
+                        account_infos.push(self.associated_token_program.clone());
                         account_infos.push(self.system_program.clone());
               remaining_accounts.iter().for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
 
@@ -331,35 +502,52 @@ impl<'a, 'b> UnlistAssetHandlerCpi<'a, 'b> {
   }
 }
 
-/// Instruction builder for `UnlistAssetHandler` via CPI.
+/// Instruction builder for `BuyPositionHandler` via CPI.
 ///
 /// ### Accounts:
 ///
-                      ///   0. `[writable, signer]` seller
-          ///   1. `[]` asset
-                ///   2. `[writable]` offer
-                ///   3. `[writable]` collection
-          ///   4. `[]` mpl_core_program
-          ///   5. `[]` system_program
+                      ///   0. `[writable, signer]` buyer
+                ///   1. `[writable]` seller
+                ///   2. `[writable]` asset
+                ///   3. `[writable]` offer
+                ///   4. `[writable]` collection
+          ///   5. `[]` token_mint
+                ///   6. `[writable]` seller_ata
+                ///   7. `[writable]` buyer_ata
+          ///   8. `[]` mpl_core_program
+          ///   9. `[]` token_program
+          ///   10. `[]` associated_token_program
+          ///   11. `[]` system_program
 #[derive(Clone, Debug)]
-pub struct UnlistAssetHandlerCpiBuilder<'a, 'b> {
-  instruction: Box<UnlistAssetHandlerCpiBuilderInstruction<'a, 'b>>,
+pub struct BuyPositionHandlerCpiBuilder<'a, 'b> {
+  instruction: Box<BuyPositionHandlerCpiBuilderInstruction<'a, 'b>>,
 }
 
-impl<'a, 'b> UnlistAssetHandlerCpiBuilder<'a, 'b> {
+impl<'a, 'b> BuyPositionHandlerCpiBuilder<'a, 'b> {
   pub fn new(program: &'b solana_account_info::AccountInfo<'a>) -> Self {
-    let instruction = Box::new(UnlistAssetHandlerCpiBuilderInstruction {
+    let instruction = Box::new(BuyPositionHandlerCpiBuilderInstruction {
       __program: program,
+              buyer: None,
               seller: None,
               asset: None,
               offer: None,
               collection: None,
+              token_mint: None,
+              seller_ata: None,
+              buyer_ata: None,
               mpl_core_program: None,
+              token_program: None,
+              associated_token_program: None,
               system_program: None,
                                 __remaining_accounts: Vec::new(),
     });
     Self { instruction }
   }
+      #[inline(always)]
+    pub fn buyer(&mut self, buyer: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.buyer = Some(buyer);
+                    self
+    }
       #[inline(always)]
     pub fn seller(&mut self, seller: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
                         self.instruction.seller = Some(seller);
@@ -381,9 +569,35 @@ impl<'a, 'b> UnlistAssetHandlerCpiBuilder<'a, 'b> {
                         self.instruction.collection = Some(collection);
                     self
     }
+      /// Reward token mint
+#[inline(always)]
+    pub fn token_mint(&mut self, token_mint: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.token_mint = Some(token_mint);
+                    self
+    }
+      #[inline(always)]
+    pub fn seller_ata(&mut self, seller_ata: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.seller_ata = Some(seller_ata);
+                    self
+    }
+      #[inline(always)]
+    pub fn buyer_ata(&mut self, buyer_ata: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.buyer_ata = Some(buyer_ata);
+                    self
+    }
       #[inline(always)]
     pub fn mpl_core_program(&mut self, mpl_core_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
                         self.instruction.mpl_core_program = Some(mpl_core_program);
+                    self
+    }
+      #[inline(always)]
+    pub fn token_program(&mut self, token_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.token_program = Some(token_program);
+                    self
+    }
+      #[inline(always)]
+    pub fn associated_token_program(&mut self, associated_token_program: &'b solana_account_info::AccountInfo<'a>) -> &mut Self {
+                        self.instruction.associated_token_program = Some(associated_token_program);
                     self
     }
       #[inline(always)]
@@ -413,8 +627,10 @@ impl<'a, 'b> UnlistAssetHandlerCpiBuilder<'a, 'b> {
   #[allow(clippy::clone_on_copy)]
   #[allow(clippy::vec_init_then_push)]
   pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program_error::ProgramResult {
-        let instruction = UnlistAssetHandlerCpi {
+        let instruction = BuyPositionHandlerCpi {
         __program: self.instruction.__program,
+                  
+          buyer: self.instruction.buyer.expect("buyer is not set"),
                   
           seller: self.instruction.seller.expect("seller is not set"),
                   
@@ -424,7 +640,17 @@ impl<'a, 'b> UnlistAssetHandlerCpiBuilder<'a, 'b> {
                   
           collection: self.instruction.collection.expect("collection is not set"),
                   
+          token_mint: self.instruction.token_mint.expect("token_mint is not set"),
+                  
+          seller_ata: self.instruction.seller_ata.expect("seller_ata is not set"),
+                  
+          buyer_ata: self.instruction.buyer_ata.expect("buyer_ata is not set"),
+                  
           mpl_core_program: self.instruction.mpl_core_program.expect("mpl_core_program is not set"),
+                  
+          token_program: self.instruction.token_program.expect("token_program is not set"),
+                  
+          associated_token_program: self.instruction.associated_token_program.expect("associated_token_program is not set"),
                   
           system_program: self.instruction.system_program.expect("system_program is not set"),
                     };
@@ -433,13 +659,19 @@ impl<'a, 'b> UnlistAssetHandlerCpiBuilder<'a, 'b> {
 }
 
 #[derive(Clone, Debug)]
-struct UnlistAssetHandlerCpiBuilderInstruction<'a, 'b> {
+struct BuyPositionHandlerCpiBuilderInstruction<'a, 'b> {
   __program: &'b solana_account_info::AccountInfo<'a>,
-            seller: Option<&'b solana_account_info::AccountInfo<'a>>,
+            buyer: Option<&'b solana_account_info::AccountInfo<'a>>,
+                seller: Option<&'b solana_account_info::AccountInfo<'a>>,
                 asset: Option<&'b solana_account_info::AccountInfo<'a>>,
                 offer: Option<&'b solana_account_info::AccountInfo<'a>>,
                 collection: Option<&'b solana_account_info::AccountInfo<'a>>,
+                token_mint: Option<&'b solana_account_info::AccountInfo<'a>>,
+                seller_ata: Option<&'b solana_account_info::AccountInfo<'a>>,
+                buyer_ata: Option<&'b solana_account_info::AccountInfo<'a>>,
                 mpl_core_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+                token_program: Option<&'b solana_account_info::AccountInfo<'a>>,
+                associated_token_program: Option<&'b solana_account_info::AccountInfo<'a>>,
                 system_program: Option<&'b solana_account_info::AccountInfo<'a>>,
                 /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
   __remaining_accounts: Vec<(&'b solana_account_info::AccountInfo<'a>, bool, bool)>,

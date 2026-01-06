@@ -7,7 +7,8 @@
  */
 
 export * from "./burnAssetHandler";
+export * from "./buyPositionHandler";
 export * from "./createVaultCollectionHandler";
 export * from "./initNftProgramHandler";
-export * from "./listAssetHandler";
-export * from "./unlistAssetHandler";
+export * from "./listPositionHandler";
+export * from "./unlistPositionHandler";

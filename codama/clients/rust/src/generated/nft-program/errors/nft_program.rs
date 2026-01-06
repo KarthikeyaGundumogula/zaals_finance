@@ -10,9 +10,9 @@ use thiserror::Error;
 
 #[derive(Clone, Debug, Eq, Error, FromPrimitive, PartialEq)]
 pub enum NftProgramError {
-    /// 6000 - Vault should be the owner of NFT
-    #[error("Vault should be the owner of NFT")]
-    InvalidOwner = 0x1770,
+    /// 6000 - mpl_core_program passed in accounts didn't match
+    #[error("mpl_core_program passed in accounts didn't match")]
+    InvalidMPLCoreProgramId = 0x1770,
 }
 
 impl From<NftProgramError> for solana_program_error::ProgramError {

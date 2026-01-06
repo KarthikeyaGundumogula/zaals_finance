@@ -6,14 +6,16 @@
 //!
 
   pub(crate) mod r#burn_asset_handler;
+  pub(crate) mod r#buy_position_handler;
   pub(crate) mod r#create_vault_collection_handler;
   pub(crate) mod r#init_nft_program_handler;
-  pub(crate) mod r#list_asset_handler;
-  pub(crate) mod r#unlist_asset_handler;
+  pub(crate) mod r#list_position_handler;
+  pub(crate) mod r#unlist_position_handler;
 
   pub use self::r#burn_asset_handler::*;
+  pub use self::r#buy_position_handler::*;
   pub use self::r#create_vault_collection_handler::*;
   pub use self::r#init_nft_program_handler::*;
-  pub use self::r#list_asset_handler::*;
-  pub use self::r#unlist_asset_handler::*;
+  pub use self::r#list_position_handler::*;
+  pub use self::r#unlist_position_handler::*;
 

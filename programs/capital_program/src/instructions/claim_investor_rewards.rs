@@ -78,51 +78,47 @@ pub struct ClaimInvestorRewards<'info> {
 }
 
 impl<'info> ClaimInvestorRewards<'info> {
-   /// Calculates pending rewards for this position
-///
-/// Formula:
-/// 1. Total investor rewards = total_rewards_deposited * investor_bps / BASE_BPS
-/// 2. Position share = investor_rewards * position_capital / total_vault_capital
-/// 3. Claimable = position_share - already_claimed
-pub fn calculate_claimable_rewards(&self) -> Result<u64> {
-    let total_vault_capital = self.vault.total_capital_collected;
-    let position_locked_capital = self.position.total_value_locked;
-    let total_rewards_deposited = self.vault.total_rewards_deposited;
-    let investors_share_bps = self.vault.investor_bps as u64;
+    /// Calculates pending rewards for this position
+    ///
+    /// Formula:
+    /// 1. Total investor rewards = total_rewards_deposited * investor_bps / BASE_BPS
+    /// 2. Position share = investor_rewards * position_capital / total_vault_capital
+    /// 3. Claimable = position_share - already_claimed
+    pub fn calculate_claimable_rewards(&self) -> Result<u64> {
+        let total_vault_capital = self.vault.total_capital_collected;
+        let position_locked_capital = self.position.total_value_locked;
+        let total_rewards_deposited = self.vault.total_rewards_deposited;
+        let investors_share_bps = self.vault.investor_bps as u64;
 
-    // Preconditions
-    require_gt!(
-        total_vault_capital,
-        0,
-        TokenError::InsufficientVaultBalance
-    );
+        // Preconditions
+        require_gt!(total_vault_capital, 0, TokenError::InsufficientVaultBalance);
 
-    // ---- STEP 1: investor rewards (u128 math) ----
-    let rewards_for_investors = (total_rewards_deposited as u128)
-        .checked_mul(investors_share_bps as u128)
-        .ok_or(ArithmeticError::ArithmeticOverflow)?
-        .checked_div(BASE_BPS as u128)
-        .ok_or(ArithmeticError::DivisionByZero)?;
+        // ---- STEP 1: investor rewards (u128 math) ----
+        let rewards_for_investors = (total_rewards_deposited as u128)
+            .checked_mul(investors_share_bps as u128)
+            .ok_or(ArithmeticError::ArithmeticOverflow)?
+            .checked_div(BASE_BPS as u128)
+            .ok_or(ArithmeticError::DivisionByZero)?;
 
-    // ---- STEP 2: position share (u128 math) ----
-    let position_total_rewards = rewards_for_investors
-        .checked_mul(position_locked_capital as u128)
-        .ok_or(ArithmeticError::ArithmeticOverflow)?
-        .checked_div(total_vault_capital as u128)
-        .ok_or(ArithmeticError::DivisionByZero)?;
+        // ---- STEP 2: position share (u128 math) ----
+        let position_total_rewards = rewards_for_investors
+            .checked_mul(position_locked_capital as u128)
+            .ok_or(ArithmeticError::ArithmeticOverflow)?
+            .checked_div(total_vault_capital as u128)
+            .ok_or(ArithmeticError::DivisionByZero)?;
 
-    // ---- STEP 3: subtract claimed ----
-    let claimable = position_total_rewards
-        .checked_sub(self.position.total_rewards_claimed as u128)
-        .ok_or(ArithmeticError::ArithmeticUnderflow)?;
+        // ---- STEP 3: subtract claimed ----
+        let claimable = position_total_rewards
+            .checked_sub(self.position.total_rewards_claimed as u128)
+            .ok_or(ArithmeticError::ArithmeticUnderflow)?;
 
-    // ---- STEP 4: back to u64 ----
-    let claimable: u64 = claimable
-        .try_into()
-        .map_err(|_| ArithmeticError::ArithmeticOverflow)?;
+        // ---- STEP 4: back to u64 ----
+        let claimable: u64 = claimable
+            .try_into()
+            .map_err(|_| ArithmeticError::ArithmeticOverflow)?;
 
-    Ok(claimable)
-}
+        Ok(claimable)
+    }
 
     /// Updates the position state with claimed rewards
     pub fn process_claim(&mut self, amount: u64) -> Result<()> {

@@ -6,9 +6,11 @@ pub struct BurnAsset<'info> {
     #[account(mut)]
     pub holder: Signer<'info>,
     /// CHECK: this will be checked by mpl-core-program
+    #[account(mut)]
     pub asset: UncheckedAccount<'info>,
     pub system_program: Program<'info, System>,
     /// CHECK: this will be checked by mpl-core-program
+    #[account(mut)]
     pub collection: UncheckedAccount<'info>,
     /// CHECK: this will be checked by mpl-core-program
     #[account(address = MPL_CORE_ID)]
