@@ -1,72 +1,198 @@
-# User Stories for Zaals Finance
+# **Zaals Finance**
 
-## **Actors**
-
-1. Node Operator - create vaults
-2. Capital Provider - Deposit Capital into vault earns rewards
-3. Position Holder - Capital Provider who holds a position NFT
-4. Agent - Monitors node performance and can raise slashing requests and deposits rewards
-5. Beneficiary - Receives a share of rewards from the vault ( An off-chain entity supplier who provides services to node operators)
-
-## **Initialization**
-
-- As an node-operator, when I initialize a vault with valid configuration, the vault is created and the formation phase begins. ✅
-- As an node-operator, I can initialize a vault with Beneficiaries, the vault reward revenue is split between Capital providers and Beneficiaries as defined in the configuration. ✅
-- As an node-operator, when I initialize a vault with invalid shares or min/max cap mismatch, the transaction fails with "Invalid Configuration". ✅
-- As an node-operator, when I initialize a vault a new MPL-Core collection is created. ✅
+### Capital Coordination Protocol for DePIN on Solana
 
 ---
 
-## **Capital Formation**
+## 🌟 Overview
 
-- As a capital provider, when I deposit capital during Formation phase, a Position NFT is minted and my deposit is recorded in the vault. ✅
-- As a capital provider, when I try to deposit after Active phase has started, the transaction fails with "Vault Not Accepting Deposits".✅
-- As a capital provider, when I withdraw early in Formation phase, my capital is returned minus the fee and my Position NFT is burned. ✅
-- As a capital provider, when I try to withdraw early after the Active phase has begun, the transaction fails with "Capital Locked". ✅
-- As a capital provider, I can close my position after fundraise period if the vault didn't reach the min_cap, and withdraw my funds. ✅
-- As a node operator, I can clsoe the vault after fundraise period if the vault didn't reach the min_cap and its ata is empty. ✅
+**Zaals Finance** is a decentralized protocol designed to coordinate capital between Node Operators and Capital Providers in DePIN ecosystems using NFT-backed positions and programmable vaults on the Solana blockchain.
 
----
+The protocol allows a node operator to create a revenue-sharing vault, attract capital from multiple providers, distribute token rewards, manage disputes, and enforce slashing – all through transparent on-chain logic.
 
-## **Active Phase Behavior**
-
-- As a position holder, when rewards are deposited by the reward distributor, my claimable rewards increase proportionally to my stake. ✅
-- As a position holder, when I claim rewards, if vault is not in dispute window my accumulated rewards are transferred. ✅
-- As a position holder, When I try to Unlock prinicipal, the transaction failes with "Active Phase, Rewards Locked" error. ✅
-- As a buyer, when I purchase a listed Position NFT, I become the new owner of the locked position and rewards. ✅
-- As a seller, when I try to list a Position NFT I do not own, the transaction fails with "Unauthorized". ✅
-- As a Beneficiary, When I claim rewards, my share of rewards is transferred to my wallet even if the vault is in the dispute phase. ✅
+Every deposit position is represented by a unique NFT, making ownership transferable while the underlying capital remains securely locked in a PDA vault.
 
 ---
 
-## **Reward Deposit Validation**
+## 🎯 What Problem This Solves
 
-- As a reward distributor, when I deposit rewards during the Active phase, rewards are added to the vault. ✅
-- As a reward distributor, when I try to deposit rewards using a non-authorized wallet, the transaction fails with "Invalid Reward Distributor". ✅
-- As a reward distributor, when I deposit rewards with the wrong token mint, the transaction fails with "Invalid Reward Token". ✅
+Traditional funding models for decentralized infrastructure suffer from poor coordination, lack of transparency, and rigid ownership structures.
 
----
+Zaals Finance introduces:
 
-## **Slashing & Dispute Window**
+* Trustless capital formation
+* Automated reward sharing
+* Performance-based slashing
+* NFT-transferable positions
+* Clear phase-based fund locking
 
-- As an agent, when I raise a slashing request during the Active phase, a dispute window opens and slashing amount is recorded. ✅
-- As a agent, when I submit a slashing request exceeds max_slash_bps, the transaction fails with "Slash Amount Exceeds Limit". ✅
-- As an agent, when I try to raise a slashing request outside the Active phase, the transaction fails with "Invalid Phase". ✅
-- As an agent, when I submit slashing proof before the dispute window expires, the slash amount is approved. ✅
-- As an agent, when I fail to submit proof within the dispute window, the vault dismisses the slash request automatically. ✅
-- As a node operator, when I continue depositing rewards during the dispute window, deposits succeed. ✅
-- As a position holder, when I try to claim rewards during a dispute, the transaction fails with "Vault in Dispute". ✅
+This creates an intuitive middle layer where capital can support real network activity without relying on centralized intermediaries.
 
 ---
 
-## **Closure Phase**
+## 🧩 Core Concepts
 
-- As a position holder, when I withdraw my principal in Closed phase, I receive my pro-rata capital and my Position NFT is burned. ✅
-- As a position holder, when I try to withdraw principal before closure, the transaction fails with "Invalid Phase". ✅
-- As a position holder, when I close my position if the valut didn't reach the min_cap requirement before active phase begins, I receive my locked capital and my Position NFT is burned. ✅
-- As a node-operator, when I close the vault only if all the Tokens of the vault is withdrawn, the Vault pda is closed and I receive the rent sol. ✅
+* **Vault** – Program Derived Account holding locked capital and rewards
+* **Position NFT** – Represents each capital provider’s stake
+* **Beneficiaries** – Off-chain entities entitled to reward share
+* **Agent** – Dispute and slashing enforcer
+* **Reward Distributor** – Authorized wallet for depositing rewards
+
 ---
 
-## Program Flow Architecture
+## 🏗 Actors
+
+The protocol revolves around five major actors:
+
+1. **Node Operator**
+   Creates and manages vault configurations.
+
+2. **Capital Provider**
+   Deposits capital and earns pro-rata rewards.
+
+3. **Position Holder**
+   The current owner of a Position NFT.
+
+4. **Agent**
+   Monitors node performance and raises slashing disputes.
+
+5. **Beneficiary**
+   Receives predefined share of vault rewards.
+
+---
+
+## 🔄 Protocol Phases
+
+Zaals Finance operates through distinct lifecycle phases:
+
+### 1. Initialization Phase
+
+Node Operators initialize vaults with:
+
+* Token mint for rewards
+* Minimum and Maximum capital limits
+* Investor reward BPS
+* Beneficiary addresses and shares
+* Slashing constraints
+
+During this phase:
+
+* Vaults are validated for correct share totals
+* Mismatched caps or invalid shares cause failure
+* A new **MPL-Core Collection** NFT is created
+* Capital formation period begins
+
+---
+
+### 2. Capital Formation Phase
+
+Capital Providers can:
+
+* Deposit capital into vault
+* Receive minted Position NFTs
+* Withdraw early before activation
+* Exit if minimum cap isn’t reached
+
+Key behaviors:
+
+* Deposits after activation are rejected
+* Early withdrawals burn NFTs
+* Withdrawals after active phase are locked
+* Node Operators can close unformed vaults if ATA is empty
+
+---
+
+### 3. Active Phase
+
+Once fundraise ends and conditions are met:
+
+* Vault enters **Active Phase**
+* Capital becomes locked
+* Rewards can be deposited
+* Claimable rewards grow with stake
+* Principal unlock attempts are rejected
+
+NFT positions can now be:
+
+* Listed on secondary markets
+* Purchased by buyers
+* Ownership transferred seamlessly
+
+---
+
+### 4. Reward Deposit Validation
+
+Rewards are accepted only if:
+
+* Sent from authorized distributor
+* Match correct token mint
+* Occur during Active Phase
+
+Invalid deposits fail with appropriate errors.
+
+---
+
+### 5. Slashing & Dispute Window
+
+Agents can:
+
+* Raise slashing requests
+* Open dispute windows
+* Submit proofs
+* Get slash approvals
+
+Important rules:
+
+* Requests above max BPS are rejected
+* No slashing outside Active Phase
+* Rewards can continue flowing during disputes
+* Claims during disputes are blocked
+
+If proof isn isn’t submitted in time:
+
+* Slash requests are automatically dismissed
+
+---
+
+### 6. Closure Phase
+
+After vault lifecycle ends:
+
+* Position Holders can withdraw principal
+* NFTs are burned upon withdrawal
+* All remaining tokens must be withdrawn
+* Vault PDA closes and rent SOL returns to Node Operator
+
+---
+
+## 🛠 Technical Implementation
+
+The project has been implemented as a suite of Solana programs using the **Anchor Framework** and **MPL Core** standards.
+
+### Key Technologies
+
+* Rust
+* Anchor Framework
+* Anchor SPL Token Interfaces
+* Codama-generated clients
+* LiteSVM for testing
+
+---
+
+## 📁 Program Flow Architecture
+
+The following diagram represents the end-to-end protocol flow:
 
 ![Programs Arch](diagrams/FINAL_ARCH.jpg)
+
+---
+
+## 📜 Key Features
+
+* NFT-backed staking positions
+* Fee-adjusted early exits
+* Automated reward splits
+* Beneficiary priority claims
+* Dispute-resistant vault design
+* Slashing with max limits
+* Rent-reclaimable PDAs
