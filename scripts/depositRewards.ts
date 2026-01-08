@@ -11,9 +11,8 @@ import {
   SYSTEM_PROGRAM_ADDRESS,
 } from "gill/programs";
 import {
-  getDepositRewardsInstruction,
-  fetchStakingVault
-} from "./codama/generated";
+  getDepositRewardsHandlerInstruction as getDepositRewardsInstruction,fetchVault as fetchStakingVault
+} from "../codama/clients/sdk/src/generated/capital-program";
 import { Client, getClient, getAccounts, airdrop, STAKING_VAULT_ID } from "./helpers/setUp";
 import { fund_rewardToken } from "./helpers/token-ops";
 

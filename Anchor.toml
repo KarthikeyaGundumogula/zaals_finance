@@ -13,13 +13,13 @@ nft_program = "AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
 depositRewards = "npx ts-node ./scripts/depositRewards.ts"
 generate-clients = "bash codama/generate-clients.sh"
-localnet = "solana-test-validator -r --bpf-program CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d core.so"
+localnet = "solana-test-validator -r --bpf-program CoREENxT6tW1HoK8ypY1SxRMZTcVPm7R94rH4PZNhX7d tests/programs/core.so"
 open = "npx ts-node ./scripts/open-vault.ts"
 stake = "npx ts-node ./scripts/stake.ts"
 test = "cargo test"

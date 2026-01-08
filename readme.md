@@ -196,3 +196,19 @@ The following diagram represents the end-to-end protocol flow:
 * Dispute-resistant vault design
 * Slashing with max limits
 * Rent-reclaimable PDAs
+
+---
+
+## 🚀 Devnet - Deployments
+
+**NFT-Program :-**
+
+Program Id: AkFAoXys2zhqE15q8XJJJRqXgxLdtJ1kb9ec4fCo1GgH
+
+Signature: 4fAbGGzGnv1h1YJZAN3D3Pzkxe5nrG31vMvZZYM3U1yAijmiTCNRFMqwdUdQdb5ZTeYTaWRWh9SisymoNvpHccsm
+
+**Zaals-Finance-Program :-**
+
+Program Id: 8syRdGBunFUWZzkgGigv1KWcTEhxPkc15DMVXEYj9qVn
+
+Signature: 4hSmq4RVv5m9gF6nfRJMj4peypdWs5YjRi6K3SDN74soBMFFz2CWAFUPuz9cFoRE1uo1x9CkiGgaLqjt7jgCf7tW
